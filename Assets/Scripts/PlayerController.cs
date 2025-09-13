@@ -1,30 +1,69 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    float inputAccel;
+    [Header("Movement Stats")]
+    [Range(1,100)]
+    [SerializeField] float accelerationRate;
+    [Range(100,1000)]
+    [SerializeField] float maxBaseSpeed;
+    [Range(1,10)]
+    [SerializeField] float steerSensitivity;
+
     Rigidbody playerRB;
+    float currentSpeed;
 
-    private void Start()
+    float inputAccel;
+    float inputBoost;
+    float inputDrift;
+    float inputJump;
+    float inputSteer;
+
+    void Start()
     {
-        playerRB = GetComponent<Rigidbody>();
+        playerRB = GetComponentInChildren<Rigidbody>();
     }
 
-    private void FixedUpdate()
+    void FixedUpdate()
     {
-        playerRB.AddForce(60 * inputAccel * transform.forward);
+        Steer();
+        Accelerate();     
     }
 
-    private void Update()
+    void Accelerate()
     {
-        if (UnityEngine.Input.GetKey(KeyCode.W))
-        {
-            inputAccel = 1;
-        }
-        else
-        {
-            inputAccel = 0;
-        }
-        Debug.Log(inputAccel);
+        currentSpeed += inputAccel * accelerationRate * Time.fixedDeltaTime;
+        if (currentSpeed > maxBaseSpeed) currentSpeed = maxBaseSpeed;
+
+        playerRB.linearVelocity = transform.forward * currentSpeed;
+    }
+
+    void Steer()
+    {
+        playerRB.MoveRotation(Quaternion.Euler(0f, inputSteer * steerSensitivity, 0f) * playerRB.rotation);
+    }
+
+    public void OnAccelerate(InputAction.CallbackContext buttonInput)
+    {
+        inputAccel = buttonInput.ReadValue<float>();
+        
+    }
+    public void OnBoost(InputAction.CallbackContext buttonInput)
+    {
+        inputBoost = buttonInput.ReadValue<float>();
+    }
+    public void OnDrift(InputAction.CallbackContext buttonInput)
+    {
+        inputDrift = buttonInput.ReadValue<float>();
+
+    }
+    public void OnJump(InputAction.CallbackContext buttonInput)
+    {
+        inputJump = buttonInput.ReadValue<float>();
+    }
+    public void OnSteer(InputAction.CallbackContext stickInput)
+    {
+        inputSteer = stickInput.ReadValue<Vector2>().x;
     }
 }

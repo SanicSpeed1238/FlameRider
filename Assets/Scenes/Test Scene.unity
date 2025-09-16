@@ -20,7 +20,7 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.21226418, g: 0.49019608, b: 1, a: 1}
+  m_AmbientSkyColor: {r: 0.43867922, g: 0.6369567, b: 1, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
@@ -156,7 +156,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 0}
+  m_BackGroundColor: {r: 0.122641504, g: 0.122641504, b: 0.122641504, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -739,7 +739,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 1, z: 100}
+  m_LocalScale: {x: 20, y: 1, z: 200}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -772,7 +772,7 @@ Transform:
   m_GameObject: {fileID: 1197087522}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: -490}
+  m_LocalPosition: {x: 0, y: 0.5, z: -990}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -793,9 +793,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 921123255622b9240a9196c14968f457, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  accelerationRate: 50
-  maxBaseSpeed: 200
   steerSensitivity: 2
+  driftStrength: 5
+  accelerationRate: 50
+  maxSpeed: 200
+  boostRate: 50
+  jumpHeight: 10
 --- !u!114 &1197087526
 MonoBehaviour:
   m_ObjectHideFlags: 0

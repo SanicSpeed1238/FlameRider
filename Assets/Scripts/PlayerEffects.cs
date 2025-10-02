@@ -12,6 +12,7 @@ public class PlayerEffects : MonoBehaviour
 
     // Other Variables Needed
     float gameFOV;
+    Coroutine currentZoomCoroutine;
 
     void Start()
     {
@@ -21,15 +22,17 @@ public class PlayerEffects : MonoBehaviour
 
     public void ActivateBoostEffect(bool activate)
     {
+        if (currentZoomCoroutine != null) StopCoroutine(currentZoomCoroutine);
+
         if (activate)
-        {
+        {       
+            currentZoomCoroutine = StartCoroutine(CameraZoomOut(70f));
             speedLines.Play();
-            StartCoroutine(CameraZoomOut(70f));
         }
         else
         {
+            currentZoomCoroutine = StartCoroutine(CameraZoomOut(gameFOV));
             speedLines.Stop();
-            StartCoroutine(CameraZoomOut(gameFOV));
         }
     }
     IEnumerator CameraZoomOut(float targetFOV)

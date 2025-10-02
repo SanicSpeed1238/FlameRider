@@ -21,12 +21,12 @@ public class PlayerAnimator : MonoBehaviour
 
     public void SteerAnimation(float steer)
     {
-        animator.SetFloat("Steer", steer);
+        animator.SetFloat("Steer", steer, 0.1f, Time.deltaTime);
     }
 
     public void DriftAnimation(bool activate, float drift)
     {
         animator.SetBool("Drifting", activate);
-        animator.SetFloat("Drift", drift);
+        animator.SetFloat("Drift", drift, 0.1f, Time.deltaTime);
     }
 }

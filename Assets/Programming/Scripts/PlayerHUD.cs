@@ -25,13 +25,18 @@ public class PlayerHUD : MonoBehaviour
         fireEnergy.value = value;
     }
 
-    public void UpdateSpeedValue(float value)
+    public void UpdateSpeedValue(float playerSpeed)
     {
-        // update speed text but as an int
+        int intSpeed = Mathf.RoundToInt(playerSpeed);
+        speedValue.text = intSpeed.ToString();
     }
 
-    public void UpdateTimerValue()
+    public void UpdateTimerValue(float timeElapsed)
     {
-        // update timer text in the format 0:00:000
+        int minutes = Mathf.FloorToInt(timeElapsed / 60f);
+        int seconds = Mathf.FloorToInt(timeElapsed % 60f);
+        int milliseconds = Mathf.FloorToInt((timeElapsed * 1000f) % 1000f);
+
+        timerValue.text = string.Format("{0}:{1:00}:{2:000}", minutes, seconds, milliseconds);
     }
 }

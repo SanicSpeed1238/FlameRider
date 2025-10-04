@@ -4,6 +4,7 @@ using System.Collections;
 public class PlayerEffects : MonoBehaviour
 {
     [Header("VFX References")]
+    public ParticleSystem flameBoost;
     public ParticleSystem speedLines;
     public ParticleSystem driftSparks;
 
@@ -18,6 +19,12 @@ public class PlayerEffects : MonoBehaviour
     {
         Camera playerCam = Camera.main;
         gameFOV = playerCam.fieldOfView;
+    }
+
+    public void ActivateFlameLines(bool activate)
+    {
+        if (activate) flameBoost.Play();
+        else flameBoost.Stop();
     }
 
     public void ActivateBoostEffect(bool activate)

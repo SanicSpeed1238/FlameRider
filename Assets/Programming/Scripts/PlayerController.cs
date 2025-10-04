@@ -17,11 +17,14 @@ public class PlayerController : MonoBehaviour
     [Range(10,100)]
     [SerializeField] float boostRate;
     [Range(1,50)]
+    [SerializeField] float energyRate;
+    [Range(1,50)]
     [SerializeField] float jumpHeight;
 
     // Important References
     PlayerAnimator playerAnimator;
     PlayerEffects playerVFX;
+    PlayerAudio playerSFX;
 
     // Variables for Movement
     Rigidbody playerRB;
@@ -31,6 +34,10 @@ public class PlayerController : MonoBehaviour
 
     // Variables for Boosting
     FlameTrailGeneration flameTrailGen;
+    float currentFlameEnergy;
+    bool onFlameTrail;
+    float offFlameTrailTimer;
+    readonly float offFlameTrailTime = 0.8f;
 
     // Variables for Jumping
     bool hasJumped;
@@ -67,9 +74,11 @@ public class PlayerController : MonoBehaviour
         baseMaxSpeed = maxSpeed;
 
         flameTrailGen = GetComponent<FlameTrailGeneration>();
+        currentFlameEnergy = 50f;
 
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         playerVFX = GetComponentInChildren<PlayerEffects>();
+        playerSFX = GetComponentInChildren<PlayerAudio>();
     }
     #endregion
 
@@ -99,22 +108,25 @@ public class PlayerController : MonoBehaviour
     #region Accelerate
     void AcceleratePhysics()
     {
-        if (inputAccel > 0 || isBoosting)
+        if (inputAccel > 0 || (isBoosting || onFlameTrail))
         {
-            float forwardInput = (isBoosting) ? 1 : inputAccel;
+            float forwardInput = (isBoosting || onFlameTrail) ? 1 : inputAccel;
             baseSpeed += forwardInput * accelerationRate * Time.fixedDeltaTime;
             if (baseSpeed > maxSpeed) baseSpeed = maxSpeed;
+            playerSFX.StartSound(playerSFX.movingSound);
         }
         else
         {
             float decelerationInput = inputDrift + 0.1f;
             baseSpeed -= decelerationInput * decelerationRate * Time.fixedDeltaTime;
             if (baseSpeed < 0f) baseSpeed = 0f;
+            playerSFX.StopSound(playerSFX.movingSound);
         }
 
         Vector3 playerVelocity = baseSpeed * transform.forward;
         playerVelocity.y = playerRB.linearVelocity.y;
         playerRB.linearVelocity = playerVelocity;
+        PlayerHUD.Instance.UpdateSpeedValue(Mathf.Abs(Vector3.Dot(playerRB.linearVelocity, transform.forward)));
     }
     #endregion
 
@@ -130,26 +142,44 @@ public class PlayerController : MonoBehaviour
     {
         isBoosting = inputBoost_Held;
 
-        if (isBoosting)
+        if (isBoosting && currentFlameEnergy > 0)
         {
             if (isGrounded) StartBoost();
             else StopBoost();
 
             maxSpeed += boostRate * Time.fixedDeltaTime;
+
+            currentFlameEnergy -= Time.fixedDeltaTime * energyRate;
+            if (currentFlameEnergy <= 0f) StopBoost();
+            PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy/100f);
         }
         else
         {
-            if (maxSpeed > baseMaxSpeed) maxSpeed -= (boostRate * 2f) * Time.fixedDeltaTime;
-            else maxSpeed = baseMaxSpeed;
+            if (!onFlameTrail)
+            {
+                if (maxSpeed > baseMaxSpeed) maxSpeed -= (boostRate * 2f) * Time.fixedDeltaTime;
+                else maxSpeed = baseMaxSpeed;
+            }          
+        }
+
+        if (offFlameTrailTimer < offFlameTrailTime)
+        {
+            offFlameTrailTimer += Time.fixedDeltaTime;
+            if (offFlameTrailTimer >= offFlameTrailTime)
+            {
+                onFlameTrail = false;
+                playerSFX.StopSound(playerSFX.boostingSound);
+            }
         }
     }
 
     void StartBoost()
     {
-        if (!flameTrailGen.IsGenerating())
+        if (!flameTrailGen.IsGenerating() && currentFlameEnergy > 0)
         {
             flameTrailGen.StartBoostTrail();
             playerVFX.ActivateBoostEffect(true);
+            playerSFX.StartSound(playerSFX.boostingSound);
         } 
     }
     void StopBoost()
@@ -158,6 +188,7 @@ public class PlayerController : MonoBehaviour
         {
             flameTrailGen.StopBoostTrail();
             playerVFX.ActivateBoostEffect(false);
+            playerSFX.StopSound(playerSFX.boostingSound);
         }
     }
     #endregion
@@ -178,23 +209,27 @@ public class PlayerController : MonoBehaviour
     {
         playerAnimator.DriftAnimation(isDrifting, driftDirection);
         playerVFX.ActivateDriftSparks(isDrifting && isGrounded);
+
+        if (isDrifting && isGrounded) playerSFX.StartSound(playerSFX.driftingSound);
+        else playerSFX.StopSound(playerSFX.driftingSound);
     }
     void DriftPhysics()
     {
-        if (inputDrift != 0f && (inputAccel > 0 && inputSteer != 0))
+        if (inputDrift >= .5 && inputSteer != 0)
         {
-            if (!isBoosting)
-            {
-                driftDirection = (inputSteer > 0f) ? 1 : -1;
-                isDrifting = true;
-            }
-
+            isDrifting = !isBoosting;
             if (isDrifting)
             {
+                driftDirection = (inputSteer > 0f) ? 1 : -1;
                 float rotationInfluence = inputSteer * (inputSteer == driftDirection ? 2f : 1f);
                 float rotationAmount = ((driftStrength * driftDirection) + rotationInfluence) * (Time.fixedDeltaTime * 10f);
+                
                 Quaternion newRotation = Quaternion.Euler(0f, rotationAmount, 0f) * playerRB.rotation;
                 playerRB.MoveRotation(newRotation);
+
+                if (isGrounded) currentFlameEnergy += Time.fixedDeltaTime * energyRate;
+                if (currentFlameEnergy >= 100f) currentFlameEnergy = 100f;
+                PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy / 100f);
             }
         }
         else isDrifting = false;
@@ -210,6 +245,7 @@ public class PlayerController : MonoBehaviour
             {
                 playerRB.AddForce(jumpHeight * transform.up, ForceMode.Impulse);
                 playerAnimator.JumpAnimation(true);
+                playerSFX.PlaySound(playerSFX.jumpSound);
 
                 jumpTimer = 0f;
                 hasJumped = true;
@@ -234,7 +270,11 @@ public class PlayerController : MonoBehaviour
     {
         if(other.CompareTag("Trail"))
         {
-            Debug.Log("BOOST!!!!  " + Time.time);
+            onFlameTrail = true;
+            offFlameTrailTimer = 0f;
+            playerVFX.ActivateFlameLines(true);
+            playerSFX.StartSound(playerSFX.boostingSound);
+            maxSpeed += other.GetComponentInParent<FlameTrailObject>().speedBoost * Time.fixedDeltaTime;
         }
     }
 

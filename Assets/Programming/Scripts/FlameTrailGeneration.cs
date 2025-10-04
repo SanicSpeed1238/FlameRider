@@ -4,16 +4,18 @@ using System.Collections.Generic;
 public class FlameTrailGeneration : MonoBehaviour
 {
     [Header("Trail Settings")]
+    [Range(1f, 10f)]
+    public float trailWidth = 1f;
     public GameObject trailPrefab;
     public GameObject trailCollider;
-    public float pointSpacing = 1f;
 
     // Variables Needed
     private bool generating = false;
     private Rigidbody rigidBody;
     private LineRenderer currentTrail;
     private List<Vector3> currentPoints;
-    private Vector3 lastPoint; 
+    private Vector3 lastPoint;
+    private readonly float pointSpacing = 1f;
 
     void Start()
     {
@@ -35,15 +37,19 @@ public class FlameTrailGeneration : MonoBehaviour
 
     private void AddPoint(Vector3 point)
     {
+        if (Physics.Raycast(point + Vector3.up, Vector3.down, out RaycastHit hit, 20f)) point.y = hit.point.y + 0.05f;
+        else point.y = 0f;
+
         if (currentPoints.Count > 0)
         {
             Vector3 last = currentPoints[^1];
             Vector3 mid = (last + point) / 2f;
             float length = Vector3.Distance(last, point);
 
-            GameObject col = Instantiate(trailCollider, mid, Quaternion.identity, currentTrail.gameObject.transform);
-            col.transform.LookAt(point);
-            col.transform.localScale = new Vector3(1f, 0.2f, length);
+            GameObject collider = Instantiate(trailCollider, mid, Quaternion.identity, currentTrail.gameObject.transform);
+            BoxCollider colliderSize = collider.GetComponent<BoxCollider>();
+            collider.transform.LookAt(point);
+            collider.transform.localScale = new Vector3(colliderSize.size.x, colliderSize.size.y, length);
         }
 
         currentPoints.Add(point);
@@ -55,8 +61,11 @@ public class FlameTrailGeneration : MonoBehaviour
     public void StartBoostTrail()
     {
         GameObject newTrail = Instantiate(trailPrefab, Vector3.zero, Quaternion.identity);
-        currentTrail = newTrail.GetComponent<LineRenderer>();
+        currentTrail = newTrail.GetComponentInChildren<LineRenderer>();
 
+        currentTrail.startWidth = trailWidth;
+        currentTrail.endWidth = trailWidth;
+        currentTrail.alignment = LineAlignment.TransformZ;
         currentPoints.Clear();
         AddPoint(transform.position);
 

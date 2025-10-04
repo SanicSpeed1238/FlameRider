@@ -24,7 +24,7 @@ public class LeantweenCustomEditor : Editor
 
         if (logo == null)
         {
-            logo = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/GogoGaga/TweenMadeEasy/Sprites/logo.png", typeof(Texture2D));
+            logo = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Plugins/Tween/TweenMadeEasy/Sprites/logo.png", typeof(Texture2D));
         }
         else
         {

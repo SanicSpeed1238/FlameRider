@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -371,3 +373,5 @@ namespace AK.MapEditorTools
         }
     }
 }
+
+#endif

@@ -21,7 +21,7 @@ public class LeantweenCustomEditor : Editor
 
         
         
-
+        /*
         if (logo == null)
         {
             logo = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/Plugins/Tween/TweenMadeEasy/Sprites/logo.png", typeof(Texture2D));
@@ -40,7 +40,7 @@ public class LeantweenCustomEditor : Editor
                 Application.OpenURL("https://assetstore.unity.com/publishers/44583");
             }
         }
-
+        
 
         EditorGUILayout.Space(100);
 
@@ -50,7 +50,7 @@ public class LeantweenCustomEditor : Editor
         EditorGUILayout.EndScrollView();
 
         EditorGUILayout.Space(20);
-
+        */
 
         EditorGUILayout.PropertyField(serializedObject.FindProperty("Name"));
         

@@ -1247,7 +1247,7 @@ MonoBehaviour:
   DontOverrideEndProperty: 0
   EndTargetType: 0
   EndTargetTranform: {fileID: 0}
-  end_vector: {x: 0, y: 240, z: 0}
+  end_vector: {x: 0, y: 200, z: 0}
   endValue: 0
   RotationAxis: 0
   RotationPerSec: 0

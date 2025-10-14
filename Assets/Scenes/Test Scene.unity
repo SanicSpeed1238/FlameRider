@@ -7445,9 +7445,9 @@ MonoBehaviour:
   steerSensitivity: 5
   driftStrength: 10
   accelerationRate: 70
-  decelerationRate: 50
+  decelerationRate: 60
   maxSpeed: 150
-  boostRate: 20
+  boostRate: 15
   energyRate: 10
   jumpHeight: 45
 --- !u!114 &1197087526
@@ -7627,7 +7627,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f19ac53e14ab7044cb96c80810453ff8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trailWidth: 2
+  trailWidth: 3.5
   trailPrefab: {fileID: 8718537156586937533, guid: 685d3123746034647bf18631593013c6, type: 3}
   trailCollider: {fileID: 4833498911445145740, guid: 73a86667ab476604db47a031ed23ecf9, type: 3}
 --- !u!136 &1197087529

@@ -55,8 +55,6 @@ public class PlayerController : MonoBehaviour
     float inputDrift;
     float inputSteer;
     bool inputBoost_Pressed;
-    bool inputBoost_Held;
-    bool inputBoost_Released;
     bool inputJump_Pressed;
     InputAction playerInput_Boost;
     InputAction playerInput_Jump;
@@ -133,15 +131,14 @@ public class PlayerController : MonoBehaviour
     #region Boost
     void BoostAction()
     {
-        if (inputBoost_Pressed) StartBoost();
-        if (inputBoost_Released) StopBoost();
-
-        playerAnimator.BoostAnimation(isBoosting && isGrounded);
+        if (inputBoost_Pressed)
+        {
+            if (!isBoosting) StartBoost();
+            else StopBoost();
+        }
     }
     void BoostPhysics()
     {
-        isBoosting = inputBoost_Held;
-
         if (isBoosting && currentFlameEnergy > 0)
         {
             if (isGrounded) StartBoost();
@@ -177,6 +174,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!flameTrailGen.IsGenerating() && currentFlameEnergy > 0)
         {
+            isBoosting = true;
             flameTrailGen.StartBoostTrail();
             playerVFX.ActivateBoostEffect(true);
             playerSFX.StartSound(playerSFX.boostingSound);
@@ -186,6 +184,7 @@ public class PlayerController : MonoBehaviour
     {
         if (flameTrailGen.IsGenerating())
         {
+            isBoosting = false;
             flameTrailGen.StopBoostTrail();
             playerVFX.ActivateBoostEffect(false);
             playerSFX.StopSound(playerSFX.boostingSound);
@@ -215,15 +214,16 @@ public class PlayerController : MonoBehaviour
     }
     void DriftPhysics()
     {
-        if (inputDrift >= .5 && inputSteer != 0)
+        if (inputDrift >= .5 && (inputSteer < -.5f || inputSteer > .5f))
         {
-            isDrifting = !isBoosting;
+            if (!isDrifting) StartDrift();
+
             if (isDrifting)
-            {
-                driftDirection = (inputSteer > 0f) ? 1 : -1;
-                float rotationInfluence = inputSteer * (inputSteer == driftDirection ? 2f : 1f);
+            {           
+                float rotationInfluence = driftDirection * inputSteer;
                 float rotationAmount = ((driftStrength * driftDirection) + rotationInfluence) * (Time.fixedDeltaTime * 10f);
                 
+                // THIS NEEDS TO BE FIXED
                 Quaternion newRotation = Quaternion.Euler(0f, rotationAmount, 0f) * playerRB.rotation;
                 playerRB.MoveRotation(newRotation);
 
@@ -232,7 +232,12 @@ public class PlayerController : MonoBehaviour
                 PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy / 100f);
             }
         }
-        else isDrifting = false;
+        else if (inputDrift == 0f && isDrifting) isDrifting = false;
+    }
+    void StartDrift()
+    {
+        isDrifting = true;
+        driftDirection = (inputSteer > 0f) ? 1 : -1;
     }
     #endregion
 
@@ -297,23 +302,15 @@ public class PlayerController : MonoBehaviour
     public void InputDrift(InputAction.CallbackContext floatInput)
     {
         inputDrift = floatInput.ReadValue<float>();
-
     }
     public void InputAccelerate(InputAction.CallbackContext floatInput)
     {
-        inputAccel = floatInput.ReadValue<float>();
-        
-    }   
-    public void InputBoost(InputAction.CallbackContext buttonInput)
-    {
-        inputBoost_Held = buttonInput.ReadValueAsButton();
+        inputAccel = floatInput.ReadValue<float>();        
     }
     private void CheckInputs()
     {
         if (playerInput_Boost.WasPressedThisFrame()) inputBoost_Pressed = true;
         else inputBoost_Pressed = false;
-        if (playerInput_Boost.WasReleasedThisFrame()) inputBoost_Released = true;
-        else inputBoost_Released = false;
 
         if (playerInput_Jump.WasPressedThisFrame()) inputJump_Pressed = true;
         else inputJump_Pressed = false;

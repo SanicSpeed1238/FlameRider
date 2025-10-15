@@ -22,7 +22,7 @@ public class PlayerHUD : MonoBehaviour
 
     public void UpdateFireEnergy(float value)
     {
-        fireEnergy.value = value;
+        fireEnergy.value = value / 100f;
     }
 
     public void UpdateSpeedValue(float playerSpeed)

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
@@ -148,7 +148,7 @@ public class PlayerController : MonoBehaviour
 
             currentFlameEnergy -= Time.fixedDeltaTime * energyRate;
             if (currentFlameEnergy <= 0f) StopBoost();
-            PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy/100f);
+            PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy);
         }
         else
         {
@@ -206,7 +206,7 @@ public class PlayerController : MonoBehaviour
     #region Drift
     void DriftAction()
     {
-        playerAnimator.DriftAnimation(isDrifting, driftDirection);
+        //playerAnimator.DriftAnimation(isDrifting, driftDirection);
         playerVFX.ActivateDriftSparks(isDrifting && isGrounded);
 
         if (isDrifting && isGrounded) playerSFX.StartSound(playerSFX.driftingSound);
@@ -220,16 +220,16 @@ public class PlayerController : MonoBehaviour
 
             if (isDrifting)
             {           
-                float rotationInfluence = driftDirection * inputSteer;
-                float rotationAmount = ((driftStrength * driftDirection) + rotationInfluence) * (Time.fixedDeltaTime * 10f);
-                
-                // THIS NEEDS TO BE FIXED
+                float rotationAmount = ((driftDirection * driftStrength) + inputSteer) * (Time.fixedDeltaTime * 10f);
                 Quaternion newRotation = Quaternion.Euler(0f, rotationAmount, 0f) * playerRB.rotation;
                 playerRB.MoveRotation(newRotation);
 
-                if (isGrounded) currentFlameEnergy += Time.fixedDeltaTime * energyRate;
-                if (currentFlameEnergy >= 100f) currentFlameEnergy = 100f;
-                PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy / 100f);
+                if (isGrounded)
+                {
+                    currentFlameEnergy += Time.fixedDeltaTime * energyRate;
+                    if (currentFlameEnergy >= 100f) currentFlameEnergy = 100f;
+                    PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy);
+                }
             }
         }
         else if (inputDrift == 0f && isDrifting) isDrifting = false;

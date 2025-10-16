@@ -8,6 +8,7 @@ public class PlayerAudio : MonoBehaviour
     public AudioSource boostingSound;
     public AudioSource driftingSound;
     public AudioSource jumpSound;
+    public AudioSource respawnSound;
 
     public void PlaySound(AudioSource audio)
     {
@@ -22,5 +23,15 @@ public class PlayerAudio : MonoBehaviour
     public void StopSound(AudioSource audio)
     {
         audio.Stop();
+    }
+
+    public void StopAllAudio()
+    {
+        idleSound.volume = 0;
+        movingSound.volume = 0;
+        boostingSound.volume = 0;
+        driftingSound.volume = 0;
+        jumpSound.volume = 0;
+        respawnSound.volume = 0;
     }
 }

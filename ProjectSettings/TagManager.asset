@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Trail
+  - Road
+  - Checkpoint
+  - Deadzone
   layers:
   - Default
   - TransparentFX

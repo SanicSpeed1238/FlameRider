@@ -3,31 +3,24 @@ using EasyTransition;
 
 public class PauseScreen : MonoBehaviour
 {
-    public GameObject pauseScreenUI;
     public TransitionSettings exitTransition;
 
-    bool paused;
-
-    private void Update()
+    private void OnEnable()
     {
-        if (Input.GetButtonDown("Pause"))
-        {
-            if (!paused) PauseGame();
-        }
+        PauseGame();
     }
 
     public void PauseGame()
     {
         Time.timeScale = 0;
-        paused = true;
-        pauseScreenUI.SetActive(true);
+        GameState.Instance.isPlaying = false;
     }
 
     public void ResumeGame()
     {
         Time.timeScale = 1;
-        paused = false;
-        pauseScreenUI.SetActive(false);
+        GameState.Instance.isPlaying = false;
+        this.gameObject.SetActive(false);
     }
 
     public void ExitGame()

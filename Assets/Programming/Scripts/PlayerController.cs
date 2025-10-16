@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
@@ -14,7 +16,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float decelerationRate;
     [Range(100,1000)]
     [SerializeField] float maxSpeed;
-    [Range(10,100)]
+    [Range(1,50)]
     [SerializeField] float boostRate;
     [Range(1,50)]
     [SerializeField] float energyRate;
@@ -25,6 +27,9 @@ public class PlayerController : MonoBehaviour
     PlayerAnimator playerAnimator;
     PlayerEffects playerVFX;
     PlayerAudio playerSFX;
+    Transform currentCheckpoint;
+    int passedCheckpoint;
+    int lapsCompleted;
 
     // Variables for Movement
     Rigidbody playerRB;
@@ -49,6 +54,7 @@ public class PlayerController : MonoBehaviour
     bool isDrifting;
     bool isJumping;
     bool isGrounded;
+    bool isRespawning;
 
     // Input Variables
     float inputAccel;
@@ -68,6 +74,10 @@ public class PlayerController : MonoBehaviour
     }
     void Start()
     {
+        lapsCompleted = 0;
+        passedCheckpoint = -1;
+        currentCheckpoint = gameObject.transform;
+
         playerRB = GetComponent<Rigidbody>();
         baseMaxSpeed = maxSpeed;
 
@@ -82,6 +92,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (!CanMove()) return;
+
         CheckInputs();
 
         SteerAction();
@@ -92,6 +104,8 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
+        if (!CanMove()) return;
+
         CheckGrounded();
 
         AcceleratePhysics();
@@ -125,6 +139,8 @@ public class PlayerController : MonoBehaviour
         playerVelocity.y = playerRB.linearVelocity.y;
         playerRB.linearVelocity = playerVelocity;
         PlayerHUD.Instance.UpdateSpeedValue(Mathf.Abs(Vector3.Dot(playerRB.linearVelocity, transform.forward)));
+
+        if (inputAccel > 0 && !isBoosting) RegenerateFireEngery(0.5f);
     }
     #endregion
 
@@ -190,12 +206,19 @@ public class PlayerController : MonoBehaviour
             playerSFX.StopSound(playerSFX.boostingSound);
         }
     }
+
+    void RegenerateFireEngery(float mult)
+    {
+        currentFlameEnergy += Time.fixedDeltaTime * (energyRate * mult);
+        if (currentFlameEnergy >= 100f) currentFlameEnergy = 100f;
+        PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy);
+    }
     #endregion
 
     #region Steer
     void SteerAction()
     {
-        playerAnimator.SteerAnimation(inputSteer);
+        if(!isDrifting) playerAnimator.SteerAnimation(inputSteer);
     }
     void SteerPhysics()
     {
@@ -206,7 +229,7 @@ public class PlayerController : MonoBehaviour
     #region Drift
     void DriftAction()
     {
-        //playerAnimator.DriftAnimation(isDrifting, driftDirection);
+        playerAnimator.DriftAnimation(isDrifting, driftDirection);
         playerVFX.ActivateDriftSparks(isDrifting && isGrounded);
 
         if (isDrifting && isGrounded) playerSFX.StartSound(playerSFX.driftingSound);
@@ -224,12 +247,7 @@ public class PlayerController : MonoBehaviour
                 Quaternion newRotation = Quaternion.Euler(0f, rotationAmount, 0f) * playerRB.rotation;
                 playerRB.MoveRotation(newRotation);
 
-                if (isGrounded)
-                {
-                    currentFlameEnergy += Time.fixedDeltaTime * energyRate;
-                    if (currentFlameEnergy >= 100f) currentFlameEnergy = 100f;
-                    PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy);
-                }
+                if (isGrounded) RegenerateFireEngery(1f);
             }
         }
         else if (inputDrift == 0f && isDrifting) isDrifting = false;
@@ -280,6 +298,33 @@ public class PlayerController : MonoBehaviour
             playerVFX.ActivateFlameLines(true);
             playerSFX.StartSound(playerSFX.boostingSound);
             maxSpeed += other.GetComponentInParent<FlameTrailObject>().speedBoost * Time.fixedDeltaTime;
+        }    
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Checkpoint"))
+        {
+            currentCheckpoint = other.gameObject.transform;
+            int checkpointIndex = Array.IndexOf(other.GetComponentInParent<TrackManager>().checkPoints, other.gameObject);
+
+            if (checkpointIndex == 0 && passedCheckpoint >= other.GetComponentInParent<TrackManager>().checkPoints.Length - 15)
+            {
+                lapsCompleted++;
+                PlayerHUD.Instance.UpdateLapNumber(lapsCompleted + 1);
+
+                if (lapsCompleted == 3) { GameState.Instance.WinGame(); playerSFX.StopAllAudio(); }
+                else { PlayerHUD.Instance.DisplayMessage("LAP " + (lapsCompleted + 1) + "!"); GameState.Instance.lapSound.PlayOneShot(GameState.Instance.lapSound.clip); }
+            }
+
+            else if (passedCheckpoint < checkpointIndex && passedCheckpoint >= checkpointIndex - 15)
+            {
+                passedCheckpoint = checkpointIndex;
+            }
+        }
+
+        if (other.CompareTag("Deadzone"))
+        {
+            StartCoroutine(RespawnPlayer());
         }
     }
 
@@ -291,6 +336,21 @@ public class PlayerController : MonoBehaviour
 
         Debug.DrawRay(origin, direction * distance, Color.red);
         isGrounded = Physics.Raycast(origin, direction, distance) && !hasJumped;
+    }
+
+    IEnumerator RespawnPlayer()
+    {
+        isRespawning = true;
+
+        playerRB.position = currentCheckpoint.position;
+        playerRB.rotation = currentCheckpoint.rotation;
+        playerRB.linearVelocity = Vector3.down;
+
+        playerSFX.PlaySound(playerSFX.respawnSound);
+
+        yield return new WaitForSeconds(1f);
+
+        isRespawning = false;
     }
     #endregion
 
@@ -314,6 +374,11 @@ public class PlayerController : MonoBehaviour
 
         if (playerInput_Jump.WasPressedThisFrame()) inputJump_Pressed = true;
         else inputJump_Pressed = false;
+    }
+    private bool CanMove()
+    {
+        if (GameState.Instance.isPlaying && !isRespawning) return true;
+        else return false;
     }
     #endregion
 }

@@ -1,23 +1,53 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using GogoGaga.TME;
+using TMPro;
 
 public class PlayerHUD : MonoBehaviour
 {
     public static PlayerHUD Instance;
 
-    [Header("Fire Energy UI")]
-    public Slider fireEnergy;
+    [Header("Message Text")]
+    public TextMeshProUGUI messageText;
+    public TextMeshProUGUI countdownNumbers;
 
-    [Header("Speed UI")]
+    [Header("Player Status")]
+    public Slider fireEnergy;
     public TextMeshProUGUI speedValue;
 
-    [Header("Timer UI")]
+    [Header("Track Progress")]
     public TextMeshProUGUI timerValue;
+    public TextMeshProUGUI lapNumber;
 
     private void Awake()
     {
         Instance = this;
+    }
+
+    public void DisplayMessage(string message)
+    {
+        messageText.text = message;
+        messageText.gameObject.GetComponent<LeantweenCustomAnimator>().PlayAnimation();
+    }
+    public void DisplayCountdown(int num)
+    {
+        string numText = num.ToString();
+        if (num == 0) numText = string.Empty;
+
+        countdownNumbers.text = numText;
+        countdownNumbers.gameObject.GetComponent<LeantweenCustomAnimator>().PlayAnimation();
+
+        switch(num)
+        {
+            case 3:
+                countdownNumbers.color = Color.yellow; break;
+            case 2:
+                countdownNumbers.color = new Color(1f, 0.5f, 0f); break;
+            case 1:
+                countdownNumbers.color = Color.red; break;
+            default:
+                countdownNumbers.color = Color.white; break;
+        }
     }
 
     public void UpdateFireEnergy(float value)
@@ -38,5 +68,11 @@ public class PlayerHUD : MonoBehaviour
         int milliseconds = Mathf.FloorToInt((timeElapsed * 1000f) % 1000f);
 
         timerValue.text = string.Format("{0}:{1:00}:{2:000}", minutes, seconds, milliseconds);
+    }
+
+    public void UpdateLapNumber(int lap)
+    {
+        string lapText = lap.ToString();
+        lapNumber.text = "LAP " + lapText + "/3";
     }
 }

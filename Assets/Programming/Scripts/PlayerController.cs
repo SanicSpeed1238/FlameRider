@@ -192,6 +192,7 @@ public class PlayerController : MonoBehaviour
         {
             isBoosting = true;
             flameTrailGen.StartBoostTrail();
+            playerVFX.ActivateFlameTire(true);
             playerVFX.ActivateBoostEffect(true);
             playerSFX.StartSound(playerSFX.boostingSound);
         } 
@@ -202,6 +203,7 @@ public class PlayerController : MonoBehaviour
         {
             isBoosting = false;
             flameTrailGen.StopBoostTrail();
+            playerVFX.ActivateFlameTire(false);
             playerVFX.ActivateBoostEffect(false);
             playerSFX.StopSound(playerSFX.boostingSound);
         }
@@ -229,8 +231,8 @@ public class PlayerController : MonoBehaviour
     #region Drift
     void DriftAction()
     {
-        playerAnimator.DriftAnimation(isDrifting, driftDirection);
-        playerVFX.ActivateDriftSparks(isDrifting && isGrounded);
+        playerAnimator.DriftAnimation(isDrifting, ((inputSteer > 0f) ? 1 : -1));
+        playerVFX.ActivateFlameTire(isDrifting && isGrounded);
 
         if (isDrifting && isGrounded) playerSFX.StartSound(playerSFX.driftingSound);
         else playerSFX.StopSound(playerSFX.driftingSound);

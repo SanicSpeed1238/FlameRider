@@ -35,7 +35,11 @@ public class PlayerController : MonoBehaviour
     Rigidbody playerRB;
     float baseSpeed;
     float baseMaxSpeed;
+
+    // Variables for Drifting
     float driftDirection;
+    float driftSpeed;
+    readonly float driftAcceleration = 10f;
 
     // Variables for Boosting
     FlameTrailGeneration flameTrailGen;
@@ -241,7 +245,13 @@ public class PlayerController : MonoBehaviour
     {
         if (isDrifting)
         {
-            float rotationAmount = ((driftDirection * driftStrength) + inputSteer) * (Time.fixedDeltaTime * 10f);
+            if (driftSpeed < driftStrength) driftSpeed += driftAcceleration * Time.fixedDeltaTime;
+            else driftSpeed = driftStrength;
+
+            float driftInfluence = inputSteer;
+            if (driftDirection * inputSteer < 0f) driftInfluence *= 5f;
+
+            float rotationAmount = ((driftSpeed * driftDirection) + driftInfluence) * (Time.fixedDeltaTime * 10f);
             Quaternion newRotation = Quaternion.Euler(0f, rotationAmount, 0f) * playerRB.rotation;
             playerRB.MoveRotation(newRotation);
 
@@ -252,14 +262,16 @@ public class PlayerController : MonoBehaviour
     {
         if (inputDrift >= 0.5f)
         {
-            isDrifting = true;
-
             driftDirection = inputSteer;
-            if (driftDirection > -0.5f && driftDirection < 0.5f) driftDirection = 0;
+
+            if (isGrounded && (driftDirection > -0.5f && driftDirection < 0.5f)) driftDirection = 0;
             else if (driftDirection <= -.5f) driftDirection = -1;
             else if (driftDirection >= .5f) driftDirection = 1;
+            else { return; }
 
+            isDrifting = true;
             playerAnimator.DriftAnimation(true, driftDirection);
+            driftSpeed = 0.1f;
         }    
     }
     void StopDrift()

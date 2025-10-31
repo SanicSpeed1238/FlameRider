@@ -266,7 +266,7 @@ public class PlayerController : MonoBehaviour
     {
         isDrifting = false;
 
-        playerAnimator.DriftAnimation(false, 0);
+        playerAnimator.DriftAnimation(false, driftDirection);
     }
     #endregion
 

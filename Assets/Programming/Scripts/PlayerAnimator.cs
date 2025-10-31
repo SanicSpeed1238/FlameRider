@@ -14,9 +14,9 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool("Grounded", grounded);
     }
 
-    public void SteerAnimation(float direction)
+    public void SteerAnimation(float tilt)
     {
-        animator.SetFloat("Direction", direction, 0.2f, Time.deltaTime);
+        animator.SetFloat("Tilt", tilt, 0.2f, Time.deltaTime);
     }
 
     public void DriftAnimation(bool activate, float direction)

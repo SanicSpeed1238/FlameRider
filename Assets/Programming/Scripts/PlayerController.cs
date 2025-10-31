@@ -52,7 +52,6 @@ public class PlayerController : MonoBehaviour
     // Player States
     bool isBoosting;
     bool isDrifting;
-    bool isJumping;
     bool isGrounded;
     bool isRespawning;
 
@@ -104,9 +103,9 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
-        if (!CanMove()) return;
-
         CheckGrounded();
+
+        if (!CanMove()) return;   
 
         AcceleratePhysics();
         SteerPhysics();
@@ -181,6 +180,7 @@ public class PlayerController : MonoBehaviour
             if (offFlameTrailTimer >= offFlameTrailTime)
             {
                 onFlameTrail = false;
+                playerVFX.ActivateFlameLines(false);
                 playerSFX.StopSound(playerSFX.boostingSound);
             }
         }
@@ -231,33 +231,42 @@ public class PlayerController : MonoBehaviour
     #region Drift
     void DriftAction()
     {
-        playerAnimator.DriftAnimation(isDrifting, ((inputSteer > 0f) ? 1 : -1));
-        playerVFX.ActivateFlameTire(isDrifting && isGrounded);
+        if (!isDrifting) StartDrift();
+        else if (inputDrift == 0) StopDrift();
 
         if (isDrifting && isGrounded) playerSFX.StartSound(playerSFX.driftingSound);
         else playerSFX.StopSound(playerSFX.driftingSound);
     }
     void DriftPhysics()
     {
-        if (inputDrift >= .5 && (inputSteer < -.5f || inputSteer > .5f))
+        if (isDrifting)
         {
-            if (!isDrifting) StartDrift();
+            float rotationAmount = ((driftDirection * driftStrength) + inputSteer) * (Time.fixedDeltaTime * 10f);
+            Quaternion newRotation = Quaternion.Euler(0f, rotationAmount, 0f) * playerRB.rotation;
+            playerRB.MoveRotation(newRotation);
 
-            if (isDrifting)
-            {           
-                float rotationAmount = ((driftDirection * driftStrength) + inputSteer) * (Time.fixedDeltaTime * 10f);
-                Quaternion newRotation = Quaternion.Euler(0f, rotationAmount, 0f) * playerRB.rotation;
-                playerRB.MoveRotation(newRotation);
-
-                if (isGrounded) RegenerateFireEngery(1f);
-            }
+            if (isGrounded) RegenerateFireEngery(1f);
         }
-        else if (inputDrift == 0f && isDrifting) isDrifting = false;
     }
     void StartDrift()
     {
-        isDrifting = true;
-        driftDirection = (inputSteer > 0f) ? 1 : -1;
+        if (inputDrift >= 0.5f)
+        {
+            isDrifting = true;
+
+            driftDirection = inputSteer;
+            if (driftDirection > -0.5f && driftDirection < 0.5f) driftDirection = 0;
+            else if (driftDirection <= -.5f) driftDirection = -1;
+            else if (driftDirection >= .5f) driftDirection = 1;
+
+            playerAnimator.DriftAnimation(true, driftDirection);
+        }    
+    }
+    void StopDrift()
+    {
+        isDrifting = false;
+
+        playerAnimator.DriftAnimation(false, 0);
     }
     #endregion
 
@@ -269,15 +278,12 @@ public class PlayerController : MonoBehaviour
             if (isGrounded)
             {
                 playerRB.AddForce(jumpHeight * transform.up, ForceMode.Impulse);
-                playerAnimator.JumpAnimation(true);
                 playerSFX.PlaySound(playerSFX.jumpSound);
 
                 jumpTimer = 0f;
                 hasJumped = true;
-                isJumping = true;
             }         
         }
-        playerAnimator.JumpAnimation(isJumping);
     }
     void JumpPhysics()
     {
@@ -286,7 +292,6 @@ public class PlayerController : MonoBehaviour
             jumpTimer += Time.fixedDeltaTime;
             if (jumpTimer > jumpTime) hasJumped = false;
         }
-        else if (isGrounded) isJumping = false;
     }
     #endregion
 
@@ -338,6 +343,7 @@ public class PlayerController : MonoBehaviour
 
         Debug.DrawRay(origin, direction * distance, Color.red);
         isGrounded = Physics.Raycast(origin, direction, distance) && !hasJumped;
+        playerAnimator.SetGrounded(isGrounded);
     }
 
     IEnumerator RespawnPlayer()

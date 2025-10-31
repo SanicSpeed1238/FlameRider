@@ -9,24 +9,19 @@ public class PlayerAnimator : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    public void BoostAnimation(bool activate)
+    public void SetGrounded(bool grounded)
     {
-        animator.SetBool("Boosting", activate);
+        animator.SetBool("Grounded", grounded);
     }
 
-    public void JumpAnimation(bool activate)
+    public void SteerAnimation(float direction)
     {
-        animator.SetBool("Jumping", activate);
+        animator.SetFloat("Direction", direction, 0.2f, Time.deltaTime);
     }
 
-    public void SteerAnimation(float steer)
-    {
-        animator.SetFloat("Steer", steer, 0.1f, Time.deltaTime);
-    }
-
-    public void DriftAnimation(bool activate, float drift)
+    public void DriftAnimation(bool activate, float direction)
     {
         animator.SetBool("Drifting", activate);
-        animator.SetFloat("Drift", drift, 0.1f, Time.deltaTime);
+        animator.SetFloat("Direction", direction);
     }
 }

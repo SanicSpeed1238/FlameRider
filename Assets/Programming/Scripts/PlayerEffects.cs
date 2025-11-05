@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Unity.Cinemachine;
 
 public class PlayerEffects : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class PlayerEffects : MonoBehaviour
     public ParticleSystem flameTire;
 
     [Header("Important References")]
-    public Camera playerCam;
+    public CinemachineCamera playerCam;
 
     // Other Variables Needed
     float gameFOV;
@@ -17,8 +18,7 @@ public class PlayerEffects : MonoBehaviour
 
     void Start()
     {
-        Camera playerCam = Camera.main;
-        gameFOV = playerCam.fieldOfView;
+        gameFOV = playerCam.Lens.FieldOfView;
     }
 
     public void ActivateFlameLines(bool activate)
@@ -44,7 +44,7 @@ public class PlayerEffects : MonoBehaviour
     }
     IEnumerator CameraZoomOut(float targetFOV)
     {
-        float startFOV = playerCam.fieldOfView;
+        float startFOV = playerCam.Lens.FieldOfView;
         float endFOV = targetFOV;
         float duration = 0.2f;
         float elapsed = 0f;
@@ -52,10 +52,10 @@ public class PlayerEffects : MonoBehaviour
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            playerCam.fieldOfView = Mathf.Lerp(startFOV, endFOV, elapsed / duration);
+            playerCam.Lens.FieldOfView = Mathf.Lerp(startFOV, endFOV, elapsed / duration);
             yield return null;
         }
-        playerCam.fieldOfView = endFOV;
+        playerCam.Lens.FieldOfView = endFOV;
     }
 
     public void ActivateFlameTire(bool activate)

@@ -49,7 +49,7 @@ public class FlameTrailGeneration : MonoBehaviour
             GameObject collider = Instantiate(trailCollider, mid, Quaternion.identity, currentTrail.gameObject.transform);
             BoxCollider colliderSize = collider.GetComponent<BoxCollider>();
             collider.transform.LookAt(point);
-            collider.transform.localScale = new Vector3(colliderSize.size.x, colliderSize.size.y, length);
+            collider.transform.localScale = new Vector3(1, 1, length);
         }
 
         currentPoints.Add(point);

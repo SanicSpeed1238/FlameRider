@@ -220,7 +220,13 @@ public class PlayerController : MonoBehaviour
     void RegenerateFireEngery(float mult)
     {
         currentFlameEnergy += Time.fixedDeltaTime * (energyRate * mult);
-        if (currentFlameEnergy >= 100f) currentFlameEnergy = 100f;
+
+        if (currentFlameEnergy >= 100f)
+        {
+            currentFlameEnergy = 100f;
+            StartBoost();
+        }
+
         PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy);
     }
     #endregion
@@ -273,9 +279,11 @@ public class PlayerController : MonoBehaviour
             else if (driftDirection >= .5f) driftDirection = 1;
             else { return; }
 
-            isDrifting = true;
-            playerAnimator.DriftAnimation(true, driftDirection);
+            isDrifting = true;            
             driftSpeed = 0.1f;
+
+            playerAnimator.DriftAnimation(true, driftDirection);
+            playerVFX.ActivateFlameTire(true);
         }    
     }
     void StopDrift()
@@ -283,6 +291,7 @@ public class PlayerController : MonoBehaviour
         isDrifting = false;
 
         playerAnimator.DriftAnimation(false, driftDirection);
+        playerVFX.ActivateFlameTire(false);
     }
     #endregion
 
@@ -335,7 +344,8 @@ public class PlayerController : MonoBehaviour
                 lapsCompleted++;
                 PlayerHUD.Instance.UpdateLapNumber(lapsCompleted + 1);
 
-                if (lapsCompleted == 3) { GameState.Instance.WinGame(); playerSFX.StopAllAudio(); }
+                if (lapsCompleted == 3) 
+                    { GameState.Instance.WinGame(); playerVFX.StopAllEffects(); playerSFX.StopAllAudio(); GetComponent<BasicComputerPlayer>().SetAutoMove(); }
                 else { PlayerHUD.Instance.DisplayMessage("LAP " + (lapsCompleted + 1) + "!"); GameState.Instance.lapSound.PlayOneShot(GameState.Instance.lapSound.clip); }
             }
 

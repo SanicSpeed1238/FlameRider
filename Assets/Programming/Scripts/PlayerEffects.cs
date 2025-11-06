@@ -21,6 +21,12 @@ public class PlayerEffects : MonoBehaviour
         gameFOV = playerCam.Lens.FieldOfView;
     }
 
+    public void ActivateFlameTire(bool activate)
+    {
+        if (activate) flameTire.Play();
+        else flameTire.Stop();
+    }
+
     public void ActivateFlameLines(bool activate)
     {
         if (activate) flameLines.Play();
@@ -58,15 +64,10 @@ public class PlayerEffects : MonoBehaviour
         playerCam.Lens.FieldOfView = endFOV;
     }
 
-    public void ActivateFlameTire(bool activate)
+    public void StopAllEffects()
     {
-        if (activate)
-        {
-            flameTire.Play();
-        }
-        else
-        {
-            flameTire.Stop();
-        }
+        ActivateFlameTire(false);
+        ActivateFlameLines(false);
+        ActivateBoostEffect(false);
     }
 }

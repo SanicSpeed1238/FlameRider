@@ -13,6 +13,7 @@ public class GameState : MonoBehaviour
     public GameObject pauseScreen;
 
     [Header("Audio Sources")]
+    public AudioSource gameMusic;
     public AudioSource countdownSound;
     public AudioSource lapSound;
     public AudioSource winSound;
@@ -68,6 +69,7 @@ public class GameState : MonoBehaviour
             countdownSound.PlayOneShot(countdownSound.clip);
             PlayerHUD.Instance.DisplayMessage("GO !!!");
             isPlaying = true;
+            gameMusic.Play();
         }
         else
         {
@@ -96,6 +98,7 @@ public class GameState : MonoBehaviour
         isPlaying = false;
 
         PlayerHUD.Instance.DisplayMessage("FINISH!");
+        gameMusic.Stop();
         winSound.Play();
         yield return new WaitForSeconds(3f);
 

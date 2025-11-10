@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
     readonly float driftAcceleration = 10f;
 
     // Variables for Boosting
-    FlameTrailGeneration flameTrailGen;
+    FlameTrailGeneration flameTrail;
     float currentFlameEnergy;
     bool onFlameTrail;
     float offFlameTrailTimer;
@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour
         playerRB = GetComponent<Rigidbody>();
         baseMaxSpeed = maxSpeed;
 
-        flameTrailGen = GetComponent<FlameTrailGeneration>();
+        flameTrail = GetComponent<FlameTrailGeneration>();
         currentFlameEnergy = 50f;
 
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
@@ -196,10 +196,10 @@ public class PlayerController : MonoBehaviour
 
     void StartBoost()
     {
-        if (!flameTrailGen.IsGenerating() && currentFlameEnergy > 0)
+        if (!flameTrail.IsGenerating() && currentFlameEnergy > 0)
         {
             isBoosting = true;
-            flameTrailGen.StartBoostTrail();
+            flameTrail.StartBoostTrail();
             playerVFX.ActivateFlameTire(true);
             playerVFX.ActivateBoostEffect(true);
             playerSFX.StartSound(playerSFX.boostingSound);
@@ -207,10 +207,10 @@ public class PlayerController : MonoBehaviour
     }
     void StopBoost()
     {
-        if (flameTrailGen.IsGenerating())
+        if (flameTrail.IsGenerating())
         {
             isBoosting = false;
-            flameTrailGen.StopBoostTrail();
+            flameTrail.StopBoostTrail();
             playerVFX.ActivateFlameTire(false);
             playerVFX.ActivateBoostEffect(false);
             playerSFX.StopSound(playerSFX.boostingSound);

@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float boostRate;
     [Range(1,50)]
     [SerializeField] float energyRate;
-    [Range(1,50)]
+    [Range(10,100)]
     [SerializeField] float jumpHeight;
 
     // Important References
@@ -33,8 +33,8 @@ public class PlayerController : MonoBehaviour
 
     // Variables for Movement
     Rigidbody playerRB;
-    float baseSpeed;
-    float baseMaxSpeed;
+    float currentSpeed;
+    float currentMaxSpeed;
     LayerMask groundLayer;
     readonly float groundLerp = 30f;
 
@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviour
         currentCheckpoint = gameObject.transform;
 
         playerRB = GetComponent<Rigidbody>();
-        baseMaxSpeed = maxSpeed;
+        currentMaxSpeed = maxSpeed;
 
         flameTrail = GetComponent<FlameTrailGeneration>();
         currentFlameEnergy = 50f;
@@ -130,24 +130,28 @@ public class PlayerController : MonoBehaviour
         if (inputAccel > 0 || (isBoosting || onFlameTrail))
         {
             float forwardInput = (isBoosting || onFlameTrail) ? 1 : inputAccel;
-            baseSpeed += forwardInput * accelerationRate * Time.fixedDeltaTime;
-            if (baseSpeed > maxSpeed) baseSpeed = maxSpeed;
+            currentSpeed += forwardInput * accelerationRate * Time.fixedDeltaTime;
+            if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
             playerSFX.StartSound(playerSFX.movingSound);
         }
         else
         {
             float decelerationInput = inputDrift + 0.1f;
-            baseSpeed -= decelerationInput * decelerationRate * Time.fixedDeltaTime;
-            if (baseSpeed < 0f) baseSpeed = 0f;
+            currentSpeed -= decelerationInput * decelerationRate * Time.fixedDeltaTime;
+            if (currentSpeed < 0f) currentSpeed = 0f;
             playerSFX.StopSound(playerSFX.movingSound);
         }
-
-        Vector3 playerVelocity = baseSpeed * playerRB.transform.forward;
+        
+        Vector3 playerVelocity = currentSpeed * playerRB.transform.forward;
         playerVelocity.y = playerRB.linearVelocity.y;
         playerRB.linearVelocity = playerVelocity;
-        PlayerHUD.Instance.UpdateSpeedValue(Mathf.Abs(Vector3.Dot(playerRB.linearVelocity, playerRB.transform.forward)));
 
+        float transformSpeed = Mathf.Abs(Vector3.Dot(playerRB.linearVelocity, playerRB.transform.forward));
+        PlayerHUD.Instance.UpdateSpeedValue(transformSpeed, onFlameTrail);
+        playerAnimator.SetSpeed(transformSpeed);
+        
         if (inputAccel > 0 && !isBoosting) RegenerateFireEngery(0.5f);
+        if (currentFlameEnergy == 100f && isGrounded) StartBoost();
     }
     #endregion
 
@@ -159,6 +163,7 @@ public class PlayerController : MonoBehaviour
             if (!isBoosting) StartBoost();
             else StopBoost();
         }
+        if (isBoosting) playerVFX.ActivateFlameTire(true);
     }
     void BoostPhysics()
     {
@@ -169,7 +174,7 @@ public class PlayerController : MonoBehaviour
 
             maxSpeed += boostRate * Time.fixedDeltaTime;
 
-            currentFlameEnergy -= Time.fixedDeltaTime * energyRate;
+            currentFlameEnergy -= Time.fixedDeltaTime * (energyRate * 2f);
             if (currentFlameEnergy <= 0f) StopBoost();
             PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy);
         }
@@ -177,8 +182,8 @@ public class PlayerController : MonoBehaviour
         {
             if (!onFlameTrail)
             {
-                if (maxSpeed > baseMaxSpeed) maxSpeed -= (boostRate * 2f) * Time.fixedDeltaTime;
-                else maxSpeed = baseMaxSpeed;
+                if (maxSpeed > currentMaxSpeed) maxSpeed -= (boostRate * 2f) * Time.fixedDeltaTime;
+                else maxSpeed = currentMaxSpeed;
             }          
         }
 
@@ -220,12 +225,7 @@ public class PlayerController : MonoBehaviour
     void RegenerateFireEngery(float mult)
     {
         currentFlameEnergy += Time.fixedDeltaTime * (energyRate * mult);
-
-        if (currentFlameEnergy >= 100f)
-        {
-            currentFlameEnergy = 100f;
-            StartBoost();
-        }
+        if (currentFlameEnergy >= 100f) currentFlameEnergy = 100f;
 
         PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy);
     }
@@ -321,16 +321,18 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Other Functions
-    void OnTriggerStay(Collider other)
+    private void OnCollisionStay(Collision other)
     {
-        if(other.CompareTag("Trail"))
+        if (!CanMove()) return;
+
+        /*if (other.gameObject.CompareTag("Trail"))
         {
             onFlameTrail = true;
             offFlameTrailTimer = 0f;
             playerVFX.ActivateFlameLines(true);
             playerSFX.StartSound(playerSFX.boostingSound);
-            maxSpeed += other.GetComponentInParent<FlameTrailObject>().speedBoost * Time.fixedDeltaTime;
-        }    
+            maxSpeed += other.gameObject.GetComponentInParent<FlameTrailObject>().speedBoost * Time.fixedDeltaTime;
+        }*/
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -344,9 +346,18 @@ public class PlayerController : MonoBehaviour
                 lapsCompleted++;
                 PlayerHUD.Instance.UpdateLapNumber(lapsCompleted + 1);
 
-                if (lapsCompleted == 3) 
-                    { GameState.Instance.WinGame(); playerVFX.StopAllEffects(); playerSFX.StopAllAudio(); GetComponent<BasicComputerPlayer>().SetAutoMove(); }
-                else { PlayerHUD.Instance.DisplayMessage("LAP " + (lapsCompleted + 1) + "!"); GameState.Instance.lapSound.PlayOneShot(GameState.Instance.lapSound.clip); }
+                if (lapsCompleted == 3)
+                {
+                    GameState.Instance.WinGame();
+                    playerVFX.StopAllEffects();
+                    playerSFX.StopAllAudio();
+                    GetComponent<BasicComputerPlayer>().SetAutoMove();
+                }
+                else
+                {  
+                    PlayerHUD.Instance.DisplayMessage("LAP " + (lapsCompleted + 1) + "!");
+                    GameState.Instance.lapSound.PlayOneShot(GameState.Instance.lapSound.clip);
+                }
             }
 
             else if (passedCheckpoint < checkpointIndex && passedCheckpoint >= checkpointIndex - 15)
@@ -401,9 +412,12 @@ public class PlayerController : MonoBehaviour
         playerRB.position = currentCheckpoint.position;
         playerRB.rotation = currentCheckpoint.rotation;
         playerRB.linearVelocity = Vector3.down;
+        currentSpeed = 0f;
+
+        StopBoost();
+        playerVFX.StopAllEffects();
 
         playerSFX.PlaySound(playerSFX.respawnSound);
-
         yield return new WaitForSeconds(1f);
 
         isRespawning = false;

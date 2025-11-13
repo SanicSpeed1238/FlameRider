@@ -8,8 +8,9 @@ public class PlayerHUD : MonoBehaviour
     public static PlayerHUD Instance;
 
     [Header("Message Text")]
-    public TextMeshProUGUI messageText;
     public TextMeshProUGUI countdownNumbers;
+    public TextMeshProUGUI messageText;
+    public LeantweenCustomAnimator messageAnimation;
 
     [Header("Player Status")]
     public Slider fireEnergy;
@@ -19,6 +20,9 @@ public class PlayerHUD : MonoBehaviour
     public TextMeshProUGUI timerValue;
     public TextMeshProUGUI lapNumber;
 
+    // Other Variables Needed
+    private bool tweenPlaying;
+
     private void Awake()
     {
         Instance = this;
@@ -27,7 +31,7 @@ public class PlayerHUD : MonoBehaviour
     public void DisplayMessage(string message)
     {
         messageText.text = message;
-        messageText.gameObject.GetComponent<LeantweenCustomAnimator>().PlayAnimation();
+        messageAnimation.PlayAnimation();
     }
     public void DisplayCountdown(int num)
     {
@@ -37,17 +41,13 @@ public class PlayerHUD : MonoBehaviour
         countdownNumbers.text = numText;
         countdownNumbers.gameObject.GetComponent<LeantweenCustomAnimator>().PlayAnimation();
 
-        switch(num)
+        countdownNumbers.color = num switch
         {
-            case 3:
-                countdownNumbers.color = Color.yellow; break;
-            case 2:
-                countdownNumbers.color = new Color(1f, 0.5f, 0f); break;
-            case 1:
-                countdownNumbers.color = Color.red; break;
-            default:
-                countdownNumbers.color = Color.white; break;
-        }
+            3 => Color.yellow,
+            2 => new Color(1f, 0.5f, 0f),
+            1 => Color.red,
+            _ => Color.white,
+        };
     }
 
     public void UpdateFireEnergy(float value)
@@ -55,10 +55,16 @@ public class PlayerHUD : MonoBehaviour
         fireEnergy.value = value / 100f;
     }
 
-    public void UpdateSpeedValue(float playerSpeed)
+    public void UpdateSpeedValue(float playerSpeed, bool increaseAnimation)
     {
         int intSpeed = Mathf.RoundToInt(playerSpeed);
         speedValue.text = intSpeed.ToString();
+
+        if (increaseAnimation && !tweenPlaying)
+        {
+            speedValue.GetComponent<LeantweenCustomAnimator>().PlayAnimation();
+            SetTweenPlaying(true);
+        }
     }
 
     public void UpdateTimerValue(float timeElapsed)
@@ -74,5 +80,10 @@ public class PlayerHUD : MonoBehaviour
     {
         string lapText = lap.ToString();
         lapNumber.text = "LAP " + lapText + "/3";
+    }
+
+    public void SetTweenPlaying(bool playing)
+    {
+        tweenPlaying = playing;
     }
 }

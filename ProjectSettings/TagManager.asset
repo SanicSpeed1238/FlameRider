@@ -4,8 +4,6 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - Trail
-  - Road
   - Checkpoint
   - Deadzone
   layers:
@@ -16,7 +14,7 @@ TagManager:
   - Water
   - UI
   - Player
-  - 
+  - Trail
   - 
   - 
   - 

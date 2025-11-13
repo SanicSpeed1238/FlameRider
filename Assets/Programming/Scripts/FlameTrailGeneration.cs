@@ -9,17 +9,19 @@ public class FlameTrailGeneration : MonoBehaviour
     [Range(0.1f, 10f)] public float trailWidth = 1f;
     public GameObject trailPrefab;
     public Material trailMaterial;
-    public PhysicsMaterial colliderMaterial;
 
     // Variables Needed
     private bool generating = false;
-    private readonly float pointSpacing = 1f;
+    private readonly float collisionHeight = 0.2f;
+    private readonly float pointSpacing = 1f;   
+    private const int updateInterval = 3;
+    private int pointsSinceLastColliderUpdate = 0;
     private Vector3 lastPoint;
     private Rigidbody rigidBody;
     private GameObject currentTrailObj;
     private LineRenderer currentTrailLine;
     private SplineContainer splineContainer;
-    private Spline splinePoints;  
+    private Spline splinePoints;
 
     void Start()
     {
@@ -58,7 +60,7 @@ public class FlameTrailGeneration : MonoBehaviour
 
     public bool IsGenerating() => generating;
 
-    #region Trail Mesh Generation (idk what's going on here lol)
+    #region Trail Mesh Generation
     void FixedUpdate()
     {
         if (generating && splinePoints != null)
@@ -67,16 +69,15 @@ public class FlameTrailGeneration : MonoBehaviour
             if (dist >= pointSpacing) AddPoint(transform.position);
         }
     }
+
     private void AddPoint(Vector3 point)
     {
-        // Snap to Ground
         if (Physics.Raycast(point + Vector3.up, Vector3.down, out RaycastHit hit, 20f))
             point.y = hit.point.y + 0.05f;
 
         var knot = new BezierKnot(point);
         splinePoints.Add(knot);
 
-        // Update Line Renderer
         if (currentTrailLine != null)
         {
             currentTrailLine.positionCount = splinePoints.Count;
@@ -86,12 +87,12 @@ public class FlameTrailGeneration : MonoBehaviour
 
         lastPoint = point;
     }
+
     private void GenerateMeshCollider()
     {
         if (splineContainer == null || splinePoints == null || splinePoints.Count < 2)
             return;
 
-        // Create Mesh Components
         Mesh trailMesh = BuildTrailMesh(splineContainer, trailWidth);
         MeshFilter mf = currentTrailObj.AddComponent<MeshFilter>();
         MeshRenderer mr = currentTrailObj.AddComponent<MeshRenderer>();
@@ -100,15 +101,14 @@ public class FlameTrailGeneration : MonoBehaviour
         mf.sharedMesh = trailMesh;
         mr.sharedMaterial = trailMaterial;
         mc.sharedMesh = trailMesh;
-        mc.sharedMaterial = colliderMaterial;
         mc.convex = false;
     }
+
     private Mesh BuildTrailMesh(SplineContainer container, float width)
     {
         if (container == null || container.Spline.Count < 2)
             return null;
 
-        // Estimate spline length by summing distances between knots
         float length = 0f;
         int knotCount = Mathf.Max(2, container.Spline.Count);
         Vector3 prev = ToVector3(container.EvaluatePosition(0, 0f));
@@ -120,49 +120,67 @@ public class FlameTrailGeneration : MonoBehaviour
             prev = p;
         }
 
-        // Number of segments along the spline to build the ribbon mesh
         int segments = Mathf.Max(2, Mathf.CeilToInt(length / pointSpacing));
 
-        var verts = new List<Vector3>((segments + 1) * 2);
-        var tris = new List<int>(segments * 6);
-        var uvs = new List<Vector2>((segments + 1) * 2);
+        var verts = new List<Vector3>();
+        var tris = new List<int>();
+        var uvs = new List<Vector2>();
 
         for (int i = 0; i <= segments; i++)
         {
             float t = (float)i / segments;
-
-            // Evaluate world-space position and tangent from the container
-            // Returns Unity.Mathematics.float3, so convert to Vector3
             Vector3 center = ToVector3(container.EvaluatePosition(0, t));
             Vector3 tangent = ToVector3(container.EvaluateTangent(0, t)).normalized;
-
-            // Assuming mostly horizontal ground; compute lateral vector
             Vector3 normal = Vector3.up;
-            Vector3 lateral = Vector3.Cross(normal, tangent);
-            if (lateral.sqrMagnitude <= 1e-6f) lateral = Vector3.right; // avoid degenerate cross
-            lateral = lateral.normalized * (width * 0.5f);
+            Vector3 lateral = Vector3.Cross(normal, tangent).normalized * (width * 0.5f);
+            Vector3 up = 0.5f * collisionHeight * normal;
 
-            verts.Add(center - lateral);
-            verts.Add(center + lateral);
+            // bottom vertices (left/right)
+            verts.Add(center - lateral - up);
+            verts.Add(center + lateral - up);
+            // top vertices (left/right)
+            verts.Add(center - lateral + up);
+            verts.Add(center + lateral + up);
 
+            uvs.Add(new Vector2(0f, t));
+            uvs.Add(new Vector2(1f, t));
             uvs.Add(new Vector2(0f, t));
             uvs.Add(new Vector2(1f, t));
 
             if (i > 0)
             {
-                int baseIndex = i * 2;
-                // tri 1
-                tris.Add(baseIndex - 2);
-                tris.Add(baseIndex - 1);
-                tris.Add(baseIndex);
-                // tri 2
-                tris.Add(baseIndex + 1);
-                tris.Add(baseIndex);
-                tris.Add(baseIndex - 1);
+                int baseIndex = i * 4;
+                int prevIndex = baseIndex - 4;
+
+                // bottom face
+                tris.Add(prevIndex); tris.Add(baseIndex); tris.Add(prevIndex + 1);
+                tris.Add(baseIndex); tris.Add(baseIndex + 1); tris.Add(prevIndex + 1);
+
+                // top face
+                tris.Add(prevIndex + 2); tris.Add(prevIndex + 3); tris.Add(baseIndex + 2);
+                tris.Add(baseIndex + 3); tris.Add(baseIndex + 2); tris.Add(prevIndex + 3);
+
+                // left side
+                tris.Add(prevIndex); tris.Add(prevIndex + 2); tris.Add(baseIndex);
+                tris.Add(baseIndex); tris.Add(prevIndex + 2); tris.Add(baseIndex + 2);
+
+                // right side
+                tris.Add(prevIndex + 1); tris.Add(baseIndex + 1); tris.Add(prevIndex + 3);
+                tris.Add(baseIndex + 1); tris.Add(baseIndex + 3); tris.Add(prevIndex + 3);
             }
         }
 
-        Mesh mesh = new() { name = "FlameTrail_Ribbon" };
+        // Add start cap
+        int first = 0;
+        tris.Add(first); tris.Add(first + 1); tris.Add(first + 2);
+        tris.Add(first + 1); tris.Add(first + 3); tris.Add(first + 2);
+
+        // Add end cap
+        int last = verts.Count - 4;
+        tris.Add(last + 2); tris.Add(last + 1); tris.Add(last);
+        tris.Add(last + 2); tris.Add(last + 3); tris.Add(last + 1);
+
+        Mesh mesh = new() { name = "FlameTrail_Volume" };
         mesh.SetVertices(verts);
         mesh.SetTriangles(tris, 0);
         mesh.SetUVs(0, uvs);
@@ -171,10 +189,9 @@ public class FlameTrailGeneration : MonoBehaviour
 
         return mesh;
     }
+
     private static Vector3 ToVector3(Unity.Mathematics.float3 f)
     {
-        // Helper conversion from Unity.Mathematics.float3 (returned by EvaluatePosition/Tangent)
-        // to UnityEngine.Vector3. EvaluatePosition/EvaluateTangent return float3 types.
         return new Vector3(f.x, f.y, f.z);
     }
     #endregion

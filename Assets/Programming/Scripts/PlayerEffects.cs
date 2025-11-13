@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using Unity.Cinemachine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class PlayerEffects : MonoBehaviour
 {
@@ -11,14 +13,18 @@ public class PlayerEffects : MonoBehaviour
 
     [Header("Important References")]
     public CinemachineCamera playerCam;
+    public Volume postProcessVolume;
 
     // Other Variables Needed
     float gameFOV;
     Coroutine currentZoomCoroutine;
+    Coroutine motionBlurCoroutine;
+    MotionBlur motionBlur;
 
     void Start()
     {
         gameFOV = playerCam.Lens.FieldOfView;
+        if (postProcessVolume != null && postProcessVolume.profile != null) postProcessVolume.profile.TryGet(out motionBlur);
     }
 
     public void ActivateFlameTire(bool activate)
@@ -62,6 +68,34 @@ public class PlayerEffects : MonoBehaviour
             yield return null;
         }
         playerCam.Lens.FieldOfView = endFOV;
+    }
+
+    public void SetMotionBlurIntensity(float targetIntensity, float duration = 0.2f)
+    {
+        if (motionBlur == null)
+            return;
+
+        if (motionBlurCoroutine != null)
+            StopCoroutine(motionBlurCoroutine);
+
+        motionBlurCoroutine = StartCoroutine(LerpMotionBlurIntensity(targetIntensity, duration));
+    }
+    private IEnumerator LerpMotionBlurIntensity(float target, float duration)
+    {
+        if (!motionBlur.intensity.overrideState)
+            motionBlur.intensity.overrideState = true;
+
+        float start = motionBlur.intensity.value;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            motionBlur.intensity.value = Mathf.Lerp(start, target, elapsed / duration);
+            yield return null;
+        }
+
+        motionBlur.intensity.value = target;
     }
 
     public void StopAllEffects()

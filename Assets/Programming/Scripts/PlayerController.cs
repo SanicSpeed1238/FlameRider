@@ -60,6 +60,7 @@ public class PlayerController : MonoBehaviour
     bool isDrifting;
     bool isGrounded;
     bool isRespawning;
+    bool isFinished;
 
     // Input Variables
     float inputAccel;
@@ -94,11 +95,14 @@ public class PlayerController : MonoBehaviour
         playerSFX = GetComponentInChildren<PlayerAudio>();
 
         groundLayer = LayerMask.GetMask("Ground");
+
+        isFinished = false;
     }
     #endregion
 
     void Update()
     {
+        if (isFinished) return;
         if (!CanMove()) return;
 
         CheckInputs();
@@ -111,6 +115,8 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
+        if (isFinished) return;
+
         CheckGrounded();
 
         if (!CanMove()) return;   
@@ -148,7 +154,9 @@ public class PlayerController : MonoBehaviour
 
         float transformSpeed = Mathf.Abs(Vector3.Dot(playerRB.linearVelocity, playerRB.transform.forward));
         PlayerHUD.Instance.UpdateSpeedValue(transformSpeed, onFlameTrail);
+        
         playerAnimator.SetSpeed(transformSpeed);
+        playerVFX.SetMotionBlurIntensity(transformSpeed / 300f);
         
         if (inputAccel > 0 && !isBoosting) RegenerateFireEngery(0.5f);
         if (currentFlameEnergy == 100f && isGrounded) StartBoost();
@@ -174,7 +182,7 @@ public class PlayerController : MonoBehaviour
 
             maxSpeed += boostRate * Time.fixedDeltaTime;
 
-            currentFlameEnergy -= Time.fixedDeltaTime * (energyRate * 2f);
+            currentFlameEnergy -= Time.fixedDeltaTime * (energyRate * 1.5f);
             if (currentFlameEnergy <= 0f) StopBoost();
             PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy);
         }
@@ -265,7 +273,7 @@ public class PlayerController : MonoBehaviour
             Quaternion newRotation = Quaternion.Euler(0f, rotationAmount, 0f) * playerRB.rotation;
             playerRB.MoveRotation(newRotation);
 
-            if (isGrounded) RegenerateFireEngery(1f);
+            if (isGrounded) { RegenerateFireEngery(1f); playerVFX.ActivateFlameTire(true); }
         }
     }
     void StartDrift()
@@ -321,19 +329,18 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Other Functions
-    private void OnCollisionStay(Collision other)
+    public void RideFlameTrail(float trailSpeedBoost)
     {
-        if (!CanMove()) return;
-
-        /*if (other.gameObject.CompareTag("Trail"))
+        if (CanMove())
         {
             onFlameTrail = true;
             offFlameTrailTimer = 0f;
             playerVFX.ActivateFlameLines(true);
             playerSFX.StartSound(playerSFX.boostingSound);
-            maxSpeed += other.gameObject.GetComponentInParent<FlameTrailObject>().speedBoost * Time.fixedDeltaTime;
-        }*/
+            maxSpeed += trailSpeedBoost * Time.fixedDeltaTime;
+        }
     }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Checkpoint"))
@@ -349,9 +356,14 @@ public class PlayerController : MonoBehaviour
                 if (lapsCompleted == 3)
                 {
                     GameState.Instance.WinGame();
+                    PlayerHUD.Instance.UpdateLapNumber(3);
+
                     playerVFX.StopAllEffects();
                     playerSFX.StopAllAudio();
+                    playerAnimator.SetGrounded(true);
+
                     GetComponent<BasicComputerPlayer>().SetAutoMove();
+                    isFinished = true;
                 }
                 else
                 {  

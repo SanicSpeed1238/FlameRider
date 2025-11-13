@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 public class FlameTrailCheck : MonoBehaviour
 {
@@ -6,6 +7,9 @@ public class FlameTrailCheck : MonoBehaviour
     [Range(0.1f, 2f)]
     public float raycastDistance;
     public bool debugRay = true;
+
+    [Header("Trail Events")]
+    public UnityEvent OnTrail;
 
     private int trailLayer;
 
@@ -16,9 +20,10 @@ public class FlameTrailCheck : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, raycastDistance, trailLayer))
+        if (Physics.Raycast(transform.position, Vector3.down, out _, raycastDistance, trailLayer))
         {
-            Debug.Log($"✅ On Trail: {hit.collider.name} at {hit.point}");
+            OnTrail?.Invoke();
+            Debug.Log("On Trail");
         }
 
         if (debugRay)

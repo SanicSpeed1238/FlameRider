@@ -10,13 +10,12 @@ public class FlameTrailGeneration : MonoBehaviour
     public GameObject trailPrefab;
     public Material trailMaterial;
 
-    // Variables Needed
+    // Trail generation variables
     private bool generating = false;
     private readonly float collisionHeight = 0.2f;
-    private readonly float pointSpacing = 1f;   
-    private const int updateInterval = 3;
-    private int pointsSinceLastColliderUpdate = 0;
+    private readonly float pointSpacing = 1f;
     private Vector3 lastPoint;
+
     private Rigidbody rigidBody;
     private GameObject currentTrailObj;
     private LineRenderer currentTrailLine;
@@ -31,13 +30,13 @@ public class FlameTrailGeneration : MonoBehaviour
     public void StartBoostTrail()
     {
         currentTrailObj = Instantiate(trailPrefab, Vector3.zero, Quaternion.identity);
+
         splineContainer = currentTrailObj.AddComponent<SplineContainer>();
         splinePoints = new Spline();
         splineContainer.Spline = splinePoints;
 
         currentTrailLine = currentTrailObj.GetComponentInChildren<LineRenderer>();
         if (currentTrailLine == null) currentTrailLine = currentTrailObj.AddComponent<LineRenderer>();
-
         currentTrailLine.startWidth = trailWidth;
         currentTrailLine.endWidth = trailWidth;
         currentTrailLine.alignment = LineAlignment.TransformZ;
@@ -60,7 +59,6 @@ public class FlameTrailGeneration : MonoBehaviour
 
     public bool IsGenerating() => generating;
 
-    #region Trail Mesh Generation
     void FixedUpdate()
     {
         if (generating && splinePoints != null)
@@ -70,13 +68,13 @@ public class FlameTrailGeneration : MonoBehaviour
         }
     }
 
+    #region Trail Mesh & Particle Generation
     private void AddPoint(Vector3 point)
     {
         if (Physics.Raycast(point + Vector3.up, Vector3.down, out RaycastHit hit, 20f))
             point.y = hit.point.y + 0.05f;
 
-        var knot = new BezierKnot(point);
-        splinePoints.Add(knot);
+        splinePoints.Add(new BezierKnot(point));
 
         if (currentTrailLine != null)
         {
@@ -135,10 +133,8 @@ public class FlameTrailGeneration : MonoBehaviour
             Vector3 lateral = Vector3.Cross(normal, tangent).normalized * (width * 0.5f);
             Vector3 up = 0.5f * collisionHeight * normal;
 
-            // bottom vertices (left/right)
             verts.Add(center - lateral - up);
             verts.Add(center + lateral - up);
-            // top vertices (left/right)
             verts.Add(center - lateral + up);
             verts.Add(center + lateral + up);
 
@@ -152,30 +148,24 @@ public class FlameTrailGeneration : MonoBehaviour
                 int baseIndex = i * 4;
                 int prevIndex = baseIndex - 4;
 
-                // bottom face
                 tris.Add(prevIndex); tris.Add(baseIndex); tris.Add(prevIndex + 1);
                 tris.Add(baseIndex); tris.Add(baseIndex + 1); tris.Add(prevIndex + 1);
 
-                // top face
                 tris.Add(prevIndex + 2); tris.Add(prevIndex + 3); tris.Add(baseIndex + 2);
                 tris.Add(baseIndex + 3); tris.Add(baseIndex + 2); tris.Add(prevIndex + 3);
 
-                // left side
                 tris.Add(prevIndex); tris.Add(prevIndex + 2); tris.Add(baseIndex);
                 tris.Add(baseIndex); tris.Add(prevIndex + 2); tris.Add(baseIndex + 2);
 
-                // right side
                 tris.Add(prevIndex + 1); tris.Add(baseIndex + 1); tris.Add(prevIndex + 3);
                 tris.Add(baseIndex + 1); tris.Add(baseIndex + 3); tris.Add(prevIndex + 3);
             }
         }
 
-        // Add start cap
         int first = 0;
         tris.Add(first); tris.Add(first + 1); tris.Add(first + 2);
         tris.Add(first + 1); tris.Add(first + 3); tris.Add(first + 2);
 
-        // Add end cap
         int last = verts.Count - 4;
         tris.Add(last + 2); tris.Add(last + 1); tris.Add(last);
         tris.Add(last + 2); tris.Add(last + 3); tris.Add(last + 1);
@@ -190,9 +180,6 @@ public class FlameTrailGeneration : MonoBehaviour
         return mesh;
     }
 
-    private static Vector3 ToVector3(Unity.Mathematics.float3 f)
-    {
-        return new Vector3(f.x, f.y, f.z);
-    }
+    private static Vector3 ToVector3(Unity.Mathematics.float3 f) => new(f.x, f.y, f.z);
     #endregion
 }

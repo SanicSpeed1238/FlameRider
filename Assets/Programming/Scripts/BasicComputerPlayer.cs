@@ -52,7 +52,7 @@ public class BasicComputerPlayer : MonoBehaviour
         if (direction.sqrMagnitude > 0.001f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime);
+            rigbody.rotation = Quaternion.Slerp(rigbody.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime);
         }
 
         Vector3 playerVelocity = baseSpeed * rigbody.transform.forward;
@@ -96,6 +96,7 @@ public class BasicComputerPlayer : MonoBehaviour
     public void SetAutoMove()
     {
         canAutoMove = true;
-        currentIndex = 1;
+        currentIndex = 0;
+        rigbody = GetComponent<Rigidbody>();
     }
 }

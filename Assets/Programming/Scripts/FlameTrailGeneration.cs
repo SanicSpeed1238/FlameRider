@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Splines;
+using UnityEngine.VFX;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -7,6 +8,7 @@ public class FlameTrailGeneration : MonoBehaviour
 {
     [Header("Trail Settings")]
     [Range(0.1f, 10f)] public float trailWidth = 1f;
+    public VisualEffect flameTrailVFX;
     public GameObject trailPrefab;
     public Material trailMaterial;
 
@@ -21,6 +23,7 @@ public class FlameTrailGeneration : MonoBehaviour
     private LineRenderer currentTrailLine;
     private SplineContainer splineContainer;
     private Spline splinePoints;
+    private GraphicsBuffer splineBuffer;
 
     void Start()
     {
@@ -46,6 +49,8 @@ public class FlameTrailGeneration : MonoBehaviour
         splinePoints.Clear();
         AddPoint(transform.position);
         generating = true;
+
+        flameTrailVFX = currentTrailObj.GetComponentInChildren<VisualEffect>();
     }
 
     public void StopBoostTrail()
@@ -55,6 +60,13 @@ public class FlameTrailGeneration : MonoBehaviour
         currentTrailLine = null;
         splinePoints = null;
         splineContainer = null;
+
+        if (splineBuffer != null)
+        {
+            flameTrailVFX.SetGraphicsBuffer("SplineBuffer", null);
+            splineBuffer.Release();
+            splineBuffer = null;
+        }
     }
 
     public bool IsGenerating() => generating;
@@ -84,6 +96,8 @@ public class FlameTrailGeneration : MonoBehaviour
         }
 
         lastPoint = point;
+
+        UpdateVFXBuffer();
     }
 
     private void GenerateMeshCollider()
@@ -100,6 +114,8 @@ public class FlameTrailGeneration : MonoBehaviour
         mr.sharedMaterial = trailMaterial;
         mc.sharedMesh = trailMesh;
         mc.convex = false;
+
+        UpdateVFXBuffer();
     }
 
     private Mesh BuildTrailMesh(SplineContainer container, float width)
@@ -179,6 +195,41 @@ public class FlameTrailGeneration : MonoBehaviour
 
         return mesh;
     }
+
+    private void UpdateVFXBuffer()
+    {
+        if (flameTrailVFX == null || splinePoints == null) return;
+
+        int count = splinePoints.Count;
+        if (count == 0) return;
+
+        // Build a managed Vector3[] from your spline points
+        Vector3[] points = new Vector3[count];
+        for (int i = 0; i < count; i++)
+            points[i] = splinePoints[i].Position;
+
+        // Release old buffer if it exists and size changed
+        if (splineBuffer != null && splineBuffer.count != count)
+        {
+            splineBuffer.Release();
+            splineBuffer = null;
+        }
+
+        // If buffer is null, create it (Structured target). stride = 3 floats = 12 bytes
+        if (splineBuffer == null)
+        {
+            int stride = sizeof(float) * 3; // 12
+            splineBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, count, stride);
+        }
+
+        // Upload data to GPU
+        splineBuffer.SetData(points);
+
+        // Set the buffer and count on the VFX component
+        flameTrailVFX.SetGraphicsBuffer("SplineBuffer", splineBuffer);
+        flameTrailVFX.SetInt("PointsCount", count);
+    }
+
 
     private static Vector3 ToVector3(Unity.Mathematics.float3 f) => new(f.x, f.y, f.z);
     #endregion

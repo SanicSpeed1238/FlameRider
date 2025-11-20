@@ -1,6 +1,7 @@
 using GogoGaga.TME;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class GameState : MonoBehaviour
 {
@@ -13,20 +14,24 @@ public class GameState : MonoBehaviour
     public GameObject pauseScreen;
 
     [Header("Audio Sources")]
+    public AudioMixer audioMixer;
     public AudioSource gameMusic;
+    public AudioSource resultsMusic;
     public AudioSource countdownSound;
+    public AudioSource startSound;
     public AudioSource lapSound;
-    public AudioSource winSound;
 
     [Header("Debugging Tools")]
     public bool disableCountdown;
 
+    // Variables Needed
     private float timeElapsed = 0f;
 
     private void Awake()
     {
         Instance = this;
         isPlaying = false;
+        audioMixer.SetFloat("sfxVolume", 0f);
     }
     private void Start()
     {
@@ -65,11 +70,10 @@ public class GameState : MonoBehaviour
             yield return new WaitForSeconds(1f);
 
             PlayerHUD.Instance.DisplayCountdown(0);
-            countdownSound.volume = 1f;
-            countdownSound.PlayOneShot(countdownSound.clip);
             PlayerHUD.Instance.DisplayMessage("GO !!!");
-            isPlaying = true;
+            startSound.PlayOneShot(startSound.clip);
             gameMusic.Play();
+            isPlaying = true;          
         }
         else
         {
@@ -99,11 +103,27 @@ public class GameState : MonoBehaviour
 
         PlayerHUD.Instance.DisplayMessage("FINISH!");
         gameMusic.Stop();
-        winSound.Play();
+        resultsMusic.Play();
+        startSound.PlayOneShot(startSound.clip);
         yield return new WaitForSeconds(3f);
 
         PlayerHUD.Instance.DisplayMessage(string.Empty);
+        PlayerHUD.Instance.SetSelectedButton(playerHUD.GetComponent<PlayerHUD>().replayButton);
         playerHUD.GetComponent<LeantweenCustomAnimator>().PlayAnimation();
         winScreen.SetActive(true);
+    }
+
+    public void LowerGameVolume(bool paused)
+    {
+        if (paused)
+        {
+            gameMusic.volume = 0.1f;
+            audioMixer.SetFloat("sfxVolume", -45f);
+        }
+        else
+        {
+            gameMusic.volume = 0.45f;
+            audioMixer.SetFloat("sfxVolume", 0f);
+        }
     }
 }

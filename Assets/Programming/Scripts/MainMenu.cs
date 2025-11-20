@@ -12,7 +12,7 @@ public class MainMenu : MonoBehaviour
 
     public void PlayGame()
     {
-        TransitionManager.Instance().Transition("Test Scene", playTransition, 0.2f);
+        TransitionManager.Instance().Transition("Test Scene", playTransition, 2.5f);
     }
 
     public void QuitGame()

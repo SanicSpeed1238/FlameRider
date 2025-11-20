@@ -136,8 +136,8 @@ public class PlayerController : MonoBehaviour
         if (inputAccel > 0 || (isBoosting || onFlameTrail))
         {
             float forwardInput = (isBoosting || onFlameTrail) ? 1 : inputAccel;
-            currentSpeed += forwardInput * accelerationRate * Time.fixedDeltaTime;
-            if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+            currentSpeed += forwardInput * ((currentSpeed < maxSpeed || currentMaxSpeed > maxSpeed) ? accelerationRate : (accelerationRate * 0.01f)) * Time.fixedDeltaTime;
+            if (currentSpeed > currentMaxSpeed) currentSpeed = currentMaxSpeed;
             playerSFX.StartSound(playerSFX.movingSound);
         }
         else
@@ -180,7 +180,7 @@ public class PlayerController : MonoBehaviour
             if (isGrounded) StartBoost();
             else StopBoost();
 
-            maxSpeed += boostRate * Time.fixedDeltaTime;
+            currentMaxSpeed += boostRate * Time.fixedDeltaTime;
 
             currentFlameEnergy -= Time.fixedDeltaTime * (energyRate * 1.5f);
             if (currentFlameEnergy <= 0f) StopBoost();
@@ -190,8 +190,8 @@ public class PlayerController : MonoBehaviour
         {
             if (!onFlameTrail)
             {
-                if (maxSpeed > currentMaxSpeed) maxSpeed -= (boostRate * 2f) * Time.fixedDeltaTime;
-                else maxSpeed = currentMaxSpeed;
+                if (currentMaxSpeed > maxSpeed) currentMaxSpeed -= (boostRate * 2f) * Time.fixedDeltaTime;
+                else currentMaxSpeed = maxSpeed;
             }          
         }
 
@@ -337,7 +337,7 @@ public class PlayerController : MonoBehaviour
             offFlameTrailTimer = 0f;
             playerVFX.ActivateFlameLines(true);
             playerSFX.StartSound(playerSFX.boostingSound);
-            maxSpeed += trailSpeedBoost * Time.fixedDeltaTime;
+            currentMaxSpeed += trailSpeedBoost * Time.fixedDeltaTime;
         }
     }
 

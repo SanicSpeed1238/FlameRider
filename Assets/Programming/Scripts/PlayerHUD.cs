@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using GogoGaga.TME;
 using TMPro;
 
@@ -20,12 +21,21 @@ public class PlayerHUD : MonoBehaviour
     public TextMeshProUGUI timerValue;
     public TextMeshProUGUI lapNumber;
 
+    [Header("Button References")]
+    public GameObject resumeButton;
+    public GameObject replayButton;
+
     // Other Variables Needed
+    private EventSystem eventSystem;
     private bool tweenPlaying;
 
     private void Awake()
     {
         Instance = this;
+    }
+    private void Start()
+    {
+        eventSystem = EventSystem.current;
     }
 
     public void DisplayMessage(string message)
@@ -85,5 +95,10 @@ public class PlayerHUD : MonoBehaviour
     public void SetTweenPlaying(bool playing)
     {
         tweenPlaying = playing;
+    }
+
+    public void SetSelectedButton(GameObject menuButton)
+    {
+        eventSystem.SetSelectedGameObject(menuButton);
     }
 }

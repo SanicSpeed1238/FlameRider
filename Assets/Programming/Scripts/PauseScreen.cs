@@ -14,12 +14,15 @@ public class PauseScreen : MonoBehaviour
     {
         Time.timeScale = 0;
         GameState.Instance.isPlaying = false;
+        GameState.Instance.LowerGameVolume(true);
+        PlayerHUD.Instance.SetSelectedButton(PlayerHUD.Instance.resumeButton);
     }
 
     public void ResumeGame()
     {
         Time.timeScale = 1;
-        GameState.Instance.isPlaying = false;
+        GameState.Instance.isPlaying = true;
+        GameState.Instance.LowerGameVolume(false);
         this.gameObject.SetActive(false);
     }
 

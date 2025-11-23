@@ -50,7 +50,7 @@ public class FlameTrailGeneration : MonoBehaviour
         AddPoint(transform.position);
         generating = true;
 
-        flameTrailVFX = currentTrailObj.GetComponentInChildren<VisualEffect>();
+        flameTrailVFX = currentTrailObj.GetComponent<VisualEffect>();
     }
 
     public void StopBoostTrail()
@@ -203,33 +203,39 @@ public class FlameTrailGeneration : MonoBehaviour
         int count = splinePoints.Count;
         if (count == 0) return;
 
-        // Build a managed Vector3[] from your spline points
         Vector3[] points = new Vector3[count];
-        for (int i = 0; i < count; i++)
-            points[i] = splinePoints[i].Position;
+        Transform splineTransform = splineContainer.transform;
 
-        // Release old buffer if it exists and size changed
+        // Convert spline local positions to world positions
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 localPos = splinePoints[i].Position;
+            Vector3 worldPos = splineTransform.TransformPoint(localPos);
+            points[i] = worldPos;
+        }
+
+        // Recreate buffer if needed
         if (splineBuffer != null && splineBuffer.count != count)
         {
+            flameTrailVFX.SetGraphicsBuffer("SplineBuffer", null);
             splineBuffer.Release();
             splineBuffer = null;
         }
 
-        // If buffer is null, create it (Structured target). stride = 3 floats = 12 bytes
         if (splineBuffer == null)
         {
-            int stride = sizeof(float) * 3; // 12
-            splineBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, count, stride);
+            splineBuffer = new GraphicsBuffer(
+                GraphicsBuffer.Target.Structured,
+                count,
+                sizeof(float) * 3
+            );
         }
 
-        // Upload data to GPU
         splineBuffer.SetData(points);
 
-        // Set the buffer and count on the VFX component
         flameTrailVFX.SetGraphicsBuffer("SplineBuffer", splineBuffer);
         flameTrailVFX.SetInt("PointsCount", count);
     }
-
 
     private static Vector3 ToVector3(Unity.Mathematics.float3 f) => new(f.x, f.y, f.z);
     #endregion

@@ -22,7 +22,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_BasicColor_TempTrail
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-  m_Parent: {fileID: 2100000, guid: d34e3d07c68595748a6f470c9d66565e, type: 2}
+  m_Parent: {fileID: 2100000, guid: 0016d2700f213ba4bbd4dd10118fc719, type: 2}
   m_ModifiedSerializedProperties: 26
   m_ValidKeywords:
   - _EMISSION
@@ -48,6 +48,7 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _Metallic: 0
+    - _QueueControl: 0
     - _ReceiveShadows: 0
     - _Smoothness: 0
     - _Surface: 0

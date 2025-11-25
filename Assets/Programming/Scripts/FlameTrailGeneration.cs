@@ -1,242 +1,144 @@
 using UnityEngine;
-using UnityEngine.Splines;
-using UnityEngine.VFX;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(Rigidbody))]
 public class FlameTrailGeneration : MonoBehaviour
 {
     [Header("Trail Settings")]
-    [Range(0.1f, 10f)] public float trailWidth = 1f;
-    public VisualEffect flameTrailVFX;
+    [Range(1f, 10f)]
+    public float trailWidth = 1f;
     public GameObject trailPrefab;
-    public Material trailMaterial;
 
-    // Trail generation variables
+    [Header("Collider Settings")]
+    public float colliderHeight = 1f; // vertical thickness of collider
+    public int pointsPerBake = 10;    // bake collider every 10 points
+
+    [Header("Debug Settings")]
+    public bool drawColliderGizmos = true; // visualize the collider in the editor
+    public Color gizmoColor = Color.red;
+
+    // Internal variables
     private bool generating = false;
-    private readonly float collisionHeight = 0.2f;
-    private readonly float pointSpacing = 1f;
-    private Vector3 lastPoint;
-
     private Rigidbody rigidBody;
-    private GameObject currentTrailObj;
-    private LineRenderer currentTrailLine;
-    private SplineContainer splineContainer;
-    private Spline splinePoints;
-    private GraphicsBuffer splineBuffer;
+    private LineRenderer currentTrail;
+    private List<Vector3> currentPoints;
+    private Vector3 lastPoint;
+    private int pointsSinceLastBake = 0;
+    private readonly float pointSpacing = 1f;
+
+    private MeshCollider meshCollider;
+    private Mesh bakedMesh;
 
     void Start()
     {
         rigidBody = GetComponent<Rigidbody>();
+        currentPoints = new List<Vector3>();
+    }
+
+    void FixedUpdate()
+    {
+        if (!generating || currentTrail == null) return;
+
+        float dist = Vector3.Distance(rigidBody.position, lastPoint);
+        if (dist >= pointSpacing)
+        {
+            AddPoint(transform.position);
+        }
+    }
+
+    private void AddPoint(Vector3 point)
+    {
+        // Snap to ground
+        if (Physics.Raycast(point + Vector3.up, Vector3.down, out RaycastHit hit, 20f))
+            point.y = hit.point.y + 0.05f;
+        else
+            point.y = 0f;
+
+        currentPoints.Add(point);
+        currentTrail.positionCount = currentPoints.Count;
+        currentTrail.SetPosition(currentPoints.Count - 1, point);
+        lastPoint = point;
+
+        pointsSinceLastBake++;
+        if (pointsSinceLastBake >= pointsPerBake)
+        {
+            BakeCollider();
+            pointsSinceLastBake = 0;
+        }
+    }
+
+    private void BakeCollider()
+    {
+        if (currentTrail.positionCount < 2) return;
+
+        bakedMesh = new Mesh { name = "FlameTrailColliderMesh" };
+        currentTrail.BakeMesh(bakedMesh, true);
+
+        // Add vertical thickness
+        Vector3[] verts = bakedMesh.vertices;
+        for (int i = 0; i < verts.Length; i++)
+        {
+            verts[i].y += colliderHeight * 0.5f; // raise mesh upward
+        }
+        bakedMesh.vertices = verts;
+        bakedMesh.RecalculateBounds();
+        bakedMesh.RecalculateNormals();
+
+        // Assign mesh to MeshCollider
+        if (meshCollider == null)
+        {
+            meshCollider = currentTrail.transform.parent.gameObject.GetComponent<MeshCollider>();
+            if (meshCollider == null)
+                meshCollider = currentTrail.transform.parent.gameObject.AddComponent<MeshCollider>();
+        }
+
+        meshCollider.sharedMesh = bakedMesh;
+        meshCollider.convex = false;
     }
 
     public void StartBoostTrail()
     {
-        currentTrailObj = Instantiate(trailPrefab, Vector3.zero, Quaternion.identity);
+        GameObject newTrail = Instantiate(trailPrefab, Vector3.zero, Quaternion.identity);
+        currentTrail = newTrail.GetComponentInChildren<LineRenderer>();
 
-        splineContainer = currentTrailObj.AddComponent<SplineContainer>();
-        splinePoints = new Spline();
-        splineContainer.Spline = splinePoints;
+        currentTrail.startWidth = trailWidth;
+        currentTrail.endWidth = trailWidth;
+        currentPoints.Clear();
+        pointsSinceLastBake = 0;
 
-        currentTrailLine = currentTrailObj.GetComponentInChildren<LineRenderer>();
-        if (currentTrailLine == null) currentTrailLine = currentTrailObj.AddComponent<LineRenderer>();
-        currentTrailLine.startWidth = trailWidth;
-        currentTrailLine.endWidth = trailWidth;
-        currentTrailLine.alignment = LineAlignment.TransformZ;
-        currentTrailLine.material = trailMaterial;
-        currentTrailLine.positionCount = 0;
-
-        splinePoints.Clear();
         AddPoint(transform.position);
         generating = true;
-
-        flameTrailVFX = currentTrailObj.GetComponent<VisualEffect>();
     }
 
     public void StopBoostTrail()
     {
         generating = false;
-        GenerateMeshCollider();
-        currentTrailLine = null;
-        splinePoints = null;
-        splineContainer = null;
-
-        if (splineBuffer != null)
-        {
-            flameTrailVFX.SetGraphicsBuffer("SplineBuffer", null);
-            splineBuffer.Release();
-            splineBuffer = null;
-        }
+        currentTrail = null;
+        currentPoints.Clear();
+        meshCollider = null;
+        bakedMesh = null;
     }
 
     public bool IsGenerating() => generating;
 
-    void FixedUpdate()
+    // ---------------- Debug Gizmos ----------------
+    private void OnDrawGizmos()
     {
-        if (generating && splinePoints != null)
+        if (!drawColliderGizmos || bakedMesh == null) return;
+
+        Gizmos.color = gizmoColor;
+
+        Vector3[] verts = bakedMesh.vertices;
+        int[] tris = bakedMesh.triangles;
+
+        for (int i = 0; i < tris.Length; i += 3)
         {
-            float dist = Vector3.Distance(rigidBody.position, lastPoint);
-            if (dist >= pointSpacing) AddPoint(transform.position);
+            Vector3 v0 = currentTrail.transform.TransformPoint(verts[tris[i]]);
+            Vector3 v1 = currentTrail.transform.TransformPoint(verts[tris[i + 1]]);
+            Vector3 v2 = currentTrail.transform.TransformPoint(verts[tris[i + 2]]);
+
+            Gizmos.DrawLine(v0, v1);
+            Gizmos.DrawLine(v1, v2);
+            Gizmos.DrawLine(v2, v0);
         }
     }
-
-    #region Trail Mesh & Particle Generation
-    private void AddPoint(Vector3 point)
-    {
-        if (Physics.Raycast(point + Vector3.up, Vector3.down, out RaycastHit hit, 20f))
-            point.y = hit.point.y + 0.05f;
-
-        splinePoints.Add(new BezierKnot(point));
-
-        if (currentTrailLine != null)
-        {
-            currentTrailLine.positionCount = splinePoints.Count;
-            for (int i = 0; i < splinePoints.Count; i++)
-                currentTrailLine.SetPosition(i, splinePoints[i].Position);
-        }
-
-        lastPoint = point;
-
-        UpdateVFXBuffer();
-    }
-
-    private void GenerateMeshCollider()
-    {
-        if (splineContainer == null || splinePoints == null || splinePoints.Count < 2)
-            return;
-
-        Mesh trailMesh = BuildTrailMesh(splineContainer, trailWidth);
-        MeshFilter mf = currentTrailObj.AddComponent<MeshFilter>();
-        MeshRenderer mr = currentTrailObj.AddComponent<MeshRenderer>();
-        MeshCollider mc = currentTrailObj.AddComponent<MeshCollider>();
-
-        mf.sharedMesh = trailMesh;
-        mr.sharedMaterial = trailMaterial;
-        mc.sharedMesh = trailMesh;
-        mc.convex = false;
-
-        UpdateVFXBuffer();
-    }
-
-    private Mesh BuildTrailMesh(SplineContainer container, float width)
-    {
-        if (container == null || container.Spline.Count < 2)
-            return null;
-
-        float length = 0f;
-        int knotCount = Mathf.Max(2, container.Spline.Count);
-        Vector3 prev = ToVector3(container.EvaluatePosition(0, 0f));
-        for (int k = 1; k < knotCount; ++k)
-        {
-            float tKnot = (float)k / (knotCount - 1);
-            Vector3 p = ToVector3(container.EvaluatePosition(0, tKnot));
-            length += Vector3.Distance(prev, p);
-            prev = p;
-        }
-
-        int segments = Mathf.Max(2, Mathf.CeilToInt(length / pointSpacing));
-
-        var verts = new List<Vector3>();
-        var tris = new List<int>();
-        var uvs = new List<Vector2>();
-
-        for (int i = 0; i <= segments; i++)
-        {
-            float t = (float)i / segments;
-            Vector3 center = ToVector3(container.EvaluatePosition(0, t));
-            Vector3 tangent = ToVector3(container.EvaluateTangent(0, t)).normalized;
-            Vector3 normal = Vector3.up;
-            Vector3 lateral = Vector3.Cross(normal, tangent).normalized * (width * 0.5f);
-            Vector3 up = 0.5f * collisionHeight * normal;
-
-            verts.Add(center - lateral - up);
-            verts.Add(center + lateral - up);
-            verts.Add(center - lateral + up);
-            verts.Add(center + lateral + up);
-
-            uvs.Add(new Vector2(0f, t));
-            uvs.Add(new Vector2(1f, t));
-            uvs.Add(new Vector2(0f, t));
-            uvs.Add(new Vector2(1f, t));
-
-            if (i > 0)
-            {
-                int baseIndex = i * 4;
-                int prevIndex = baseIndex - 4;
-
-                tris.Add(prevIndex); tris.Add(baseIndex); tris.Add(prevIndex + 1);
-                tris.Add(baseIndex); tris.Add(baseIndex + 1); tris.Add(prevIndex + 1);
-
-                tris.Add(prevIndex + 2); tris.Add(prevIndex + 3); tris.Add(baseIndex + 2);
-                tris.Add(baseIndex + 3); tris.Add(baseIndex + 2); tris.Add(prevIndex + 3);
-
-                tris.Add(prevIndex); tris.Add(prevIndex + 2); tris.Add(baseIndex);
-                tris.Add(baseIndex); tris.Add(prevIndex + 2); tris.Add(baseIndex + 2);
-
-                tris.Add(prevIndex + 1); tris.Add(baseIndex + 1); tris.Add(prevIndex + 3);
-                tris.Add(baseIndex + 1); tris.Add(baseIndex + 3); tris.Add(prevIndex + 3);
-            }
-        }
-
-        int first = 0;
-        tris.Add(first); tris.Add(first + 1); tris.Add(first + 2);
-        tris.Add(first + 1); tris.Add(first + 3); tris.Add(first + 2);
-
-        int last = verts.Count - 4;
-        tris.Add(last + 2); tris.Add(last + 1); tris.Add(last);
-        tris.Add(last + 2); tris.Add(last + 3); tris.Add(last + 1);
-
-        Mesh mesh = new() { name = "FlameTrail_Volume" };
-        mesh.SetVertices(verts);
-        mesh.SetTriangles(tris, 0);
-        mesh.SetUVs(0, uvs);
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-
-        return mesh;
-    }
-
-    private void UpdateVFXBuffer()
-    {
-        if (flameTrailVFX == null || splinePoints == null) return;
-
-        int count = splinePoints.Count;
-        if (count == 0) return;
-
-        Vector3[] points = new Vector3[count];
-        Transform splineTransform = splineContainer.transform;
-
-        // Convert spline local positions to world positions
-        for (int i = 0; i < count; i++)
-        {
-            Vector3 localPos = splinePoints[i].Position;
-            Vector3 worldPos = splineTransform.TransformPoint(localPos);
-            points[i] = worldPos;
-        }
-
-        // Recreate buffer if needed
-        if (splineBuffer != null && splineBuffer.count != count)
-        {
-            flameTrailVFX.SetGraphicsBuffer("SplineBuffer", null);
-            splineBuffer.Release();
-            splineBuffer = null;
-        }
-
-        if (splineBuffer == null)
-        {
-            splineBuffer = new GraphicsBuffer(
-                GraphicsBuffer.Target.Structured,
-                count,
-                sizeof(float) * 3
-            );
-        }
-
-        splineBuffer.SetData(points);
-
-        flameTrailVFX.SetGraphicsBuffer("SplineBuffer", splineBuffer);
-        flameTrailVFX.SetInt("PointsCount", count);
-    }
-
-    private static Vector3 ToVector3(Unity.Mathematics.float3 f) => new(f.x, f.y, f.z);
-    #endregion
 }

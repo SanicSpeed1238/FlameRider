@@ -171,7 +171,7 @@ public class PlayerController : MonoBehaviour
             if (!isBoosting) StartBoost();
             else StopBoost();
         }
-        if (isBoosting) playerVFX.ActivateFlameTire(true);
+        if (isBoosting) playerVFX.ActivateFlameGenerate(true);
     }
     void BoostPhysics()
     {
@@ -213,7 +213,7 @@ public class PlayerController : MonoBehaviour
         {
             isBoosting = true;
             flameTrail.StartBoostTrail();
-            playerVFX.ActivateFlameTire(true);
+            playerVFX.ActivateFlameGenerate(true);
             playerVFX.ActivateBoostEffect(true);
             playerSFX.StartSound(playerSFX.boostingSound);
         } 
@@ -224,7 +224,7 @@ public class PlayerController : MonoBehaviour
         {
             isBoosting = false;
             flameTrail.StopBoostTrail();
-            playerVFX.ActivateFlameTire(false);
+            playerVFX.ActivateFlameGenerate(false);
             playerVFX.ActivateBoostEffect(false);
             playerSFX.StopSound(playerSFX.boostingSound);
         }

@@ -19,6 +19,7 @@ public class BasicComputerPlayer : MonoBehaviour
     private Rigidbody rigbody;
     private FlameTrailGeneration flameTrail;
     private int currentIndex = 0;
+    private Vector3 targetPosition;
 
     IEnumerator Start()
     {
@@ -26,6 +27,7 @@ public class BasicComputerPlayer : MonoBehaviour
         flameTrail = GetComponent<FlameTrailGeneration>();
 
         currentIndex = 0;
+        GetTargetPosition();
 
         if (canAutoMove)
         {
@@ -42,13 +44,19 @@ public class BasicComputerPlayer : MonoBehaviour
         if (canAutoMove) MoveTowardsTarget();
     }
 
+    private void GetTargetPosition()
+    {
+        Transform target = targetPoints[currentIndex].transform;
+
+        float randomOffset = Random.Range(-5f, 5f);
+
+        targetPosition = target.position + (target.right * randomOffset);
+    }
     private void MoveTowardsTarget()
     {
-        // make rotate towards target point
-        Vector3 targetPos = targetPoints[currentIndex].transform.position;
-        Vector3 direction = (targetPos - transform.position).normalized;
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        direction.y = 0f;
 
-        // Smoothly rotate toward target
         if (direction.sqrMagnitude > 0.001f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction);
@@ -70,6 +78,7 @@ public class BasicComputerPlayer : MonoBehaviour
                 currentIndex = 0;
                 StopAllCoroutines();
             }
+            GetTargetPosition();
         }
     }
 

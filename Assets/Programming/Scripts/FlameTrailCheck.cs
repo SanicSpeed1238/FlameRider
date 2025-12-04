@@ -23,13 +23,13 @@ public class FlameTrailCheck : MonoBehaviour
         if (Physics.Raycast(transform.position, Vector3.down, out _, raycastDistance, trailLayer))
         {
             OnTrail?.Invoke();
-            Debug.Log("On Trail");
+            //Debug.Log("On Trail");
         }
 
         if (debugRay)
         {
             bool hitTrail = Physics.Raycast(transform.position, Vector3.down, out _, raycastDistance, trailLayer);
-            Debug.DrawRay(transform.position, Vector3.down * raycastDistance, hitTrail ? Color.green : Color.red);
+            //Debug.DrawRay(transform.position, Vector3.down * raycastDistance, hitTrail ? Color.green : Color.red);
         }
     }
 }

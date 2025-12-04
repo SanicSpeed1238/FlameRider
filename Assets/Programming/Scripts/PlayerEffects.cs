@@ -10,6 +10,8 @@ public class PlayerEffects : MonoBehaviour
     public ParticleSystem speedLines;
     public ParticleSystem flameLines;
     public ParticleSystem flameTire;
+    public ParticleSystem flameGenerate;
+    public ParticleSystem flameRide;
 
     [Header("Important References")]
     public CinemachineCamera playerCam;
@@ -33,10 +35,24 @@ public class PlayerEffects : MonoBehaviour
         else flameTire.Stop();
     }
 
+    public void ActivateFlameGenerate(bool activate)
+    {
+        if (activate) flameGenerate.Play();
+        else flameGenerate.Stop();
+    }
+
     public void ActivateFlameLines(bool activate)
     {
-        if (activate) flameLines.Play();
-        else flameLines.Stop();
+        if (activate)
+        {
+            flameLines.Play();
+            flameRide.Play();
+        }
+        else
+        {
+            flameLines.Stop();
+            flameRide.Stop();
+        }
     }
 
     public void ActivateBoostEffect(bool activate)
@@ -101,6 +117,7 @@ public class PlayerEffects : MonoBehaviour
     public void StopAllEffects()
     {
         ActivateFlameTire(false);
+        ActivateFlameGenerate(false);
         ActivateFlameLines(false);
         ActivateBoostEffect(false);
     }

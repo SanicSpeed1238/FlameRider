@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 
 public class FlameTrailCheck : MonoBehaviour
 {
@@ -8,28 +7,30 @@ public class FlameTrailCheck : MonoBehaviour
     public float raycastDistance;
     public bool debugRay = true;
 
-    [Header("Trail Events")]
-    public UnityEvent OnTrail;
-
+    // Variables Needed
+    private PlayerController playerController;
     private int trailLayer;
 
     void Start()
     {
+        playerController = GetComponentInParent<PlayerController>();
         trailLayer = LayerMask.GetMask("Trail");
     }
 
     void FixedUpdate()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out _, raycastDistance, trailLayer))
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit trailHit, raycastDistance, trailLayer))
         {
-            OnTrail?.Invoke();
-            //Debug.Log("On Trail");
+            float speedBoost = trailHit.collider.GetComponent<FlameTrailObject>().speedBoost;
+            playerController.RideFlameTrail(speedBoost);
+
+            if(debugRay) Debug.Log("On Trail");
         }
 
         if (debugRay)
         {
             bool hitTrail = Physics.Raycast(transform.position, Vector3.down, out _, raycastDistance, trailLayer);
-            //Debug.DrawRay(transform.position, Vector3.down * raycastDistance, hitTrail ? Color.green : Color.red);
+            Debug.DrawRay(transform.position, Vector3.down * raycastDistance, hitTrail ? Color.green : Color.red);
         }
     }
 }

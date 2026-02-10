@@ -5,22 +5,28 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement Stats")]
+    [Header("Speed")]
+    [Range(100, 200)]
+    [SerializeField] float baseSpeed;
+    [Range(10, 100)]
+    [SerializeField] float accelerationRate;
+    [Range(10, 100)]
+    [SerializeField] float decelerationRate;
+
+    [Header("Handling")]
     [Range(1,10)]
     [SerializeField] float steerSensitivity;
     [Range(1,10)]
     [SerializeField] float driftStrength;
-    [Range(10,100)]
-    [SerializeField] float accelerationRate;
-    [Range(10, 100)]
-    [SerializeField] float decelerationRate;
-    [Range(100,1000)]
-    [SerializeField] float maxSpeed;
+
+    [Header("Boost")]
     [Range(1,50)]
     [SerializeField] float boostRate;
     [Range(1,50)]
-    [SerializeField] float energyRate;
-    [Range(10,100)]
+    [SerializeField] float energyRate;   
+
+    [Header("Aerials")]
+    [Range(10, 100)]
     [SerializeField] float jumpHeight;
 
     // Important References
@@ -31,17 +37,16 @@ public class PlayerController : MonoBehaviour
     int passedCheckpoint;
     int lapsCompleted;
 
-    // Variables for Movement
+    // Variables for Speed
     Rigidbody playerRB;
     float currentSpeed;
-    float currentMaxSpeed;
+    float maxSpeed;
     LayerMask groundLayer;
     readonly float groundLerp = 30f;
 
-    // Variables for Drifting
+    // Variables for Handling
     float driftDirection;
-    float driftSpeed;
-    readonly float driftAcceleration = 10f;
+    float currentDrift;
 
     // Variables for Boosting
     FlameTrailGeneration flameTrail;
@@ -50,7 +55,7 @@ public class PlayerController : MonoBehaviour
     float offFlameTrailTimer;
     readonly float offFlameTrailTime = 0.8f;
 
-    // Variables for Jumping
+    // Variables for Aerials
     bool hasJumped;
     float jumpTimer;
     readonly float jumpTime = 0.2f;
@@ -85,7 +90,8 @@ public class PlayerController : MonoBehaviour
         currentCheckpoint = gameObject.transform;
 
         playerRB = GetComponent<Rigidbody>();
-        currentMaxSpeed = maxSpeed;
+        maxSpeed = baseSpeed;
+        if (driftStrength <= steerSensitivity) driftStrength = steerSensitivity + 0.1f;
 
         flameTrail = GetComponent<FlameTrailGeneration>();
         currentFlameEnergy = 50f;
@@ -133,11 +139,12 @@ public class PlayerController : MonoBehaviour
     #region Accelerate
     void AcceleratePhysics()
     {
+        // Accelerate or Decelerate based on input and/or conditions
         if (inputAccel > 0 || (isBoosting || onFlameTrail))
         {
             float forwardInput = (isBoosting || onFlameTrail) ? 1 : inputAccel;
-            currentSpeed += forwardInput * ((currentSpeed < maxSpeed || currentMaxSpeed > maxSpeed) ? accelerationRate : (accelerationRate * 0.01f)) * Time.fixedDeltaTime;
-            if (currentSpeed > currentMaxSpeed) currentSpeed = currentMaxSpeed;
+            currentSpeed += forwardInput * ((currentSpeed < baseSpeed || maxSpeed > baseSpeed) ? accelerationRate : (accelerationRate * 0.01f)) * Time.fixedDeltaTime;
+            if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
             playerSFX.StartSound(playerSFX.movingSound);
         }
         else
@@ -148,16 +155,20 @@ public class PlayerController : MonoBehaviour
             playerSFX.StopSound(playerSFX.movingSound);
         }
         
+        // Apply velocity to player rigidbody
         Vector3 playerVelocity = currentSpeed * playerRB.transform.forward;
         playerVelocity.y = playerRB.linearVelocity.y;
         playerRB.linearVelocity = playerVelocity;
 
+        // Calculate real speed and display on UI
         float transformSpeed = Mathf.Abs(Vector3.Dot(playerRB.linearVelocity, playerRB.transform.forward));
         PlayerHUD.Instance.UpdateSpeedValue(transformSpeed, onFlameTrail);
         
+        // Visualization effects of speed
         playerAnimator.SetSpeed(transformSpeed);
         playerVFX.SetMotionBlurIntensity(transformSpeed / 300f);
         
+        // Naturally regen fire energy, auto boost if energy full
         if (inputAccel > 0 && !isBoosting) RegenerateFireEngery(0.5f);
         if (currentFlameEnergy == 100f && isGrounded) StartBoost();
     }
@@ -180,7 +191,7 @@ public class PlayerController : MonoBehaviour
             if (isGrounded) StartBoost();
             else StopBoost();
 
-            currentMaxSpeed += boostRate * Time.fixedDeltaTime;
+            maxSpeed += boostRate * Time.fixedDeltaTime;
 
             currentFlameEnergy -= Time.fixedDeltaTime * (energyRate * 1.5f);
             if (currentFlameEnergy <= 0f) StopBoost();
@@ -190,8 +201,8 @@ public class PlayerController : MonoBehaviour
         {
             if (!onFlameTrail)
             {
-                if (currentMaxSpeed > maxSpeed) currentMaxSpeed -= (boostRate * 2f) * Time.fixedDeltaTime;
-                else currentMaxSpeed = maxSpeed;
+                if (maxSpeed > baseSpeed) maxSpeed -= (boostRate * 2f) * Time.fixedDeltaTime;
+                else maxSpeed = baseSpeed;
             }          
         }
 
@@ -230,9 +241,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void RegenerateFireEngery(float mult)
+    void RegenerateFireEngery(float multiplier)
     {
-        currentFlameEnergy += Time.fixedDeltaTime * (energyRate * mult);
+        currentFlameEnergy += Time.fixedDeltaTime * (energyRate * multiplier);
         if (currentFlameEnergy >= 100f) currentFlameEnergy = 100f;
 
         PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy);
@@ -242,10 +253,12 @@ public class PlayerController : MonoBehaviour
     #region Steer
     void SteerAction()
     {
+        // Update animator based on left stick input
         if(!isDrifting) playerAnimator.SteerAnimation(inputSteer);
     }
     void SteerPhysics()
     {
+        // Rotate rigidbody based on left stick input
         playerRB.MoveRotation(Quaternion.Euler(0f, inputSteer * steerSensitivity * (Time.fixedDeltaTime * 10f), 0f) * playerRB.rotation);
     }
     #endregion
@@ -253,31 +266,39 @@ public class PlayerController : MonoBehaviour
     #region Drift
     void DriftAction()
     {
+        // Start or Stop drift based on input
         if (!isDrifting) StartDrift();
         else if (inputDrift == 0) StopDrift();
-
-        if (isDrifting && isGrounded) playerSFX.StartSound(playerSFX.driftingSound);
-        else playerSFX.StopSound(playerSFX.driftingSound);
     }
     void DriftPhysics()
     {
         if (isDrifting)
         {
-            if (driftSpeed < driftStrength) driftSpeed += driftAcceleration * Time.fixedDeltaTime;
-            else driftSpeed = driftStrength;
-
+            // Gradually increase to the max drift strength
+            if (currentDrift < driftStrength) currentDrift += (currentSpeed / 50f) * Time.fixedDeltaTime;
+            else currentDrift = driftStrength;
+            
+            // Manipulate drift amount based on left stick direction
             float driftInfluence = inputSteer;
-            if (driftDirection * inputSteer < 0f) driftInfluence *= 5f;
+            if (driftDirection * inputSteer > 0f) driftInfluence *= Mathf.Clamp(currentSpeed / 100f, 1f, 5f);
+            else driftInfluence = (currentDrift * -driftDirection) + (0.5f * driftDirection);
 
-            float rotationAmount = ((driftSpeed * driftDirection) + driftInfluence) * (Time.fixedDeltaTime * 10f);
+            // Rotate the rigidbody based on initial drift direction, current strength, and influence from left stick
+            float rotationAmount = ((currentDrift * driftDirection) + driftInfluence) * (Time.fixedDeltaTime * 10f);
             Quaternion newRotation = Quaternion.Euler(0f, rotationAmount, 0f) * playerRB.rotation;
             playerRB.MoveRotation(newRotation);
 
-            if (isGrounded) { RegenerateFireEngery(1f); playerVFX.ActivateFlameTire(true); }
+            // Activate certain effects if grounded
+            if (isGrounded)
+            {
+                RegenerateFireEngery(1f);
+                playerSFX.StartSound(playerSFX.driftingSound);
+            }
         }
     }
     void StartDrift()
     {
+        // Sets the drift direction at time of input (cannot be changed mid-drift)
         if (inputDrift >= 0.5f)
         {
             driftDirection = inputSteer;
@@ -288,10 +309,10 @@ public class PlayerController : MonoBehaviour
             else { return; }
 
             isDrifting = true;            
-            driftSpeed = 0.1f;
+            currentDrift = 0.1f;
 
             playerAnimator.DriftAnimation(true, driftDirection);
-            playerVFX.ActivateFlameTire(true);
+            playerVFX.ActivateFlameTire(true);        
         }    
     }
     void StopDrift()
@@ -300,6 +321,7 @@ public class PlayerController : MonoBehaviour
 
         playerAnimator.DriftAnimation(false, driftDirection);
         playerVFX.ActivateFlameTire(false);
+        playerSFX.StopSound(playerSFX.driftingSound);
     }
     #endregion
 
@@ -337,7 +359,7 @@ public class PlayerController : MonoBehaviour
             offFlameTrailTimer = 0f;
             playerVFX.ActivateFlameLines(true);
             playerSFX.StartSound(playerSFX.boostingSound);
-            currentMaxSpeed += trailSpeedBoost * Time.fixedDeltaTime;
+            maxSpeed += trailSpeedBoost * Time.fixedDeltaTime;
         }
     }
 

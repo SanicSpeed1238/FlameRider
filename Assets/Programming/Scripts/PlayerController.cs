@@ -33,12 +33,12 @@ public class PlayerController : MonoBehaviour
     PlayerAnimator playerAnimator;
     PlayerEffects playerVFX;
     PlayerAudio playerSFX;
+    Rigidbody playerRB;
     Transform currentCheckpoint;
     int passedCheckpoint;
     int lapsCompleted;
 
-    // Variables for Speed
-    Rigidbody playerRB;
+    // Variables for Speed    
     float currentSpeed;
     float maxSpeed;
     LayerMask groundLayer;
@@ -64,6 +64,7 @@ public class PlayerController : MonoBehaviour
     bool isBoosting;
     bool isDrifting;
     bool isGrounded;
+    bool isFlying;
     bool isRespawning;
     bool isFinished;
 
@@ -139,6 +140,8 @@ public class PlayerController : MonoBehaviour
     #region Accelerate
     void AcceleratePhysics()
     {
+        if (isFlying) return;
+
         // Accelerate or Decelerate based on input and/or conditions
         if (inputAccel > 0 || (isBoosting || onFlameTrail))
         {
@@ -362,9 +365,19 @@ public class PlayerController : MonoBehaviour
             maxSpeed += trailSpeedBoost * Time.fixedDeltaTime;
         }
     }
+    public void UseFlameRing(float ringSpeedBoost, Transform ringTransform)
+    {
+        isFlying = true;
+        playerRB.AddForce(ringSpeedBoost * ringTransform.forward, ForceMode.VelocityChange);
+    }
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.GetComponent<FlameTrailObject>())
+        {
+            UseFlameRing(other.GetComponent<FlameTrailObject>().speedBoost, other.transform);
+        }
+
         if (other.CompareTag("Checkpoint"))
         {
             currentCheckpoint = other.gameObject.transform;
@@ -417,6 +430,7 @@ public class PlayerController : MonoBehaviour
 
         AlignToGround();
         playerAnimator.SetGrounded(isGrounded);
+        if (isFlying && isGrounded) isFlying = false;
     }
     void AlignToGround()
     {

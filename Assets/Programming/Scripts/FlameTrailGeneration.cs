@@ -3,10 +3,13 @@ using System.Collections.Generic;
 
 public class FlameTrailGeneration : MonoBehaviour
 {
-    [Header("Trail Settings")]
+    [Header("Flame Trail")]
     [Range(1f, 10f)]
     public float trailWidth = 1f;
     public GameObject trailPrefab;
+
+    [Header("Flame Ring")]
+    public GameObject ringPrefab;
 
     // Variables Needed
     private bool generating = false;
@@ -67,6 +70,12 @@ public class FlameTrailGeneration : MonoBehaviour
         meshGenerated = null;
     }
 
+    public void SpawnFlameRing(Transform playerTransform)
+    {
+        Instantiate(ringPrefab, playerTransform.position, playerTransform.rotation);
+    }
+
+    #region Trail Renderer Technical Stuff
     private void AddPoint(Vector3 point)
     {
         if (Physics.Raycast(point + Vector3.up, Vector3.down, out RaycastHit hit, 20f))
@@ -123,4 +132,5 @@ public class FlameTrailGeneration : MonoBehaviour
         var emission = flameParticles.emission;
         emission.rateOverTime = targetRate;
     }
+    #endregion
 }

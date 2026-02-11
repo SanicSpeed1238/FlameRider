@@ -41,8 +41,9 @@ public class PlayerController : MonoBehaviour
     // Variables for Speed    
     float currentSpeed;
     float maxSpeed;
+    LayerMask wallLayer;
     LayerMask groundLayer;
-    readonly float groundLerp = 30f;
+    readonly float groundLerp = 60f;
 
     // Variables for Handling
     float driftDirection;
@@ -102,6 +103,7 @@ public class PlayerController : MonoBehaviour
         playerSFX = GetComponentInChildren<PlayerAudio>();
 
         groundLayer = LayerMask.GetMask("Ground");
+        wallLayer = LayerMask.GetMask("Walls");
 
         isFinished = false;
     }
@@ -122,10 +124,9 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
-        if (isFinished) return;
-
         CheckGrounded();
 
+        if (isFinished) return;
         if (!CanMove()) return;   
 
         AcceleratePhysics();
@@ -182,8 +183,15 @@ public class PlayerController : MonoBehaviour
     {
         if (inputBoost_Pressed)
         {
-            if (!isBoosting) StartBoost();
-            else StopBoost();
+            if (isGrounded)
+            {
+                if (!isBoosting) StartBoost();
+                else StopBoost();
+            }
+            else
+            {
+                if (!isFlying) flameTrail.SpawnFlameRing(transform);
+            }
         }
         if (isBoosting) playerVFX.ActivateFlameGenerate(true);
     }
@@ -418,6 +426,31 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(RespawnPlayer());
         }
     }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.layer == wallLayer)
+        {
+            // Wall normal
+            Vector3 normal = collision.contacts[0].normal;
+
+            // Reflect current forward direction
+            Vector3 bounceDir = Vector3.Reflect(transform.forward, normal);
+
+            // Lose some speed
+            currentSpeed *= 0.5f;
+
+            // Apply new direction
+            transform.forward = bounceDir;
+
+            // Optional: push slightly away to avoid sticking
+            playerRB.position += normal * 0.5f;
+
+            // Optional: cancel drift
+            isDrifting = false;
+
+            Debug.Log("Hit Railing.");
+        }        
+    }
 
     void CheckGrounded()
     {
@@ -442,13 +475,17 @@ public class PlayerController : MonoBehaviour
             euler.y = playerRB.rotation.eulerAngles.y;
 
             Quaternion alignmentRotation = Quaternion.Euler(euler);
-            Quaternion smoothedRotation = Quaternion.Slerp(playerRB.rotation, alignmentRotation, groundLerp * Time.deltaTime);
+            Quaternion smoothedRotation = Quaternion.Slerp(playerRB.rotation, alignmentRotation, groundLerp * Time.fixedDeltaTime);
             playerRB.MoveRotation(smoothedRotation);
+
+            // Align to ground PERFECTLY
+            Vector3 gravityDirection = -hitInfo.normal;
+            playerRB.AddForce(gravityDirection * Math.Abs(Physics.gravity.y), ForceMode.Acceleration);
         }
         else
         {
             Quaternion uprightRotation = Quaternion.Euler(0f, playerRB.rotation.eulerAngles.y, 0f);
-            Quaternion smoothedRotation = Quaternion.Slerp(playerRB.rotation, uprightRotation, groundLerp * Time.deltaTime);
+            Quaternion smoothedRotation = Quaternion.Slerp(playerRB.rotation, uprightRotation, groundLerp * Time.fixedDeltaTime);
             playerRB.MoveRotation(smoothedRotation);
         }
     }

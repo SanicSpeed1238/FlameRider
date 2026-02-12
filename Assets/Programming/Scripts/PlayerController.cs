@@ -40,14 +40,14 @@ public class PlayerController : MonoBehaviour
 
     // Variables for Speed    
     float currentSpeed;
-    float maxSpeed;
-    LayerMask wallLayer;
+    float maxSpeed;   
     LayerMask groundLayer;
-    readonly float groundLerp = 60f;
+    readonly float groundLerp = 10f;
 
     // Variables for Handling
     float driftDirection;
     float currentDrift;
+    LayerMask wallLayer;
 
     // Variables for Boosting
     FlameTrailGeneration flameTrail;
@@ -376,6 +376,7 @@ public class PlayerController : MonoBehaviour
     public void UseFlameRing(float ringSpeedBoost, Transform ringTransform)
     {
         isFlying = true;
+        currentSpeed = ringSpeedBoost;
         playerRB.AddForce(ringSpeedBoost * ringTransform.forward, ForceMode.VelocityChange);
     }
 
@@ -430,24 +431,8 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.layer == wallLayer)
         {
-            // Wall normal
-            Vector3 normal = collision.contacts[0].normal;
-
-            // Reflect current forward direction
-            Vector3 bounceDir = Vector3.Reflect(transform.forward, normal);
-
-            // Lose some speed
-            currentSpeed *= 0.5f;
-
-            // Apply new direction
-            transform.forward = bounceDir;
-
-            // Optional: push slightly away to avoid sticking
-            playerRB.position += normal * 0.5f;
-
-            // Optional: cancel drift
+            // bounce method
             isDrifting = false;
-
             Debug.Log("Hit Railing.");
         }        
     }
@@ -458,7 +443,7 @@ public class PlayerController : MonoBehaviour
         Vector3 direction = Vector3.down;
         float distance = 1f;
 
-        //Debug.DrawRay(origin, direction * distance, Color.red);
+        Debug.DrawRay(origin, direction * distance, Color.red);
         isGrounded = Physics.Raycast(origin, direction, distance) && !hasJumped;
 
         AlignToGround();
@@ -477,10 +462,6 @@ public class PlayerController : MonoBehaviour
             Quaternion alignmentRotation = Quaternion.Euler(euler);
             Quaternion smoothedRotation = Quaternion.Slerp(playerRB.rotation, alignmentRotation, groundLerp * Time.fixedDeltaTime);
             playerRB.MoveRotation(smoothedRotation);
-
-            // Align to ground PERFECTLY
-            Vector3 gravityDirection = -hitInfo.normal;
-            playerRB.AddForce(gravityDirection * Math.Abs(Physics.gravity.y), ForceMode.Acceleration);
         }
         else
         {

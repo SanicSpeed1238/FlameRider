@@ -35,14 +35,15 @@ public class PlayerController : MonoBehaviour
     PlayerAudio playerSFX;
     Rigidbody playerRB;
     Transform currentCheckpoint;
+    Transform groundRaycast;
     int passedCheckpoint;
     int lapsCompleted;
 
-    // Variables for Speed    
+    // Variables for Speed
     float currentSpeed;
     float maxSpeed;   
+    Vector3 playerVelocity;
     LayerMask groundLayer;
-    readonly float groundLerp = 10f;
 
     // Variables for Handling
     float driftDirection;
@@ -104,6 +105,7 @@ public class PlayerController : MonoBehaviour
 
         groundLayer = LayerMask.GetMask("Ground");
         wallLayer = LayerMask.GetMask("Walls");
+        groundRaycast = transform.Find("Detection");
 
         isFinished = false;
     }
@@ -160,9 +162,10 @@ public class PlayerController : MonoBehaviour
         }
         
         // Apply velocity to player rigidbody
-        Vector3 playerVelocity = currentSpeed * playerRB.transform.forward;
+        playerVelocity = currentSpeed * playerRB.transform.forward;
         playerVelocity.y = playerRB.linearVelocity.y;
         playerRB.linearVelocity = playerVelocity;
+        AlignToGround();
 
         // Calculate real speed and display on UI
         float transformSpeed = Mathf.Abs(Vector3.Dot(playerRB.linearVelocity, playerRB.transform.forward));
@@ -377,6 +380,7 @@ public class PlayerController : MonoBehaviour
     {
         isFlying = true;
         currentSpeed = ringSpeedBoost;
+        maxSpeed = ringSpeedBoost;
         playerRB.AddForce(ringSpeedBoost * ringTransform.forward, ForceMode.VelocityChange);
     }
 
@@ -443,30 +447,58 @@ public class PlayerController : MonoBehaviour
         Vector3 direction = Vector3.down;
         float distance = 1f;
 
-        Debug.DrawRay(origin, direction * distance, Color.red);
+        //Debug.DrawRay(origin, direction * distance, Color.yellow);
         isGrounded = Physics.Raycast(origin, direction, distance) && !hasJumped;
 
-        AlignToGround();
         playerAnimator.SetGrounded(isGrounded);
         if (isFlying && isGrounded) isFlying = false;
     }
     void AlignToGround()
     {
-        Vector3 rayOrigin = playerRB.position + Vector3.up * 0.1f;
-        if (Physics.Raycast(rayOrigin, -playerRB.transform.up, out RaycastHit hitInfo, 10f, groundLayer))
-        {
-            Quaternion groundRotation = Quaternion.FromToRotation(playerRB.transform.up, hitInfo.normal) * playerRB.rotation;
-            Vector3 euler = groundRotation.eulerAngles;
-            euler.y = playerRB.rotation.eulerAngles.y;
+        float rotationLerp = 10f;
+        float castDistance = 1.5f;
+        float sphereRadius = 0.5f;
+        Vector3 castOrigin = groundRaycast.position;
 
-            Quaternion alignmentRotation = Quaternion.Euler(euler);
-            Quaternion smoothedRotation = Quaternion.Slerp(playerRB.rotation, alignmentRotation, groundLerp * Time.fixedDeltaTime);
+        if (Physics.SphereCast(
+            castOrigin,
+            sphereRadius,
+            -transform.up,
+            out RaycastHit hitInfo,
+            castDistance,
+            groundLayer) && !hasJumped)
+        {
+            Vector3 groundNormal = hitInfo.normal;
+
+            // --- Rotate to match ground ---
+            Quaternion targetRotation =
+                Quaternion.FromToRotation(transform.up, groundNormal) * transform.rotation;
+
+            Quaternion smoothedRotation = Quaternion.Slerp(
+                playerRB.rotation,
+                targetRotation,
+                rotationLerp * Time.fixedDeltaTime
+            );
+
             playerRB.MoveRotation(smoothedRotation);
+
+            // --- Remove velocity pushing away from surface ---
+            float verticalVelocity = Vector3.Dot(playerRB.linearVelocity, groundNormal);
+
+            if (verticalVelocity > 0f)
+                playerRB.linearVelocity -= groundNormal * verticalVelocity;
         }
         else
         {
-            Quaternion uprightRotation = Quaternion.Euler(0f, playerRB.rotation.eulerAngles.y, 0f);
-            Quaternion smoothedRotation = Quaternion.Slerp(playerRB.rotation, uprightRotation, groundLerp * Time.fixedDeltaTime);
+            Quaternion uprightRotation =
+                Quaternion.FromToRotation(transform.up, Vector3.up) * transform.rotation;
+
+            Quaternion smoothedRotation = Quaternion.Slerp(
+                playerRB.rotation,
+                uprightRotation,
+                rotationLerp * Time.fixedDeltaTime
+            );
+
             playerRB.MoveRotation(smoothedRotation);
         }
     }

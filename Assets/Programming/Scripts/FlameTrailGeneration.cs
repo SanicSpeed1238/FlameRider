@@ -78,7 +78,7 @@ public class FlameTrailGeneration : MonoBehaviour
     #region Trail Renderer Technical Stuff
     private void AddPoint(Vector3 point)
     {
-        if (Physics.Raycast(point + Vector3.up, Vector3.down, out RaycastHit hit, 20f))
+        if (Physics.Raycast(point + Vector3.up, Vector3.down, out RaycastHit hit, 10f))
             point.y = hit.point.y + 0.05f;
         else
             point.y = 0f;

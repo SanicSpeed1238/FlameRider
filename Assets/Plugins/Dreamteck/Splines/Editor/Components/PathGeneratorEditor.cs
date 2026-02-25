@@ -14,6 +14,7 @@ namespace Dreamteck.Splines.Editor
             PathGenerator pathGenerator = (PathGenerator)target;
             serializedObject.Update();
             SerializedProperty slices = serializedObject.FindProperty("_slices");
+            SerializedProperty thickness = serializedObject.FindProperty("_thickness");
             SerializedProperty shape = serializedObject.FindProperty("_shape");
             SerializedProperty shapeExposure = serializedObject.FindProperty("_shapeExposure");
             SerializedProperty useShapeCurve = serializedObject.FindProperty("_useShapeCurve");
@@ -22,6 +23,7 @@ namespace Dreamteck.Splines.Editor
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Geometry", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(slices, new GUIContent("Slices"));
+            EditorGUILayout.PropertyField(thickness, new GUIContent("Thickness"));
             EditorGUILayout.PropertyField(compensateCorners, new GUIContent("Compensate Corners"));
 
             EditorGUILayout.PropertyField(useShapeCurve, new GUIContent("Use Shape Curve"));

@@ -10,6 +10,8 @@ namespace Dreamteck.Splines
     [AddComponentMenu("Dreamteck/Splines/Users/Path Generator")]
     public class PathGenerator : MeshGenerator
     {
+        [HideInInspector] public float _thickness = 10f;
+
         public int slices
         {
             get { return _slices; }
@@ -127,11 +129,16 @@ namespace Dreamteck.Splines
         }
 
 
-        protected override void BuildMesh()
+        /*protected override void BuildMesh()
         {
            base.BuildMesh();
            GenerateVertices();
            MeshUtility.GeneratePlaneTriangles(ref _tsMesh.triangles, _slices, sampleCount, false);
+        }*/
+        protected override void BuildMesh()
+        {
+            base.BuildMesh();
+            GenerateThickMesh();
         }
 
 
@@ -206,6 +213,123 @@ namespace Dreamteck.Splines
                     lastVertPos = _tsMesh.vertices[vertexIndex];
                     vertexIndex++;
                 }
+            }
+        }
+        void GenerateThickMesh()
+        {
+            int vertsPerRow = _slices + 1;
+            int totalTopVerts = vertsPerRow * sampleCount;
+            int totalVerts = totalTopVerts * 2; // top + bottom
+
+            // Estimate triangle count:
+            int topTris = _slices * (sampleCount - 1) * 6;
+            int bottomTris = topTris;
+            int sideTris = (sampleCount - 1) * 12; // 2 sides
+            int totalTris = topTris + bottomTris + sideTris;
+
+            AllocateMesh(totalVerts, totalTris);
+
+            int vertexIndex = 0;
+
+            Vector3[,] topVertices = new Vector3[sampleCount, vertsPerRow];
+            Vector3[,] bottomVertices = new Vector3[sampleCount, vertsPerRow];
+
+            // --- CREATE TOP + BOTTOM VERTICES ---
+            for (int i = 0; i < sampleCount; i++)
+            {
+                GetSample(i, ref evalResult);
+
+                Vector3 center = evalResult.position;
+                Vector3 right = evalResult.right;
+                Vector3 up = evalResult.up;
+
+                float fullSize = size * GetBaseSize(evalResult);
+                Quaternion rot = Quaternion.AngleAxis(rotation, evalResult.forward);
+
+                for (int n = 0; n < vertsPerRow; n++)
+                {
+                    float percent = (float)n / _slices;
+
+                    Vector3 top =
+                        center +
+                        rot * right * (fullSize * 0.5f) -
+                        rot * right * (fullSize * percent);
+
+                    Vector3 bottom = top - up * _thickness;
+
+                    topVertices[i, n] = top;
+                    bottomVertices[i, n] = bottom;
+
+                    // TOP
+                    _tsMesh.vertices[vertexIndex] = top;
+                    _tsMesh.normals[vertexIndex] = up;
+                    _tsMesh.uv[vertexIndex] = new Vector2(percent, (float)i / sampleCount);
+                    vertexIndex++;
+
+                    // BOTTOM
+                    _tsMesh.vertices[vertexIndex] = bottom;
+                    _tsMesh.normals[vertexIndex] = -up;
+                    _tsMesh.uv[vertexIndex] = new Vector2(percent, (float)i / sampleCount);
+                    vertexIndex++;
+                }
+            }
+
+            // --- CREATE TRIANGLES ---
+            int triIndex = 0;
+
+            for (int i = 0; i < sampleCount - 1; i++)
+            {
+                for (int n = 0; n < _slices; n++)
+                {
+                    int topA = (i * vertsPerRow + n) * 2;
+                    int topB = ((i + 1) * vertsPerRow + n) * 2;
+                    int topC = topA + 2;
+                    int topD = topB + 2;
+
+                    // TOP
+                    _tsMesh.triangles[triIndex++] = topA;
+                    _tsMesh.triangles[triIndex++] = topB;
+                    _tsMesh.triangles[triIndex++] = topC;
+
+                    _tsMesh.triangles[triIndex++] = topC;
+                    _tsMesh.triangles[triIndex++] = topB;
+                    _tsMesh.triangles[triIndex++] = topD;
+
+                    // BOTTOM (reverse order)
+                    _tsMesh.triangles[triIndex++] = topA + 1;
+                    _tsMesh.triangles[triIndex++] = topC + 1;
+                    _tsMesh.triangles[triIndex++] = topB + 1;
+
+                    _tsMesh.triangles[triIndex++] = topC + 1;
+                    _tsMesh.triangles[triIndex++] = topD + 1;
+                    _tsMesh.triangles[triIndex++] = topB + 1;
+                }
+
+                // SIDE WALLS (left + right edges)
+
+                int leftTopA = (i * vertsPerRow) * 2;
+                int leftTopB = ((i + 1) * vertsPerRow) * 2;
+
+                int rightTopA = (i * vertsPerRow + _slices) * 2;
+                int rightTopB = ((i + 1) * vertsPerRow + _slices) * 2;
+
+                // LEFT
+                _tsMesh.triangles[triIndex++] = leftTopA;
+                _tsMesh.triangles[triIndex++] = leftTopA + 1;
+                _tsMesh.triangles[triIndex++] = leftTopB;
+
+                _tsMesh.triangles[triIndex++] = leftTopB;
+                _tsMesh.triangles[triIndex++] = leftTopA + 1;
+                _tsMesh.triangles[triIndex++] = leftTopB + 1;
+
+                // RIGHT
+                _tsMesh.triangles[triIndex++] = rightTopA;
+                _tsMesh.triangles[triIndex++] = rightTopB;
+                _tsMesh.triangles[triIndex++] = rightTopA + 1;
+
+                _tsMesh.triangles[triIndex++] = rightTopB;
+                _tsMesh.triangles[triIndex++] = rightTopB + 1;
+                _tsMesh.triangles[triIndex++] = rightTopA + 1;
             }
         }
     }

@@ -231,7 +231,7 @@ namespace Dreamteck.Splines
 #endif
             input.transform.localScale = GetScale(input.transform.localScale);
             input.position = GetPosition(input.position);
-            if (!input.isKinematic)
+            if (input.bodyType != RigidbodyType2D.Kinematic)
             {
 #if UNITY_6000_OR_NEWER
             input.linearVelocity = HandleVelocity(input.linearVelocity);

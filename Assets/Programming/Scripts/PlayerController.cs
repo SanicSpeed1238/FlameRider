@@ -165,7 +165,6 @@ public class PlayerController : MonoBehaviour
         playerVelocity = currentSpeed * playerRB.transform.forward;
         playerVelocity.y = playerRB.linearVelocity.y;
         playerRB.linearVelocity = playerVelocity;
-        AlignToGround();
 
         // Calculate real speed and display on UI
         float transformSpeed = Mathf.Abs(Vector3.Dot(playerRB.linearVelocity, playerRB.transform.forward));
@@ -435,7 +434,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.layer == wallLayer)
         {
-            // bounce method
+            // Function to bounce off walls and lose balance
             isDrifting = false;
             Debug.Log("Hit Railing.");
         }        
@@ -443,63 +442,79 @@ public class PlayerController : MonoBehaviour
 
     void CheckGrounded()
     {
-        Vector3 origin = transform.position;
-        Vector3 direction = Vector3.down;
-        float distance = 1f;
+        Vector3 origin = groundRaycast.position;
+        Vector3 direction = -playerRB.transform.up;
+        float distance = 2f;
 
-        //Debug.DrawRay(origin, direction * distance, Color.yellow);
-        isGrounded = Physics.Raycast(origin, direction, distance) && !hasJumped;
+        Debug.DrawRay(origin, direction * distance, Color.yellow);
+        isGrounded = Physics.Raycast(origin, direction, out RaycastHit ground, distance, groundLayer) && !hasJumped;
+        AlignToGround(ground);
 
         playerAnimator.SetGrounded(isGrounded);
         if (isFlying && isGrounded) isFlying = false;
     }
-    void AlignToGround()
+    void AlignToGround(RaycastHit ground)
     {
-        float rotationLerp = 10f;
-        float castDistance = 1.5f;
-        float sphereRadius = 0.5f;
-        Vector3 castOrigin = groundRaycast.position;
-
-        if (Physics.SphereCast(
-            castOrigin,
-            sphereRadius,
-            -transform.up,
-            out RaycastHit hitInfo,
-            castDistance,
-            groundLayer) && !hasJumped)
+        if (isGrounded)
         {
-            Vector3 groundNormal = hitInfo.normal;
+            Vector3 groundNormal = ground.normal;
 
-            // --- Rotate to match ground ---
-            Quaternion targetRotation =
-                Quaternion.FromToRotation(transform.up, groundNormal) * transform.rotation;
+            // -------------------------
+            // 1️⃣ Apply magnetic gravity
+            // -------------------------
+            float gravityStrength = Physics.gravity.magnitude;
 
-            Quaternion smoothedRotation = Quaternion.Slerp(
-                playerRB.rotation,
-                targetRotation,
-                rotationLerp * Time.fixedDeltaTime
+            playerRB.AddForce(
+                -groundNormal * gravityStrength,
+                ForceMode.Acceleration
             );
 
-            playerRB.MoveRotation(smoothedRotation);
+            // -------------------------
+            // 2️⃣ Hard align to surface
+            // -------------------------
+            Vector3 forwardProjected =
+                Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized;
 
-            // --- Remove velocity pushing away from surface ---
-            float verticalVelocity = Vector3.Dot(playerRB.linearVelocity, groundNormal);
+            Quaternion targetRotation =
+                Quaternion.LookRotation(forwardProjected, groundNormal);
 
-            if (verticalVelocity > 0f)
-                playerRB.linearVelocity -= groundNormal * verticalVelocity;
+            playerRB.MoveRotation(targetRotation);
+
+            Debug.Log("ON GROUND.");
         }
         else
         {
-            Quaternion uprightRotation =
-                Quaternion.FromToRotation(transform.up, Vector3.up) * transform.rotation;
-
-            Quaternion smoothedRotation = Quaternion.Slerp(
-                playerRB.rotation,
-                uprightRotation,
-                rotationLerp * Time.fixedDeltaTime
+            // -------------------------
+            // 3️⃣ Normal world gravity
+            // -------------------------
+            playerRB.AddForce(
+                Physics.gravity,
+                ForceMode.Acceleration
             );
 
-            playerRB.MoveRotation(smoothedRotation);
+            // -------------------------
+            // 4️⃣ Soft upright correction
+            // -------------------------
+            float uprightSpeed = 2f;
+
+            Vector3 forwardProjected =
+                Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
+
+            if (forwardProjected.sqrMagnitude < 0.001f)
+                forwardProjected = transform.forward;
+
+            Quaternion uprightTarget =
+                Quaternion.LookRotation(forwardProjected, Vector3.up);
+
+            playerRB.MoveRotation(
+                Quaternion.Slerp(
+                    playerRB.rotation,
+                    uprightTarget,
+                    uprightSpeed * Time.fixedDeltaTime
+                )
+            );
+
+            Debug.Log("AIRBORNE.");
         }
     }
 

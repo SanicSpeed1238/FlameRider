@@ -10376,7 +10376,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 921123255622b9240a9196c14968f457, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseSpeed: 150
+  baseSpeed: 200
   accelerationRate: 70
   decelerationRate: 60
   steerSensitivity: 3

@@ -10376,10 +10376,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 921123255622b9240a9196c14968f457, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseSpeed: 200
-  accelerationRate: 70
-  decelerationRate: 60
-  steerSensitivity: 3
+  baseSpeed: 180
+  accelerationRate: 80
+  decelerationRate: 70
+  steerSensitivity: 6
   driftStrength: 7
   boostRate: 2
   energyRate: 10
@@ -10559,7 +10559,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 112

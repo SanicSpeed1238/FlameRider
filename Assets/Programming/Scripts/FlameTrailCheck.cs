@@ -19,7 +19,7 @@ public class FlameTrailCheck : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit trailHit, raycastDistance, trailLayer))
+        if (Physics.Raycast(transform.position, -transform.up, out RaycastHit trailHit, raycastDistance, trailLayer))
         {
             float speedBoost = trailHit.collider.GetComponent<FlameTrailObject>().speedBoost;
             playerController.RideFlameTrail(speedBoost);

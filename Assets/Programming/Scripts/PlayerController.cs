@@ -272,7 +272,9 @@ public class PlayerController : MonoBehaviour
     void SteerPhysics()
     {
         // Rotate rigidbody based on left stick input
-        playerRB.MoveRotation(Quaternion.Euler(0f, inputSteer * steerSensitivity * (Time.fixedDeltaTime * 10f), 0f) * playerRB.rotation);
+        float steerAmount = inputSteer * steerSensitivity * (Time.fixedDeltaTime * 10f);
+        Quaternion turnRotation = Quaternion.AngleAxis(steerAmount, playerRB.transform.up);
+        playerRB.MoveRotation(turnRotation * playerRB.rotation);
     }
     #endregion
 
@@ -298,8 +300,8 @@ public class PlayerController : MonoBehaviour
 
             // Rotate the rigidbody based on initial drift direction, current strength, and influence from left stick
             float rotationAmount = ((currentDrift * driftDirection) + driftInfluence) * (Time.fixedDeltaTime * 10f);
-            Quaternion newRotation = Quaternion.Euler(0f, rotationAmount, 0f) * playerRB.rotation;
-            playerRB.MoveRotation(newRotation);
+            Quaternion driftRotation = Quaternion.AngleAxis(rotationAmount, transform.up);
+            playerRB.MoveRotation(driftRotation * playerRB.rotation);
 
             // Activate certain effects if grounded
             if (isGrounded)
@@ -363,7 +365,7 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region Other Functions
+    #region Fire Abilities
     public void RideFlameTrail(float trailSpeedBoost)
     {
         if (CanMove())
@@ -382,159 +384,133 @@ public class PlayerController : MonoBehaviour
         maxSpeed = ringSpeedBoost;
         playerRB.AddForce(ringSpeedBoost * ringTransform.forward, ForceMode.VelocityChange);
     }
+    #endregion
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.GetComponent<FlameTrailObject>())
+    #region Other Functions
+
+        #region Collision Checks
+        private void OnTriggerEnter(Collider other)
         {
-            UseFlameRing(other.GetComponent<FlameTrailObject>().speedBoost, other.transform);
-        }
-
-        if (other.CompareTag("Checkpoint"))
-        {
-            currentCheckpoint = other.gameObject.transform;
-            int checkpointIndex = Array.IndexOf(other.GetComponentInParent<TrackManager>().checkPoints, other.gameObject);
-
-            if (checkpointIndex == 0 && passedCheckpoint >= other.GetComponentInParent<TrackManager>().checkPoints.Length - 15)
+            if (other.GetComponent<FlameTrailObject>())
             {
-                lapsCompleted++;
-                PlayerHUD.Instance.UpdateLapNumber(lapsCompleted + 1);
+                UseFlameRing(other.GetComponent<FlameTrailObject>().speedBoost, other.transform);
+            }
 
-                if (lapsCompleted == 3)
+            if (other.CompareTag("Checkpoint"))
+            {
+                currentCheckpoint = other.gameObject.transform;
+                int checkpointIndex = Array.IndexOf(other.GetComponentInParent<TrackManager>().checkPoints, other.gameObject);
+
+                if (checkpointIndex == 0 && passedCheckpoint >= other.GetComponentInParent<TrackManager>().checkPoints.Length - 15)
                 {
-                    GameState.Instance.WinGame();
-                    PlayerHUD.Instance.UpdateLapNumber(3);
+                    lapsCompleted++;
+                    PlayerHUD.Instance.UpdateLapNumber(lapsCompleted + 1);
 
-                    playerVFX.StopAllEffects();
-                    playerSFX.StopAllAudio();
-                    playerAnimator.SetGrounded(true);
+                    if (lapsCompleted == 3)
+                    {
+                        GameState.Instance.WinGame();
+                        PlayerHUD.Instance.UpdateLapNumber(3);
 
-                    GetComponent<BasicComputerPlayer>().SetAutoMove();
-                    isFinished = true;
+                        playerVFX.StopAllEffects();
+                        playerSFX.StopAllAudio();
+                        playerAnimator.SetGrounded(true);
+
+                        GetComponent<BasicComputerPlayer>().SetAutoMove();
+                        isFinished = true;
+                    }
+                    else
+                    {  
+                        PlayerHUD.Instance.DisplayMessage("LAP " + (lapsCompleted + 1) + "!");
+                        GameState.Instance.lapSound.PlayOneShot(GameState.Instance.lapSound.clip);
+                    }
                 }
-                else
-                {  
-                    PlayerHUD.Instance.DisplayMessage("LAP " + (lapsCompleted + 1) + "!");
-                    GameState.Instance.lapSound.PlayOneShot(GameState.Instance.lapSound.clip);
+
+                else if (passedCheckpoint < checkpointIndex && passedCheckpoint >= checkpointIndex - 15)
+                {
+                    passedCheckpoint = checkpointIndex;
                 }
             }
 
-            else if (passedCheckpoint < checkpointIndex && passedCheckpoint >= checkpointIndex - 15)
+            if (other.CompareTag("Deadzone"))
             {
-                passedCheckpoint = checkpointIndex;
+                StartCoroutine(RespawnPlayer());
             }
         }
 
-        if (other.CompareTag("Deadzone"))
+        private void OnCollisionEnter(Collision collision)
         {
-            StartCoroutine(RespawnPlayer());
+            if (collision.gameObject.layer == wallLayer)
+            {
+                // Function to bounce off walls and lose balance
+                isDrifting = false;
+                Debug.Log("Hit Railing.");
+            }        
         }
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.layer == wallLayer)
+        #endregion
+
+        #region Physics Calculations
+        void CheckGrounded()
         {
-            // Function to bounce off walls and lose balance
-            isDrifting = false;
-            Debug.Log("Hit Railing.");
-        }        
-    }
+            Vector3 origin = groundRaycast.position;
+            Vector3 direction = -playerRB.transform.up;
+            float distance = 2f;
 
-    void CheckGrounded()
-    {
-        Vector3 origin = groundRaycast.position;
-        Vector3 direction = -playerRB.transform.up;
-        float distance = 2f;
+            Debug.DrawRay(origin, direction * distance, Color.yellow);
+            isGrounded = Physics.Raycast(origin, direction, out RaycastHit ground, distance, groundLayer) && !hasJumped;
+            AlignToGround(ground);
 
-        Debug.DrawRay(origin, direction * distance, Color.yellow);
-        isGrounded = Physics.Raycast(origin, direction, out RaycastHit ground, distance, groundLayer) && !hasJumped;
-        AlignToGround(ground);
-
-        playerAnimator.SetGrounded(isGrounded);
-        if (isFlying && isGrounded) isFlying = false;
-    }
-    void AlignToGround(RaycastHit ground)
-    {
-        if (isGrounded)
-        {
-            Vector3 groundNormal = ground.normal;
-
-            // -------------------------
-            // 1️⃣ Apply magnetic gravity
-            // -------------------------
-            float gravityStrength = Physics.gravity.magnitude;
-
-            playerRB.AddForce(
-                -groundNormal * gravityStrength,
-                ForceMode.Acceleration
-            );
-
-            // -------------------------
-            // 2️⃣ Hard align to surface
-            // -------------------------
-            Vector3 forwardProjected =
-                Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized;
-
-            Quaternion targetRotation =
-                Quaternion.LookRotation(forwardProjected, groundNormal);
-
-            playerRB.MoveRotation(targetRotation);
-
-            Debug.Log("ON GROUND.");
+            playerAnimator.SetGrounded(isGrounded);
+            if (isFlying && isGrounded) isFlying = false;
         }
-        else
+        void AlignToGround(RaycastHit ground)
         {
-            // -------------------------
-            // 3️⃣ Normal world gravity
-            // -------------------------
-            playerRB.AddForce(
-                Physics.gravity,
-                ForceMode.Acceleration
-            );
+            if (isGrounded)
+            {
+                // Apply gravity to stay on surface normal
+                Vector3 groundNormal = ground.normal;
+                float gravityStrength = Physics.gravity.magnitude;
+                playerRB.AddForce(-groundNormal * gravityStrength, ForceMode.Acceleration);
 
-            // -------------------------
-            // 4️⃣ Soft upright correction
-            // -------------------------
-            float uprightSpeed = 2f;
+                // Align rigidbody rotation to match surface normal
+                Vector3 forwardProjected = Vector3.ProjectOnPlane(playerRB.transform.forward, groundNormal).normalized;
+                Quaternion targetRotation = Quaternion.LookRotation(forwardProjected, groundNormal);
+                playerRB.MoveRotation(targetRotation);
+            }
+            else
+            {
+                // Apply normal gravity to allow falling naturally
+                playerRB.AddForce(Physics.gravity, ForceMode.Acceleration);
 
-            Vector3 forwardProjected =
-                Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
-
-            if (forwardProjected.sqrMagnitude < 0.001f)
-                forwardProjected = transform.forward;
-
-            Quaternion uprightTarget =
-                Quaternion.LookRotation(forwardProjected, Vector3.up);
-
-            playerRB.MoveRotation(
-                Quaternion.Slerp(
-                    playerRB.rotation,
-                    uprightTarget,
-                    uprightSpeed * Time.fixedDeltaTime
-                )
-            );
-
-            Debug.Log("AIRBORNE.");
+                // Gradually reorient to upright rotation
+                float uprightSpeed = 2f;
+                Vector3 forwardProjected = Vector3.ProjectOnPlane(playerRB.transform.forward, Vector3.up).normalized;
+                if (forwardProjected.sqrMagnitude < 0.001f) forwardProjected = playerRB.transform.forward;
+                Quaternion uprightTarget = Quaternion.LookRotation(forwardProjected, Vector3.up);
+                playerRB.MoveRotation(Quaternion.Slerp(playerRB.rotation, uprightTarget, uprightSpeed * Time.fixedDeltaTime));
+            }
         }
-    }
+        #endregion
 
-    IEnumerator RespawnPlayer()
-    {
-        isRespawning = true;
+        #region State Handling
+        IEnumerator RespawnPlayer()
+        {
+            isRespawning = true;
 
-        playerRB.position = currentCheckpoint.position;
-        playerRB.rotation = currentCheckpoint.rotation;
-        playerRB.linearVelocity = Vector3.down;
-        currentSpeed = 0f;
+            playerRB.position = currentCheckpoint.position;
+            playerRB.rotation = currentCheckpoint.rotation;
+            playerRB.linearVelocity = Vector3.down;
+            currentSpeed = 0f;
 
-        StopBoost();
-        playerVFX.StopAllEffects();
+            StopBoost();
+            playerVFX.StopAllEffects();
 
-        playerSFX.PlaySound(playerSFX.respawnSound);
-        yield return new WaitForSeconds(1f);
+            playerSFX.PlaySound(playerSFX.respawnSound);
+            yield return new WaitForSeconds(1f);
 
-        isRespawning = false;
-    }
+            isRespawning = false;
+        }
+        #endregion
+
     #endregion
 
     #region Input Handling

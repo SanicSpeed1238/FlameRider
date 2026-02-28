@@ -10376,11 +10376,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 921123255622b9240a9196c14968f457, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseSpeed: 180
-  accelerationRate: 80
+  baseSpeed: 200
+  accelerationRate: 90
   decelerationRate: 70
-  steerSensitivity: 6
-  driftStrength: 7
+  steerSensitivity: 7
+  driftStrength: 8
   boostRate: 2
   energyRate: 10
   jumpHeight: 60
@@ -10396,8 +10396,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f19ac53e14ab7044cb96c80810453ff8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trailWidth: 3.75
   trailPrefab: {fileID: 8718537156586937533, guid: 685d3123746034647bf18631593013c6, type: 3}
+  trailMaterial: {fileID: 2100000, guid: 8d2dbd33ca50e7e4b936849aaf1c6b2a, type: 2}
+  trailWidth: 3.75
   ringPrefab: {fileID: 1194431429511067260, guid: 3f99f4c7fc57884468076383d49daa4b, type: 3}
 --- !u!114 &6839355430846264356
 MonoBehaviour:

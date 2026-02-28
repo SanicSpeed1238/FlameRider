@@ -164,6 +164,7 @@ public class PlayerController : MonoBehaviour
         // Apply velocity to player rigidbody
         playerVelocity = currentSpeed * playerRB.transform.forward;
         playerVelocity.y = playerRB.linearVelocity.y;
+        playerVelocity = VelocityAdjustedToSlope(playerVelocity);
         playerRB.linearVelocity = playerVelocity;
 
         // Calculate real speed and display on UI
@@ -389,6 +390,7 @@ public class PlayerController : MonoBehaviour
     #region Other Functions
 
         #region Collision Checks
+
         private void OnTriggerEnter(Collider other)
         {
             if (other.GetComponent<FlameTrailObject>())
@@ -446,17 +448,19 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("Hit Railing.");
             }        
         }
+
         #endregion
 
         #region Physics Calculations
+
         void CheckGrounded()
         {
             Vector3 origin = groundRaycast.position;
             Vector3 direction = -playerRB.transform.up;
-            float distance = 2f;
+            float rayCastLength = 2f;
 
-            Debug.DrawRay(origin, direction * distance, Color.yellow);
-            isGrounded = Physics.Raycast(origin, direction, out RaycastHit ground, distance, groundLayer) && !hasJumped;
+            Debug.DrawRay(origin, direction * rayCastLength, Color.yellow);
+            isGrounded = Physics.Raycast(origin, direction, out RaycastHit ground, rayCastLength, groundLayer) && !hasJumped;
             AlignToGround(ground);
 
             playerAnimator.SetGrounded(isGrounded);
@@ -488,6 +492,19 @@ public class PlayerController : MonoBehaviour
                 Quaternion uprightTarget = Quaternion.LookRotation(forwardProjected, Vector3.up);
                 playerRB.MoveRotation(Quaternion.Slerp(playerRB.rotation, uprightTarget, uprightSpeed * Time.fixedDeltaTime));
             }
+        }
+        Vector3 VelocityAdjustedToSlope(Vector3 playerVelocityVector)
+        {
+            var ray = new Ray(groundRaycast.position, -playerRB.transform.up);
+            float rayCastLength = 2f;
+
+            if (Physics.Raycast(ray, out RaycastHit hit, rayCastLength, groundLayer) && !hasJumped)
+            {
+                Vector3 projectedVelocity = Vector3.ProjectOnPlane(playerVelocityVector, hit.normal);
+                return projectedVelocity;
+            }
+
+            return playerVelocityVector;
         }
         #endregion
 

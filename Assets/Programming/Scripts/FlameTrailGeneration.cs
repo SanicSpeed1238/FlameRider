@@ -5,9 +5,10 @@ using System.Collections.Generic;
 public class FlameTrailGeneration : MonoBehaviour
 {
     [Header("Flame Trail")]
+    public GameObject trailPrefab;
+    public Material trailMaterial;
     [Range(0.1f, 10f)]
     public float trailWidth = 1f;
-    public GameObject trailPrefab;
 
     [Header("Flame Ring")]
     public GameObject ringPrefab;
@@ -28,6 +29,7 @@ public class FlameTrailGeneration : MonoBehaviour
     // Mesh Components
     private Mesh meshReference;
     private MeshFilter meshFilter;
+    private MeshRenderer meshRenderer;
     private MeshCollider meshCollider;
 
     void Start()
@@ -35,7 +37,7 @@ public class FlameTrailGeneration : MonoBehaviour
         playerRB = GetComponent<Rigidbody>();
     }
 
-    void FixedUpdate()
+    void LateUpdate()
     {
         if (generating)
         {
@@ -51,22 +53,16 @@ public class FlameTrailGeneration : MonoBehaviour
 
     public void StartBoostTrail()
     {
-        GameObject trailObj = Instantiate(trailPrefab, Vector3.zero, Quaternion.identity);
+        GameObject trailObj = Instantiate(trailPrefab, Vector3.zero, Quaternion.identity);        
 
-        meshFilter = trailObj.GetComponentInChildren<MeshFilter>();
-        flameParticles = trailObj.GetComponentInChildren<ParticleSystem>();
-
-        if (meshFilter == null)
-        {
-            meshFilter = trailObj.AddComponent<MeshFilter>();
-            trailObj.AddComponent<MeshRenderer>();
-        }
-
-        meshCollider = meshFilter.gameObject.GetComponent<MeshCollider>();
-        if (meshCollider == null) meshCollider = meshFilter.gameObject.AddComponent<MeshCollider>();
+        meshRenderer = trailObj.AddComponent<MeshRenderer>();
+        meshFilter = trailObj.AddComponent<MeshFilter>();
+        meshCollider = meshFilter.gameObject.AddComponent<MeshCollider>();
 
         meshReference = new Mesh { name = "FlameTrailMesh" };
         meshFilter.mesh = meshReference;
+        meshRenderer.material = trailMaterial;
+        flameParticles = trailObj.GetComponentInChildren<ParticleSystem>();
 
         points.Clear();
         pointsSinceLastBake = 0;
@@ -78,7 +74,7 @@ public class FlameTrailGeneration : MonoBehaviour
     public void StopBoostTrail()
     {
         generating = false;
-        BakeMesh();
+        CreateTrail();
 
         points.Clear();
         meshReference = null;
@@ -91,7 +87,15 @@ public class FlameTrailGeneration : MonoBehaviour
         Instantiate(ringPrefab, playerTransform.position, playerTransform.rotation);
     }
 
-    #region Point Handling
+    #region Technical Trail Generation Stuff
+
+    private void CreateTrail()
+    {
+        if (points.Count < 2) return;
+
+        GenerateRibbonMesh();
+        BakeColliderMesh();
+    }
 
     private void AddPoint(Vector3 point)
     {
@@ -106,21 +110,9 @@ public class FlameTrailGeneration : MonoBehaviour
         pointsSinceLastBake++;
         if (pointsSinceLastBake >= pointsPerBake)
         {
-            BakeMesh();
+            CreateTrail();
             pointsSinceLastBake = 0;
         }
-    }
-
-    #endregion
-
-    #region Mesh Baking
-
-    private void BakeMesh()
-    {
-        if (points.Count < 2) return;
-
-        GenerateRibbonMesh();
-        BakeColliderMesh();
     }
 
     private void GenerateRibbonMesh()
@@ -137,14 +129,14 @@ public class FlameTrailGeneration : MonoBehaviour
             else if (i == points.Count - 1) forward = points[i] - points[i - 1];
             else forward = points[i + 1] - points[i - 1];
 
-            Vector3 right = Vector3.Cross(forward.normalized, playerRB.transform.up).normalized * trailWidth * 0.5f;
+            Vector3 right = 0.5f * trailWidth * Vector3.Cross(forward.normalized, playerRB.transform.up).normalized;
             Vector3 up = playerRB.transform.up.normalized * colliderHeight;
 
             // Bottom vertices
             vertices[i * 4] = points[i] - right;
             vertices[i * 4 + 1] = points[i] + right;
 
-            // Top vertices (adds height)
+            // Top vertices
             vertices[i * 4 + 2] = vertices[i * 4] + up;
             vertices[i * 4 + 3] = vertices[i * 4 + 1] + up;
 
@@ -213,143 +205,3 @@ public class FlameTrailGeneration : MonoBehaviour
 
     #endregion
 }
-
-/*
-using UnityEngine;
-using System.Collections.Generic;
-
-public class FlameTrailGeneration : MonoBehaviour
-{
-    [Header("Flame Trail")]
-    [Range(1f, 10f)]
-    public float trailWidth = 1f;
-    public GameObject trailPrefab;
-
-    [Header("Flame Ring")]
-    public GameObject ringPrefab;
-
-    // Variables Needed
-    private bool generating = false;
-    private Rigidbody rigidBody;
-    private Mesh meshGenerated;
-    private MeshCollider meshCollider;
-    private ParticleSystem flameParticles;
-    private LineRenderer currentTrail;
-    private List<Vector3> currentPoints;
-    private Vector3 lastPoint;
-    private int pointsSinceLastBake = 0;
-    private readonly int pointsPerBake = 10;
-    private readonly float pointSpacing = 1f;
-    private readonly float colliderHeight = 1f; 
-
-    void Start()
-    {
-        rigidBody = GetComponent<Rigidbody>();
-        currentPoints = new List<Vector3>();
-    }
-
-    void LateUpdate()
-    {
-        if (!generating || currentTrail == null) return;
-
-        float dist = Vector3.Distance(rigidBody.position, lastPoint);
-        if (dist >= pointSpacing)
-        {
-            AddPoint(transform.position);
-        }
-    }
-
-    public bool IsGenerating() => generating;
-
-    public void StartBoostTrail()
-    {
-        GameObject newTrail = Instantiate(trailPrefab, Vector3.zero, Quaternion.identity);
-        currentTrail = newTrail.GetComponentInChildren<LineRenderer>();
-        flameParticles = newTrail.GetComponentInChildren<ParticleSystem>();
-
-        currentTrail.startWidth = trailWidth;
-        currentTrail.endWidth = trailWidth;
-        currentPoints.Clear();
-        pointsSinceLastBake = 0;
-
-        AddPoint(transform.position);
-        generating = true;
-    }
-    public void StopBoostTrail()
-    {
-        generating = false;
-        BakeCollider();
-
-        currentTrail = null;
-        currentPoints.Clear();
-
-        meshCollider = null;
-        meshGenerated = null;
-    }
-
-    public void SpawnFlameRing(Transform playerTransform)
-    {
-        Instantiate(ringPrefab, playerTransform.position, playerTransform.rotation);
-    }
-
-    #region Trail Renderer Technical Stuff
-    private void AddPoint(Vector3 point)
-    {
-        if (Physics.Raycast(point + rigidBody.transform.up, -rigidBody.transform.up, out RaycastHit hit, 10f))
-        {
-            point = hit.point + hit.normal * 0.05f;
-        }
-
-        currentPoints.Add(point);
-        currentTrail.positionCount = currentPoints.Count;
-        currentTrail.SetPosition(currentPoints.Count - 1, point);
-        lastPoint = point;
-
-        pointsSinceLastBake++;
-        if (pointsSinceLastBake >= pointsPerBake)
-        {
-            BakeCollider();
-            pointsSinceLastBake = 0;
-        }
-    }
-    private void BakeCollider()
-    {
-        if (currentTrail.positionCount < 2) return;
-
-        meshGenerated = new Mesh { name = "FlameTrailColliderMesh" };
-        currentTrail.BakeMesh(meshGenerated, true);
-
-        Vector3[] verts = meshGenerated.vertices;
-        for (int i = 0; i < verts.Length; i++)
-        {
-            verts[i] += currentTrail.transform.up * (colliderHeight * 0.5f);
-        }
-
-        meshGenerated.vertices = verts;
-        meshGenerated.RecalculateBounds();
-        meshGenerated.RecalculateNormals();
-
-        if (meshCollider == null)
-        {
-            meshCollider = currentTrail.transform.parent.gameObject.GetComponent<MeshCollider>();
-            if (meshCollider == null)
-                meshCollider = currentTrail.transform.parent.gameObject.AddComponent<MeshCollider>();
-        }
-
-        meshCollider.sharedMesh = meshGenerated;
-        meshCollider.convex = false;
-
-        var shape = flameParticles.shape;
-        shape.enabled = true;
-        shape.shapeType = ParticleSystemShapeType.Mesh;
-        shape.meshRenderer = null;
-        shape.mesh = meshGenerated;
-
-        float targetRate = 1000f + (currentPoints.Count * 5f);
-        targetRate = Mathf.Clamp(targetRate, 1000f, 5000f);
-        var emission = flameParticles.emission;
-        emission.rateOverTime = targetRate;
-    }
-    #endregion
-}
-*/

@@ -20,11 +20,16 @@ public class FlameTrailGeneration : MonoBehaviour
 
     // Trail Generation Variables
     private List<Vector3> points = new();
-    private Vector3 lastPoint;
+    private List<Vector3> vertexBuffer = new();
+    private List<Vector2> uvBuffer = new();
+    private List<int> triangleBuffer = new();
+    private Vector3 lastPoint = Vector3.zero;
     private int pointsSinceLastBake = 0;
-    private readonly int pointsPerBake = 10;
-    private readonly float pointSpacing = 1f;
-    private readonly float colliderHeight = 1f;
+    private int colliderBakeCounter = 0;
+    private readonly int meshBakeInterval = 2;
+    private readonly float pointSpacing = 0.5f;
+    private readonly int colliderBakeInterval = 10;
+    private readonly float colliderHeight = 0.5f;   
 
     // Mesh Components
     private Mesh meshReference;
@@ -37,7 +42,7 @@ public class FlameTrailGeneration : MonoBehaviour
         playerRB = GetComponent<Rigidbody>();
     }
 
-    void LateUpdate()
+    void FixedUpdate()
     {
         if (generating)
         {
@@ -53,20 +58,21 @@ public class FlameTrailGeneration : MonoBehaviour
 
     public void StartBoostTrail()
     {
-        GameObject trailObj = Instantiate(trailPrefab, Vector3.zero, Quaternion.identity);        
+        GameObject trailObj = Instantiate(trailPrefab, Vector3.zero, Quaternion.identity);
 
+        flameParticles = trailObj.GetComponentInChildren<ParticleSystem>();
         meshRenderer = trailObj.AddComponent<MeshRenderer>();
         meshFilter = trailObj.AddComponent<MeshFilter>();
         meshCollider = meshFilter.gameObject.AddComponent<MeshCollider>();
 
         meshReference = new Mesh { name = "FlameTrailMesh" };
-        meshFilter.mesh = meshReference;
-        meshRenderer.material = trailMaterial;
-        flameParticles = trailObj.GetComponentInChildren<ParticleSystem>();
+        meshReference.MarkDynamic();
+        meshFilter.sharedMesh = meshReference;
+        meshRenderer.material = trailMaterial;       
 
         points.Clear();
         pointsSinceLastBake = 0;
-        AddPoint(transform.position);
+        AddPoint(transform.position);       
 
         generating = true;
     }
@@ -91,10 +97,17 @@ public class FlameTrailGeneration : MonoBehaviour
 
     private void CreateTrail()
     {
-        if (points.Count < 2) return;
+        if (points.Count >= 2)
+        {
+            GenerateRibbonMesh();
 
-        GenerateRibbonMesh();
-        BakeColliderMesh();
+            colliderBakeCounter++;
+            if (colliderBakeCounter >= colliderBakeInterval)
+            {
+                BakeColliderMesh();
+                colliderBakeCounter = 0;
+            }
+        }     
     }
 
     private void AddPoint(Vector3 point)
@@ -108,7 +121,7 @@ public class FlameTrailGeneration : MonoBehaviour
         lastPoint = point;
 
         pointsSinceLastBake++;
-        if (pointsSinceLastBake >= pointsPerBake)
+        if (pointsSinceLastBake >= meshBakeInterval)
         {
             CreateTrail();
             pointsSinceLastBake = 0;
@@ -117,66 +130,68 @@ public class FlameTrailGeneration : MonoBehaviour
 
     private void GenerateRibbonMesh()
     {
-        int vertexCount = points.Count * 4;
-        Vector3[] vertices = new Vector3[vertexCount];
-        Vector2[] uvs = new Vector2[vertexCount];
-        int[] triangles = new int[(points.Count - 1) * 12];
+        int pointCount = points.Count;
+        if (pointCount < 2) return;
 
-        for (int i = 0; i < points.Count; i++)
+        vertexBuffer.Clear();
+        uvBuffer.Clear();
+        triangleBuffer.Clear();
+
+        for (int i = 0; i < pointCount; i++)
         {
             Vector3 forward;
             if (i == 0) forward = points[i + 1] - points[i];
-            else if (i == points.Count - 1) forward = points[i] - points[i - 1];
+            else if (i == pointCount - 1) forward = points[i] - points[i - 1];
             else forward = points[i + 1] - points[i - 1];
 
             Vector3 right = 0.5f * trailWidth * Vector3.Cross(forward.normalized, playerRB.transform.up).normalized;
             Vector3 up = playerRB.transform.up.normalized * colliderHeight;
 
-            // Bottom vertices
-            vertices[i * 4] = points[i] - right;
-            vertices[i * 4 + 1] = points[i] + right;
+            Vector3 bottomLeft = points[i] - right;
+            Vector3 bottomRight = points[i] + right;
+            Vector3 topLeft = bottomLeft + up;
+            Vector3 topRight = bottomRight + up;
 
-            // Top vertices
-            vertices[i * 4 + 2] = vertices[i * 4] + up;
-            vertices[i * 4 + 3] = vertices[i * 4 + 1] + up;
+            vertexBuffer.Add(bottomLeft);
+            vertexBuffer.Add(bottomRight);
+            vertexBuffer.Add(topLeft);
+            vertexBuffer.Add(topRight);
 
-            float v = (float)i / (points.Count - 1);
+            float v = (float)i / (pointCount - 1);
 
-            uvs[i * 4] = new Vector2(0, v);
-            uvs[i * 4 + 1] = new Vector2(1, v);
-            uvs[i * 4 + 2] = new Vector2(0, v);
-            uvs[i * 4 + 3] = new Vector2(1, v);
+            uvBuffer.Add(new Vector2(0, v));
+            uvBuffer.Add(new Vector2(1, v));
+            uvBuffer.Add(new Vector2(0, v));
+            uvBuffer.Add(new Vector2(1, v));
         }
 
-        int triIndex = 0;
-
-        for (int i = 0; i < points.Count - 1; i++)
+        for (int i = 0; i < pointCount - 1; i++)
         {
             int vi = i * 4;
 
-            // Bottom face
-            triangles[triIndex++] = vi;
-            triangles[triIndex++] = vi + 1;
-            triangles[triIndex++] = vi + 4;
+            // Bottom
+            triangleBuffer.Add(vi);
+            triangleBuffer.Add(vi + 1);
+            triangleBuffer.Add(vi + 4);
 
-            triangles[triIndex++] = vi + 4;
-            triangles[triIndex++] = vi + 1;
-            triangles[triIndex++] = vi + 5;
+            triangleBuffer.Add(vi + 4);
+            triangleBuffer.Add(vi + 1);
+            triangleBuffer.Add(vi + 5);
 
-            // Top face
-            triangles[triIndex++] = vi + 2;
-            triangles[triIndex++] = vi + 6;
-            triangles[triIndex++] = vi + 3;
+            // Top
+            triangleBuffer.Add(vi + 2);
+            triangleBuffer.Add(vi + 6);
+            triangleBuffer.Add(vi + 3);
 
-            triangles[triIndex++] = vi + 3;
-            triangles[triIndex++] = vi + 6;
-            triangles[triIndex++] = vi + 7;
+            triangleBuffer.Add(vi + 3);
+            triangleBuffer.Add(vi + 6);
+            triangleBuffer.Add(vi + 7);
         }
 
-        meshReference.Clear();
-        meshReference.vertices = vertices;
-        meshReference.uv = uvs;
-        meshReference.triangles = triangles;
+        meshReference.SetVertices(vertexBuffer);
+        meshReference.SetUVs(0, uvBuffer);
+        meshReference.SetTriangles(triangleBuffer, 0);
+
         meshReference.RecalculateNormals();
         meshReference.RecalculateBounds();
     }
@@ -185,7 +200,6 @@ public class FlameTrailGeneration : MonoBehaviour
     {
         if (meshCollider != null)
         {
-            meshCollider.sharedMesh = null;
             meshCollider.sharedMesh = meshReference;
             meshCollider.convex = false;
         }

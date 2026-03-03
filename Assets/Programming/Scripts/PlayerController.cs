@@ -30,14 +30,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float jumpHeight;
 
     // Important References
+    Rigidbody playerRB;
     PlayerAnimator playerAnimator;
     PlayerEffects playerVFX;
-    PlayerAudio playerSFX;
-    Rigidbody playerRB;
-    Transform currentCheckpoint;
-    Transform groundRaycast;
-    int passedCheckpoint;
-    int lapsCompleted;
+    PlayerAudio playerSFX; 
 
     // Variables for Speed
     float currentSpeed;
@@ -61,6 +57,12 @@ public class PlayerController : MonoBehaviour
     bool hasJumped;
     float jumpTimer;
     readonly float jumpTime = 0.2f;
+
+    // Variables for Tracking
+    Transform groundRaycast;
+    Transform currentCheckpoint;
+    int passedCheckpoint;
+    int lapsCompleted;
 
     // Player States
     bool isBoosting;
@@ -113,8 +115,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        //---------------------
         if (isFinished) return;
         if (!CanMove()) return;
+        //---------------------
 
         CheckInputs();
 
@@ -126,18 +130,22 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
+        // Essential Updates
+
         CheckGrounded();
 
+        //---------------------
         if (isFinished) return;
-        if (!CanMove()) return;   
+        if (!CanMove()) return;
+        //---------------------
+
+        // Player Actions
 
         AcceleratePhysics();
         SteerPhysics();
 
         BoostPhysics();    
         DriftPhysics();
-     
-        JumpPhysics();
     }
 
     #region Accelerate
@@ -390,7 +398,6 @@ public class PlayerController : MonoBehaviour
     #region Other Functions
 
         #region Collision Checks
-
         private void OnTriggerEnter(Collider other)
         {
             if (other.GetComponent<FlameTrailObject>())
@@ -452,7 +459,6 @@ public class PlayerController : MonoBehaviour
         #endregion
 
         #region Physics Calculations
-
         void CheckGrounded()
         {
             Vector3 origin = groundRaycast.position;
@@ -506,6 +512,7 @@ public class PlayerController : MonoBehaviour
 
             return playerVelocityVector;
         }
+
         #endregion
 
         #region State Handling
@@ -526,6 +533,7 @@ public class PlayerController : MonoBehaviour
 
             isRespawning = false;
         }
+
         #endregion
 
     #endregion

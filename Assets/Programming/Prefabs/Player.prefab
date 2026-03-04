@@ -10337,7 +10337,6 @@ GameObject:
   - component: {fileID: 6839355430846264356}
   - component: {fileID: 2865318837893622717}
   - component: {fileID: 4659213350004100670}
-  - component: {fileID: 683361643645367514}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -10586,25 +10585,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1.5
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &683361643645367514
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3621204120411735751}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5c2bd5023b555040b2844c118ec8e81, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  baseSpeed: 100
-  turnSpeed: 5
-  pointReachThreshold: 10
-  minBoostDelay: 2
-  maxBoostDelay: 8
-  canAutoMove: 0
-  targetPoints: []
 --- !u!1 &3931887778492641690
 GameObject:
   m_ObjectHideFlags: 0

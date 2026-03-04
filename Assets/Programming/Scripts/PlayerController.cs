@@ -90,10 +90,6 @@ public class PlayerController : MonoBehaviour
     }
     void Start()
     {
-        lapsCompleted = 0;
-        passedCheckpoint = -1;
-        currentCheckpoint = gameObject.transform;
-
         playerRB = GetComponent<Rigidbody>();
         maxSpeed = baseSpeed;
         if (driftStrength <= steerSensitivity) driftStrength = steerSensitivity + 0.1f;
@@ -109,6 +105,9 @@ public class PlayerController : MonoBehaviour
         wallLayer = LayerMask.GetMask("Walls");
         groundRaycast = transform.Find("Detection");
 
+        lapsCompleted = 0;
+        passedCheckpoint = -1;
+        currentCheckpoint = GetInitialCheckpoint();
         isFinished = false;
     }
     #endregion
@@ -532,6 +531,21 @@ public class PlayerController : MonoBehaviour
             yield return new WaitForSeconds(1f);
 
             isRespawning = false;
+        }
+
+        private Transform GetInitialCheckpoint()
+        {
+            TrackManager trackManager = GameObject.FindAnyObjectByType<TrackManager>();
+            if (trackManager == null)
+            {
+                GameObject zeroTransform = new("temporary");
+                zeroTransform.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+                zeroTransform.transform.localScale = Vector3.one;
+                return zeroTransform.transform;
+            }
+
+            Transform initialPosition = trackManager.checkPoints[0].transform;
+            return initialPosition;
         }
 
         #endregion

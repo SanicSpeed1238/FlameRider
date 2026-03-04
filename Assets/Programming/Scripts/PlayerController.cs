@@ -145,6 +145,8 @@ public class PlayerController : MonoBehaviour
 
         BoostPhysics();    
         DriftPhysics();
+
+        JumpPhysics();
     }
 
     #region Accelerate
@@ -447,12 +449,11 @@ public class PlayerController : MonoBehaviour
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (collision.gameObject.layer == wallLayer)
+            if ((wallLayer.value & (1 << collision.gameObject.layer)) > 0)
             {
-                // Function to bounce off walls and lose balance
                 isDrifting = false;
                 Debug.Log("Hit Railing.");
-            }        
+            }
         }
 
         #endregion
@@ -462,7 +463,7 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 origin = groundRaycast.position;
             Vector3 direction = -playerRB.transform.up;
-            float rayCastLength = 2f;
+            float rayCastLength = 1f;
 
             Debug.DrawRay(origin, direction * rayCastLength, Color.yellow);
             isGrounded = Physics.Raycast(origin, direction, out RaycastHit ground, rayCastLength, groundLayer) && !hasJumped;
@@ -501,9 +502,9 @@ public class PlayerController : MonoBehaviour
         Vector3 VelocityAdjustedToSlope(Vector3 playerVelocityVector)
         {
             var ray = new Ray(groundRaycast.position, -playerRB.transform.up);
-            float rayCastLength = 2f;
+            float rayCastLength = 2f; // * should be greater than rayCastLength from CheckGrounded()
 
-            if (Physics.Raycast(ray, out RaycastHit hit, rayCastLength, groundLayer) && !hasJumped)
+            if (Physics.Raycast(ray, out RaycastHit hit, rayCastLength, groundLayer) && isGrounded)
             {
                 Vector3 projectedVelocity = Vector3.ProjectOnPlane(playerVelocityVector, hit.normal);
                 return projectedVelocity;

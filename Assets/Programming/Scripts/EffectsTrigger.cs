@@ -2,15 +2,16 @@ using UnityEngine;
 
 public class EffectsTrigger : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public ParticleSystem[] particleSystems;
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        
+        if (other.GetComponent<PlayerController>())
+        {
+            foreach (var effect in particleSystems)
+            {
+                effect.Play();
+            }
+        }
     }
 }

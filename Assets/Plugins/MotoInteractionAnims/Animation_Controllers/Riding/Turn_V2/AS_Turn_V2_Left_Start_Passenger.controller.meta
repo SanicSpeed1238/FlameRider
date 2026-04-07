@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f0fde406a74b38c4fac52ab209ab3573
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Riding/Turn_V2/AS_Turn_V2_Left_Start_Passenger.controller
+  uploadId: 828140

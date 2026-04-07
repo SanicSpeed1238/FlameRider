@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ae98db1402adae24697e6fcfe580a7b7
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Riding/Drive_Fast/AS_Drive_Fast_Start.controller
+  uploadId: 828140

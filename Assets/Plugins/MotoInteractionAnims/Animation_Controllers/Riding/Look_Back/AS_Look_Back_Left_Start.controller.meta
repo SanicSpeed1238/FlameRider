@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0345d59d209a07d409ba7ab16c9f76d0
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Riding/Look_Back/AS_Look_Back_Left_Start.controller
+  uploadId: 828140

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3684be50ff8722b4eacd3c7d089ba729
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Falls/AS_Fall_From_Bike_Back.controller
+  uploadId: 828140

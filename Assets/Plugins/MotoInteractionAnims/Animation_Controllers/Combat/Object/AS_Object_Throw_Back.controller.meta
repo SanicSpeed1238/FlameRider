@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 717ee1abea3898e43956b0114f014236
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Combat/Object/AS_Object_Throw_Back.controller
+  uploadId: 828140

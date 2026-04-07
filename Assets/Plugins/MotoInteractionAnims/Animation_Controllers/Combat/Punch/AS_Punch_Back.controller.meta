@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 76dbbaa73be43a74686f7000df4b9ae9
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Combat/Punch/AS_Punch_Back.controller
+  uploadId: 828140

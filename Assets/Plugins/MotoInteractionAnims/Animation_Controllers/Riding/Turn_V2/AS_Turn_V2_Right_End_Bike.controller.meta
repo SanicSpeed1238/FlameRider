@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 30340ddffa1ed414e8ec95a719a38374
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Riding/Turn_V2/AS_Turn_V2_Right_End_Bike.controller
+  uploadId: 828140

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 71894ac4863e0c54e8579d1099a41098
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Combat/Long_Weapon/AS_Long_Weapon_Back_Passenger.controller
+  uploadId: 828140

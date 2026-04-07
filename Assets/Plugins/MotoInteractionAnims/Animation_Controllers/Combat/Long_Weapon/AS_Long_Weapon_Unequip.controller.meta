@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7f6b7abb3a3927b48bd0c343010f1645
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Combat/Long_Weapon/AS_Long_Weapon_Unequip.controller
+  uploadId: 828140

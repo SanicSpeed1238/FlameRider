@@ -38,13 +38,11 @@ public class PlayerController : MonoBehaviour
     // Variables for Speed
     float currentSpeed;
     float maxSpeed;   
-    Vector3 playerVelocity;
-    LayerMask groundLayer;
+    Vector3 playerVelocity;    
 
     // Variables for Handling
     float driftDirection;
     float currentDrift;
-    LayerMask wallLayer;
 
     // Variables for Boosting
     FlameTrailGeneration flameTrail;
@@ -58,8 +56,13 @@ public class PlayerController : MonoBehaviour
     float jumpTimer;
     readonly float jumpTime = 0.2f;
 
+    // Variables for Physics
+    LayerMask groundLayer;
+    LayerMask wallLayer;
+    Transform detectionOrigin;
+    FlameTrailCheck trailDetection;
+
     // Variables for Tracking
-    Transform groundRaycast;
     Transform currentCheckpoint;
     int passedCheckpoint;
     int lapsCompleted;
@@ -103,7 +106,8 @@ public class PlayerController : MonoBehaviour
 
         groundLayer = LayerMask.GetMask("Ground");
         wallLayer = LayerMask.GetMask("Walls");
-        groundRaycast = transform.Find("Detection");
+        detectionOrigin = transform.Find("Detection");
+        trailDetection = GetComponentInChildren<FlameTrailCheck>();
 
         lapsCompleted = 0;
         passedCheckpoint = -1;
@@ -461,12 +465,13 @@ public class PlayerController : MonoBehaviour
         #region Physics Calculations
         void CheckGrounded()
         {
-            Vector3 origin = groundRaycast.position;
+            Vector3 origin = detectionOrigin.position;
             Vector3 direction = -playerRB.transform.up;
-            float rayCastLength = 1f;
+            float rayCastLength = trailDetection.raycastDistance;
+            float rayCastRadius = trailDetection.rayCastRadius;
 
             Debug.DrawRay(origin, direction * rayCastLength, Color.yellow);
-            isGrounded = Physics.Raycast(origin, direction, out RaycastHit ground, rayCastLength, groundLayer) && !hasJumped;
+            isGrounded = Physics.SphereCast(origin, rayCastRadius, direction, out RaycastHit ground, rayCastLength, groundLayer) && !hasJumped;
             AlignToGround(ground);
 
             playerAnimator.SetGrounded(isGrounded);
@@ -501,8 +506,8 @@ public class PlayerController : MonoBehaviour
         }
         Vector3 VelocityAdjustedToSlope(Vector3 playerVelocityVector)
         {
-            var ray = new Ray(groundRaycast.position, -playerRB.transform.up);
-            float rayCastLength = 2f; // * should be greater than rayCastLength from CheckGrounded()
+            var ray = new Ray(detectionOrigin.position, -playerRB.transform.up);
+            float rayCastLength = (trailDetection.raycastDistance + 0.2f) + (currentSpeed * 0.01f);
 
             if (Physics.Raycast(ray, out RaycastHit hit, rayCastLength, groundLayer) && isGrounded)
             {

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: be3b4f7acb2d6eb47b8b055debf3114e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Riding/Stoppie/AS_Stoppie_Loop_Bike.controller
+  uploadId: 828140

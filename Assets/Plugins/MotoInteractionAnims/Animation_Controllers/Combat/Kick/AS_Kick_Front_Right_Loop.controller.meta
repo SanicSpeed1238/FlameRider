@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ee5cb4f9ffd8019408a4406adbf04168
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Combat/Kick/AS_Kick_Front_Right_Loop.controller
+  uploadId: 828140

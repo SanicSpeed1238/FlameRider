@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: db50a62cddae2b543b58e50b8cea9a2b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Combat/Kick/AS_Kick_Back_Left_Start.controller
+  uploadId: 828140

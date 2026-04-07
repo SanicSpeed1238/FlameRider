@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 47a7323234a82e24186cbae612a48793
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Combat/Kick/AS_Kick_Right_End.controller
+  uploadId: 828140

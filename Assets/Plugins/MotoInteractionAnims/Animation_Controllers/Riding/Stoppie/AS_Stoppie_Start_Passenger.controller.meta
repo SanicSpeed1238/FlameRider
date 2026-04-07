@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 48199ef29eaa8eb48ad5a8ca98a7e6ed
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Riding/Stoppie/AS_Stoppie_Start_Passenger.controller
+  uploadId: 828140

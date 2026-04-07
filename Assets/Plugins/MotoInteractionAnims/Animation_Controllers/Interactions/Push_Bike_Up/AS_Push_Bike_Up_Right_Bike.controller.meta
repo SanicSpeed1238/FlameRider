@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 88c58a428b248bd4c9132ce6a7ead576
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Interactions/Push_Bike_Up/AS_Push_Bike_Up_Right_Bike.controller
+  uploadId: 828140

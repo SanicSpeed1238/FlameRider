@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 553352eb85df1cc499012e160a3ccc86
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Dodge/AS_Dodge_Start.controller
+  uploadId: 828140

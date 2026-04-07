@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -18,18 +18,23 @@ public class FlameTrailGeneration : MonoBehaviour
     private Rigidbody playerRB;
     private ParticleSystem flameParticles;
 
-    // Trail Generation Variables
+    // Trail Data
     private List<Vector3> points = new();
+    private List<Vector3> normals = new();
+
     private List<Vector3> vertexBuffer = new();
     private List<Vector2> uvBuffer = new();
     private List<int> triangleBuffer = new();
+
     private Vector3 lastPoint = Vector3.zero;
+
     private int pointsSinceLastBake = 0;
     private int colliderBakeCounter = 0;
+
     private readonly int meshBakeInterval = 2;
     private readonly float pointSpacing = 0.5f;
     private readonly int colliderBakeInterval = 10;
-    private readonly float colliderHeight = 0.5f;   
+    private readonly float colliderHeight = 0.5f;
 
     // Mesh Components
     private Mesh meshReference;
@@ -68,11 +73,14 @@ public class FlameTrailGeneration : MonoBehaviour
         meshReference = new Mesh { name = "FlameTrailMesh" };
         meshReference.MarkDynamic();
         meshFilter.sharedMesh = meshReference;
-        meshRenderer.material = trailMaterial;       
+        meshRenderer.material = trailMaterial;
 
         points.Clear();
+        normals.Clear();
+
         pointsSinceLastBake = 0;
-        AddPoint(transform.position);       
+
+        AddPoint(transform.position);
 
         generating = true;
     }
@@ -83,6 +91,8 @@ public class FlameTrailGeneration : MonoBehaviour
         CreateTrail();
 
         points.Clear();
+        normals.Clear();
+
         meshReference = null;
         meshCollider = null;
         meshFilter = null;
@@ -90,10 +100,11 @@ public class FlameTrailGeneration : MonoBehaviour
 
     public void SpawnFlameRing(Transform playerTransform)
     {
+        Debug.Log("Flame Ring Disabled");
         Instantiate(ringPrefab, playerTransform.position, playerTransform.rotation);
     }
 
-    #region Technical Trail Generation Stuff
+    #region Trail Generation
 
     private void CreateTrail()
     {
@@ -107,19 +118,22 @@ public class FlameTrailGeneration : MonoBehaviour
                 BakeColliderMesh();
                 colliderBakeCounter = 0;
             }
-        }     
+        }
     }
 
     private void AddPoint(Vector3 point)
     {
+        Vector3 normal = playerRB.transform.up;
+
         if (Physics.Raycast(point + playerRB.transform.up, -playerRB.transform.up, out RaycastHit hit, 10f))
         {
             point = hit.point + hit.normal * 0.05f;
+            normal = hit.normal;
         }
-
         points.Add(point);
-        lastPoint = point;
+        normals.Add(normal.normalized);
 
+        lastPoint = point;
         pointsSinceLastBake++;
         if (pointsSinceLastBake >= meshBakeInterval)
         {
@@ -144,8 +158,12 @@ public class FlameTrailGeneration : MonoBehaviour
             else if (i == pointCount - 1) forward = points[i] - points[i - 1];
             else forward = points[i + 1] - points[i - 1];
 
-            Vector3 right = 0.5f * trailWidth * Vector3.Cross(forward.normalized, playerRB.transform.up).normalized;
-            Vector3 up = playerRB.transform.up.normalized * colliderHeight;
+            forward.Normalize();
+            Vector3 normal = normals[i];
+            if (Mathf.Abs(Vector3.Dot(forward, normal)) > 0.95f) normal = Vector3.up;
+
+            Vector3 right = Vector3.Cross(forward, normal).normalized * (trailWidth * 0.5f);
+            Vector3 up = normal * colliderHeight;
 
             Vector3 bottomLeft = points[i] - right;
             Vector3 bottomRight = points[i] + right;

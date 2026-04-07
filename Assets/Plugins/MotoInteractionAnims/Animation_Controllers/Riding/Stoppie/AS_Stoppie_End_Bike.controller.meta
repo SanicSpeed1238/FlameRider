@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fd9085aa065fe9a4a96660cb18339530
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Riding/Stoppie/AS_Stoppie_End_Bike.controller
+  uploadId: 828140

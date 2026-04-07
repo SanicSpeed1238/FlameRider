@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2688f5abcf746d5438724615c36b75d5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Riding/Reverse/AS_Drive_Reverse_Left_End_Bike.controller
+  uploadId: 828140

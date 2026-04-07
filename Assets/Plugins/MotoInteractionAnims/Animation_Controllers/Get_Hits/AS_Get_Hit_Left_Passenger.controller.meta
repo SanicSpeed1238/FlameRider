@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7109c003d81a3674ebb4279bb8f7f158
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Get_Hits/AS_Get_Hit_Left_Passenger.controller
+  uploadId: 828140

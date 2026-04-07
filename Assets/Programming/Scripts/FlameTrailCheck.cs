@@ -5,6 +5,8 @@ public class FlameTrailCheck : MonoBehaviour
     [Header("Trail Detection Settings")]
     [Range(0.1f, 2f)]
     public float raycastDistance;
+    [Range(0.1f, 1f)]
+    public float rayCastRadius;
     public bool debugRay = true;
 
     // Variables Needed

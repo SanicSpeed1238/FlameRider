@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6861685a5739c134da2cb8502316bfd2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Combat/Object/AS_Object_Equip.controller
+  uploadId: 828140

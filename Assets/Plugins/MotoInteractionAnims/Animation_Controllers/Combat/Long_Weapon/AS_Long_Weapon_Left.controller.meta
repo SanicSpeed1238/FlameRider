@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 92daa6b7326a971408face19eb70b9d4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Combat/Long_Weapon/AS_Long_Weapon_Left.controller
+  uploadId: 828140

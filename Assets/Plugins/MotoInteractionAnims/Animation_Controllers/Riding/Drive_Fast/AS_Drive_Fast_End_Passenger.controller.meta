@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e702b888fd1a6b4419b9a734ad010633
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Riding/Drive_Fast/AS_Drive_Fast_End_Passenger.controller
+  uploadId: 828140

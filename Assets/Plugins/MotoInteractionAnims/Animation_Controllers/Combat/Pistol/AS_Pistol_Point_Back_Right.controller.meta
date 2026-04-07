@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6f05d9022be37534096ab853b2e71bc7
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Combat/Pistol/AS_Pistol_Point_Back_Right.controller
+  uploadId: 828140

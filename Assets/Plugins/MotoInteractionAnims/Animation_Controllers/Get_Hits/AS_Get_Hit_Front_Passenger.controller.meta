@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f9918224b89488147b54221b7b519fa8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Get_Hits/AS_Get_Hit_Front_Passenger.controller
+  uploadId: 828140

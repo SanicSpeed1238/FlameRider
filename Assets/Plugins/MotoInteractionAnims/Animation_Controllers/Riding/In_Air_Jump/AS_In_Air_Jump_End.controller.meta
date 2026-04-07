@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 26a6d3e7270ab8c4ea3f787fed49a36a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Riding/In_Air_Jump/AS_In_Air_Jump_End.controller
+  uploadId: 828140

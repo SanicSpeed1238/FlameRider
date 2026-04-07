@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6f587c3fdb7647845bc31388130ec74b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 348258
+  packageName: Motorcycle Interaction Animset
+  packageVersion: 1.0
+  assetPath: Assets/MotoInteractionAnims/Animation_Controllers/Riding/Wheelie/AS_Wheelie_Loop_Bike.controller
+  uploadId: 828140

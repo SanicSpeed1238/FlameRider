@@ -6,52 +6,65 @@ using UnityEngine.Rendering.Universal;
 
 public class PlayerEffects : MonoBehaviour
 {
-    [Header("VFX References")]
-    public ParticleSystem speedLines;
-    public ParticleSystem flameLines;
-    public ParticleSystem flameTire;
-    public ParticleSystem flameGenerate;
-    public ParticleSystem flameRide;
+    [Header("VFX References")]   
+    public ParticleSystem driftEffect;
+    public ParticleSystem trailGenerate;
+    public ParticleSystem trailRide;
 
     [Header("Important References")]
-    public CinemachineCamera playerCam;
     public Volume postProcessVolume;
 
-    // Other Variables Needed
+    // Other Effects
+    // -------------
+
+    // Camera FOV
     float gameFOV;
     Coroutine currentZoomCoroutine;
-    Coroutine motionBlurCoroutine;
+    CinemachineCamera gameCamera;
+
+    // Motion Blur
     MotionBlur motionBlur;
+    Coroutine motionBlurCoroutine;   
+
+    // Screen Effects
+    private ParticleSystem speedLines;
+    private ParticleSystem flameLines;
 
     void Start()
     {
-        gameFOV = playerCam.Lens.FieldOfView;
-        if (postProcessVolume != null && postProcessVolume.profile != null) postProcessVolume.profile.TryGet(out motionBlur);
+        CameraManager cameraManager = GameObject.FindFirstObjectByType<CameraManager>();
+        gameCamera = cameraManager.gameplayCamera.GetComponent<CinemachineCamera>();
+        gameFOV = gameCamera.Lens.FieldOfView;
+        speedLines = cameraManager.speedLines;
+        flameLines = cameraManager.flameLines;
+
+        if (postProcessVolume != null && postProcessVolume.profile != null) 
+            postProcessVolume.profile.TryGet(out motionBlur);
     }
 
-    public void ActivateFlameTire(bool activate)
+    public void ActivateDriftEffect(bool activate)
     {
-        if (activate) flameTire.Play();
-        else flameTire.Stop();
+        if (activate) driftEffect.Play();
+        else driftEffect.Stop();
     }
 
-    public void ActivateFlameGenerate(bool activate)
+    public void ActivateTrailGenerate(bool activate)
     {
-        if (activate) flameGenerate.Play();
-        else flameGenerate.Stop();
+        if (activate) trailGenerate.Play();
+        else trailGenerate.Stop();
     }
 
-    public void ActivateFlameLines(bool activate)
+    public void ActivateTrailRide(bool activate)
     {
         if (activate)
         {
             flameLines.Play();
-            flameRide.Play();
+            trailRide.Play();
         }
         else
         {
             flameLines.Stop();
-            flameRide.Stop();
+            trailRide.Stop();
         }
     }
 
@@ -72,7 +85,7 @@ public class PlayerEffects : MonoBehaviour
     }
     IEnumerator CameraZoomOut(float targetFOV)
     {
-        float startFOV = playerCam.Lens.FieldOfView;
+        float startFOV = gameCamera.Lens.FieldOfView;
         float endFOV = targetFOV;
         float duration = 0.2f;
         float elapsed = 0f;
@@ -80,13 +93,13 @@ public class PlayerEffects : MonoBehaviour
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            playerCam.Lens.FieldOfView = Mathf.Lerp(startFOV, endFOV, elapsed / duration);
+            gameCamera.Lens.FieldOfView = Mathf.Lerp(startFOV, endFOV, elapsed / duration);
             yield return null;
         }
-        playerCam.Lens.FieldOfView = endFOV;
+        gameCamera.Lens.FieldOfView = endFOV;
     }
 
-    public void SetMotionBlurIntensity(float targetIntensity, float duration = 0.2f)
+    public void SetMotionBlur(float targetIntensity, float duration = 0.2f)
     {
         if (motionBlur == null)
             return;
@@ -116,9 +129,9 @@ public class PlayerEffects : MonoBehaviour
 
     public void StopAllEffects()
     {
-        ActivateFlameTire(false);
-        ActivateFlameGenerate(false);
-        ActivateFlameLines(false);
+        ActivateDriftEffect(false);
+        ActivateTrailGenerate(false);
+        ActivateTrailRide(false);
         ActivateBoostEffect(false);
     }
 }

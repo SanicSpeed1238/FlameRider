@@ -7,8 +7,8 @@ public class FlameTrailGeneration : MonoBehaviour
     [Header("Flame Trail")]
     public GameObject trailPrefab;
     public Material trailMaterial;
-    [Range(0.1f, 10f)]
-    public float trailWidth = 1f;
+    [Range(1f, 10f)]
+    public float trailWidth = 2f;
 
     [Header("Flame Ring")]
     public GameObject ringPrefab;

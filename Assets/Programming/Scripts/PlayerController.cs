@@ -42,7 +42,12 @@ public class PlayerController : MonoBehaviour
 
     // Variables for Handling
     float driftDirection;
-    float currentDrift;
+    float currentDrift;       
+    float unstableTimer = 0f;
+    private readonly float unstableDuration = 0.1f;
+    private readonly float unstableSpeedPreserve = 0.4f;
+    private Vector3 wallCollideDirection;
+    bool steerUnstable;
 
     // Variables for Boosting
     FlameTrailGeneration flameTrail;
@@ -112,7 +117,6 @@ public class PlayerController : MonoBehaviour
         lapsCompleted = 0;
         passedCheckpoint = -1;
         currentCheckpoint = GetInitialCheckpoint();
-        isFinished = false;
     }
     #endregion
 
@@ -186,7 +190,7 @@ public class PlayerController : MonoBehaviour
         
         // Visualization effects of speed
         playerAnimator.SetSpeed(transformSpeed);
-        playerVFX.SetMotionBlurIntensity(transformSpeed / 300f);
+        playerVFX.SetMotionBlur(transformSpeed / 300f);
         
         // Naturally regen fire energy, auto boost if energy full
         if (inputAccel > 0 && !isBoosting) RegenerateFireEngery(0.5f);
@@ -209,7 +213,7 @@ public class PlayerController : MonoBehaviour
                 if (!isFlying) flameTrail.SpawnFlameRing(transform);
             }
         }
-        if (isBoosting) playerVFX.ActivateFlameGenerate(true);
+        if (isBoosting) playerVFX.ActivateTrailGenerate(true);
     }
     void BoostPhysics()
     {
@@ -239,7 +243,7 @@ public class PlayerController : MonoBehaviour
             if (offFlameTrailTimer >= offFlameTrailTime)
             {
                 onFlameTrail = false;
-                playerVFX.ActivateFlameLines(false);
+                playerVFX.ActivateTrailRide(false);
                 playerSFX.StopSound(playerSFX.boostingSound);
             }
         }
@@ -251,7 +255,7 @@ public class PlayerController : MonoBehaviour
         {
             isBoosting = true;
             flameTrail.StartBoostTrail();
-            playerVFX.ActivateFlameGenerate(true);
+            playerVFX.ActivateTrailGenerate(true);
             playerVFX.ActivateBoostEffect(true);
             playerSFX.StartSound(playerSFX.boostingSound);
         } 
@@ -262,7 +266,7 @@ public class PlayerController : MonoBehaviour
         {
             isBoosting = false;
             flameTrail.StopBoostTrail();
-            playerVFX.ActivateFlameGenerate(false);
+            playerVFX.ActivateTrailGenerate(false);
             playerVFX.ActivateBoostEffect(false);
             playerSFX.StopSound(playerSFX.boostingSound);
         }
@@ -285,10 +289,45 @@ public class PlayerController : MonoBehaviour
     }
     void SteerPhysics()
     {
-        // Rotate rigidbody based on left stick input
-        float steerAmount = inputSteer * steerSensitivity * (Time.fixedDeltaTime * 10f);
-        Quaternion turnRotation = Quaternion.AngleAxis(steerAmount, playerRB.transform.up);
-        playerRB.MoveRotation(turnRotation * playerRB.rotation);
+        if (!steerUnstable)
+        {
+            float steerAmount = inputSteer * steerSensitivity * (Time.fixedDeltaTime * 10f);
+            Quaternion turnRotation = Quaternion.AngleAxis(steerAmount, playerRB.transform.up);
+            playerRB.MoveRotation(turnRotation * playerRB.rotation);
+        }
+        else
+        {
+            Vector3 forwardProjected = Vector3.ProjectOnPlane(wallCollideDirection, playerRB.transform.up).normalized;
+
+            if (forwardProjected.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(forwardProjected, playerRB.transform.up);
+                playerRB.MoveRotation(Quaternion.Slerp(playerRB.rotation, targetRotation, 10f * Time.fixedDeltaTime));
+            }
+
+            unstableTimer -= Time.fixedDeltaTime;
+            if (unstableTimer <= 0f) steerUnstable = false;
+        }
+    }
+
+    void WallCollidePhysics(Collision collision)
+    {        
+        Vector3 incomingVelocity = playerRB.linearVelocity;
+        if (incomingVelocity.magnitude < 2f) return;
+        Vector3 incomingDir = incomingVelocity.normalized;
+
+        Vector3 normal = collision.contacts[0].normal;
+        wallCollideDirection = (normal + incomingDir).normalized;
+        wallCollideDirection = Vector3.ProjectOnPlane(wallCollideDirection, playerRB.transform.up).normalized;
+
+        currentSpeed = Mathf.Clamp(currentSpeed * unstableSpeedPreserve, 0f, 100f);
+        float bounceForce = Mathf.Clamp(incomingVelocity.magnitude * unstableSpeedPreserve, 0f, 100f);
+        playerRB.AddForce(wallCollideDirection * bounceForce, ForceMode.Impulse);        
+
+        steerUnstable = true;
+        unstableTimer = unstableDuration;
+
+        //Debug.DrawRay(contactPoint, wallCollideDirection * 2f, Color.blue, 1f);
     }
     #endregion
 
@@ -341,7 +380,7 @@ public class PlayerController : MonoBehaviour
             currentDrift = 0.1f;
 
             playerAnimator.DriftAnimation(true, driftDirection);
-            playerVFX.ActivateFlameTire(true);        
+            playerVFX.ActivateDriftEffect(true);        
         }    
     }
     void StopDrift()
@@ -349,7 +388,7 @@ public class PlayerController : MonoBehaviour
         isDrifting = false;
 
         playerAnimator.DriftAnimation(false, driftDirection);
-        playerVFX.ActivateFlameTire(false);
+        playerVFX.ActivateDriftEffect(false);
         playerSFX.StopSound(playerSFX.driftingSound);
     }
     #endregion
@@ -386,7 +425,7 @@ public class PlayerController : MonoBehaviour
         {
             onFlameTrail = true;
             offFlameTrailTimer = 0f;
-            playerVFX.ActivateFlameLines(true);
+            playerVFX.ActivateTrailRide(true);
             playerSFX.StartSound(playerSFX.boostingSound);
             maxSpeed += trailSpeedBoost * Time.fixedDeltaTime;
         }
@@ -405,11 +444,6 @@ public class PlayerController : MonoBehaviour
         #region Collision Checks
         private void OnTriggerEnter(Collider other)
         {
-            if (other.GetComponent<FlameTrailObject>())
-            {
-                UseFlameRing(other.GetComponent<FlameTrailObject>().speedBoost, other.transform);
-            }
-
             if (other.CompareTag("Checkpoint"))
             {
                 currentCheckpoint = other.gameObject.transform;
@@ -456,7 +490,7 @@ public class PlayerController : MonoBehaviour
             if ((wallLayer.value & (1 << collision.gameObject.layer)) > 0)
             {
                 isDrifting = false;
-                Debug.Log("Hit Railing.");
+                WallCollidePhysics(collision);
             }
         }
 

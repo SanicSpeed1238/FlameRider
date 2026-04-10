@@ -186,7 +186,7 @@ public class PlayerController : MonoBehaviour
 
         // Calculate real speed and display on UI
         float transformSpeed = Mathf.Abs(Vector3.Dot(playerRB.linearVelocity, playerRB.transform.forward));
-        PlayerHUD.Instance.UpdateSpeedValue(transformSpeed, onFlameTrail);
+        PlayerHUD.Instance.UpdateSpeedValue(transformSpeed, baseSpeed);
         
         // Visualization effects of speed
         playerAnimator.SetSpeed(transformSpeed);
@@ -308,26 +308,6 @@ public class PlayerController : MonoBehaviour
             unstableTimer -= Time.fixedDeltaTime;
             if (unstableTimer <= 0f) steerUnstable = false;
         }
-    }
-
-    void WallCollidePhysics(Collision collision)
-    {        
-        Vector3 incomingVelocity = playerRB.linearVelocity;
-        if (incomingVelocity.magnitude < 2f) return;
-        Vector3 incomingDir = incomingVelocity.normalized;
-
-        Vector3 normal = collision.contacts[0].normal;
-        wallCollideDirection = (normal + incomingDir).normalized;
-        wallCollideDirection = Vector3.ProjectOnPlane(wallCollideDirection, playerRB.transform.up).normalized;
-
-        currentSpeed = Mathf.Clamp(currentSpeed * unstableSpeedPreserve, 0f, 100f);
-        float bounceForce = Mathf.Clamp(incomingVelocity.magnitude * unstableSpeedPreserve, 0f, 100f);
-        playerRB.AddForce(wallCollideDirection * bounceForce, ForceMode.Impulse);        
-
-        steerUnstable = true;
-        unstableTimer = unstableDuration;
-
-        //Debug.DrawRay(contactPoint, wallCollideDirection * 2f, Color.blue, 1f);
     }
     #endregion
 
@@ -493,7 +473,6 @@ public class PlayerController : MonoBehaviour
                 WallCollidePhysics(collision);
             }
         }
-
         #endregion
 
         #region Physics Calculations
@@ -552,6 +531,26 @@ public class PlayerController : MonoBehaviour
             return playerVelocityVector;
         }
 
+        void WallCollidePhysics(Collision collision)
+        {
+            Vector3 incomingVelocity = playerRB.linearVelocity;
+            if (incomingVelocity.magnitude < 2f) return;
+            Vector3 incomingDir = incomingVelocity.normalized;
+
+            Vector3 normal = collision.contacts[0].normal;
+            wallCollideDirection = (normal + incomingDir).normalized;
+            wallCollideDirection = Vector3.ProjectOnPlane(wallCollideDirection, playerRB.transform.up).normalized;
+
+            currentSpeed = Mathf.Clamp(currentSpeed * unstableSpeedPreserve, 0f, baseSpeed);
+            maxSpeed = baseSpeed;
+            float bounceForce = Mathf.Clamp(incomingVelocity.magnitude * unstableSpeedPreserve, 0f, 100f);
+            playerRB.AddForce(wallCollideDirection * bounceForce, ForceMode.Impulse);
+
+            steerUnstable = true;
+            unstableTimer = unstableDuration;
+
+            //Debug.DrawRay(contactPoint, wallCollideDirection * 2f, Color.blue, 1f);
+        }
         #endregion
 
         #region State Handling
@@ -587,7 +586,6 @@ public class PlayerController : MonoBehaviour
             Transform initialPosition = trackManager.checkPoints[0].transform;
             return initialPosition;
         }
-
         #endregion
 
     #endregion

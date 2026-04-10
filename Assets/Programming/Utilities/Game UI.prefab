@@ -1524,7 +1524,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   countdownNumbers: {fileID: 7245537155533133444}
   messageText: {fileID: 545808074904976273}
-  messageAnimation: {fileID: 2740799066564380946}
   fireEnergy: {fileID: 7544750827563892665}
   speedValue: {fileID: 229512756030905706}
   timerValue: {fileID: 7820797441911799115}
@@ -3482,9 +3481,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -320, y: 35}
+  m_AnchoredPosition: {x: -570, y: 160.00003}
   m_SizeDelta: {x: 500, y: 250}
-  m_Pivot: {x: 1, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8740266124769520207
 CanvasRenderer:
   m_ObjectHideFlags: 0

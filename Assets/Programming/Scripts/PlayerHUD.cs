@@ -1,8 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using GogoGaga.TME;
 using TMPro;
+using DG.Tweening;
 
 public class PlayerHUD : MonoBehaviour
 {
@@ -11,7 +11,6 @@ public class PlayerHUD : MonoBehaviour
     [Header("Message Text")]
     public TextMeshProUGUI countdownNumbers;
     public TextMeshProUGUI messageText;
-    public LeantweenCustomAnimator messageAnimation;
 
     [Header("Player Status")]
     public Slider fireEnergy;
@@ -27,7 +26,9 @@ public class PlayerHUD : MonoBehaviour
 
     // Other Variables Needed
     private EventSystem eventSystem;
-    private bool tweenPlaying;
+    private int speedValueStep;
+    private float speedValueRecord;
+    private Color speedValueColor;
 
     private void Awake()
     {
@@ -36,12 +37,30 @@ public class PlayerHUD : MonoBehaviour
     private void Start()
     {
         eventSystem = EventSystem.current;
+        speedValueStep = 0;
+        speedValueColor = speedValue.color;
     }
 
     public void DisplayMessage(string message)
     {
         messageText.text = message;
-        messageAnimation.PlayAnimation();
+
+        RectTransform rect = messageText.rectTransform;
+        rect.DOKill();
+        float screenWidth = Screen.width;
+        rect.anchoredPosition = new Vector2(-screenWidth, rect.anchoredPosition.y);
+        rect.localScale = Vector3.one;
+        Sequence seq = DOTween.Sequence();
+
+        // 🔹 Slide in from left
+        seq.Append(rect.DOAnchorPosX(0, 0.5f).SetEase(Ease.OutCubic));
+
+        // 🔹 Wait in center
+        seq.AppendInterval(1.2f);
+
+        // 🔹 Zoom + fly out to the right
+        seq.Append(rect.DOAnchorPosX(screenWidth, 0.5f).SetEase(Ease.InBack));
+        seq.Join(rect.DOScale(1.5f, 0.5f));
     }
     public void DisplayCountdown(int num)
     {
@@ -49,7 +68,7 @@ public class PlayerHUD : MonoBehaviour
         if (num == 0) numText = string.Empty;
 
         countdownNumbers.text = numText;
-        countdownNumbers.gameObject.GetComponent<LeantweenCustomAnimator>().PlayAnimation();
+        countdownNumbers.transform.DOPunchScale(Vector3.one * 0.5f, 0.4f, 10, 1);
 
         countdownNumbers.color = num switch
         {
@@ -65,15 +84,42 @@ public class PlayerHUD : MonoBehaviour
         fireEnergy.value = value / 100f;
     }
 
-    public void UpdateSpeedValue(float playerSpeed, bool increaseAnimation)
+    public void UpdateSpeedValue(float playerSpeed, float baseSpeed)
     {
         int intSpeed = Mathf.RoundToInt(playerSpeed);
         speedValue.text = intSpeed.ToString();
 
-        if (increaseAnimation && !tweenPlaying)
+        int newSpeedValueIncrement = intSpeed / 50;
+
+        bool passedRecord =
+            playerSpeed > baseSpeed &&
+            newSpeedValueIncrement != speedValueStep &&
+            Mathf.Abs(playerSpeed - speedValueRecord) > 5f;
+
+        if (passedRecord)
         {
-            speedValue.GetComponent<LeantweenCustomAnimator>().PlayAnimation();
-            SetTweenPlaying(true);
+            speedValueStep = newSpeedValueIncrement;
+            speedValueRecord = playerSpeed;
+
+            Transform t = speedValue.transform;
+
+            DOTween.Kill("speedPunch");
+            t.localScale = Vector3.one;
+
+            Sequence seq = DOTween.Sequence();
+            seq.SetId("speedPunch");
+
+            // Punch Animation
+            float punchRelative = Mathf.Clamp01(intSpeed / 1000f);
+            float punchStrength = Mathf.Lerp(0.2f, 2f, punchRelative);
+
+            seq.Append(
+                t.DOPunchScale(Vector3.one * punchStrength, 0.3f, 8, 0.8f)
+            );
+
+            // Color flash (optional - keeping your commented logic)
+            // seq.Join(speedValue.DOColor(Color.white, 0.1f));
+            // seq.Append(speedValue.DOColor(speedValueColor, 0.2f));
         }
     }
 
@@ -90,11 +136,6 @@ public class PlayerHUD : MonoBehaviour
     {
         string lapText = lap.ToString();
         lapNumber.text = "LAP " + lapText + "/3";
-    }
-
-    public void SetTweenPlaying(bool playing)
-    {
-        tweenPlaying = playing;
     }
 
     public void SetSelectedButton(GameObject menuButton)

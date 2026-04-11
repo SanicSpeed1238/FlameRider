@@ -19,6 +19,8 @@ public class FlameTrailGeneration : MonoBehaviour
     private ParticleSystem flameParticles;
 
     // Trail Data
+
+    private Vector3 lastPoint = Vector3.zero;
     private List<Vector3> points = new();
     private List<Vector3> normals = new();
 
@@ -26,13 +28,12 @@ public class FlameTrailGeneration : MonoBehaviour
     private List<Vector2> uvBuffer = new();
     private List<int> triangleBuffer = new();
 
-    private Vector3 lastPoint = Vector3.zero;
-
     private int pointsSinceLastBake = 0;
     private int colliderBakeCounter = 0;
 
     private readonly int meshBakeInterval = 2;
     private readonly float pointSpacing = 0.5f;
+    private readonly float textureTiling = 0.1f;
     private readonly int colliderBakeInterval = 10;
     private readonly float colliderHeight = 0.5f;
 
@@ -100,8 +101,8 @@ public class FlameTrailGeneration : MonoBehaviour
 
     public void SpawnFlameRing(Transform playerTransform)
     {
-        Debug.Log("Flame Ring Disabled");
-        Instantiate(ringPrefab, playerTransform.position, playerTransform.rotation);
+        //Instantiate(ringPrefab, playerTransform.position, playerTransform.rotation);
+        Debug.Log("Flame Ring Spawn Disabled");
     }
 
     #region Trail Generation
@@ -151,6 +152,17 @@ public class FlameTrailGeneration : MonoBehaviour
         uvBuffer.Clear();
         triangleBuffer.Clear();
 
+        float totalDistance = 0f;
+        List<float> distances = new();
+        distances.Add(0f);
+
+        for (int i = 1; i < pointCount; i++)
+        {
+            float dist = Vector3.Distance(points[i], points[i - 1]);
+            totalDistance += dist;
+            distances.Add(totalDistance);
+        }
+
         for (int i = 0; i < pointCount; i++)
         {
             Vector3 forward;
@@ -175,8 +187,7 @@ public class FlameTrailGeneration : MonoBehaviour
             vertexBuffer.Add(topLeft);
             vertexBuffer.Add(topRight);
 
-            float v = (float)i / (pointCount - 1);
-
+            float v = distances[i] * textureTiling;
             uvBuffer.Add(new Vector2(0, v));
             uvBuffer.Add(new Vector2(1, v));
             uvBuffer.Add(new Vector2(0, v));

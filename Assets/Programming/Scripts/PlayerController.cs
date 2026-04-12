@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float steerSensitivity;
     [Range(1,10)]
     [SerializeField] float driftStrength;
+    [Range(10,100)]
+    [SerializeField] float driftAcceleration;
 
     [Header("Boost")]
     [Range(1,50)]
@@ -293,9 +295,12 @@ public class PlayerController : MonoBehaviour
     {
         if (!steerUnstable)
         {
-            float steerAmount = inputSteer * steerSensitivity * (Time.fixedDeltaTime * 10f);
-            Quaternion turnRotation = Quaternion.AngleAxis(steerAmount, playerRB.transform.up);
-            playerRB.MoveRotation(turnRotation * playerRB.rotation);
+            if (!isDrifting)
+            {
+                float steerAmount = inputSteer * steerSensitivity * (Time.fixedDeltaTime * 10f);
+                Quaternion turnRotation = Quaternion.AngleAxis(steerAmount, playerRB.transform.up);
+                playerRB.MoveRotation(turnRotation * playerRB.rotation);
+            }           
         }
         else
         {
@@ -325,13 +330,20 @@ public class PlayerController : MonoBehaviour
         if (isDrifting)
         {
             // Gradually increase to the max drift strength
-            if (currentDrift < driftStrength) currentDrift += (currentSpeed / 50f) * Time.fixedDeltaTime;
+            if (currentDrift < driftStrength) currentDrift += (currentSpeed / (110f - driftAcceleration)) * Time.fixedDeltaTime;
             else currentDrift = driftStrength;
-            
+
             // Manipulate drift amount based on left stick direction
             float driftInfluence = inputSteer;
-            if (driftDirection * inputSteer > 0f) driftInfluence *= Mathf.Clamp(currentSpeed / 100f, 1f, 5f);
-            else driftInfluence = (currentDrift * -driftDirection) + (0.5f * driftDirection);
+            if (driftDirection * inputSteer > 0f)
+            {
+                driftInfluence += (currentSpeed / 100f) * driftDirection;
+            }
+            else if (driftDirection * inputSteer <= 0f)
+            {
+                driftInfluence = 0f;
+                currentDrift = 0f;
+            }
 
             // Rotate the rigidbody based on initial drift direction, current strength, and influence from left stick
             float rotationAmount = ((currentDrift * driftDirection) + driftInfluence) * (Time.fixedDeltaTime * 10f);

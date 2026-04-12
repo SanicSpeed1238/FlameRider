@@ -5431,9 +5431,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseSpeed: 200
   accelerationRate: 90
-  decelerationRate: 70
-  steerSensitivity: 7
+  decelerationRate: 120
+  steerSensitivity: 5
   driftStrength: 8
+  driftAcceleration: 75
   boostRate: 2
   energyRate: 10
   jumpHeight: 60

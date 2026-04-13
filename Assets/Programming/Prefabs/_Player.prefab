@@ -5434,7 +5434,7 @@ MonoBehaviour:
   decelerationRate: 120
   steerSensitivity: 5
   driftStrength: 8
-  driftAcceleration: 75
+  driftAcceleration: 85
   boostRate: 2
   energyRate: 10
   jumpHeight: 60

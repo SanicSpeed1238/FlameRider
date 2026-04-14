@@ -64,7 +64,7 @@ public class FlameTrailGeneration : MonoBehaviour
 
     public void StartBoostTrail()
     {
-        GameObject trailObj = Instantiate(trailPrefab, Vector3.zero, Quaternion.identity);
+        GameObject trailObj = Instantiate(trailPrefab, transform.position, Quaternion.identity);
 
         flameParticles = trailObj.GetComponentInChildren<ParticleSystem>();
         meshRenderer = trailObj.AddComponent<MeshRenderer>();
@@ -145,6 +145,8 @@ public class FlameTrailGeneration : MonoBehaviour
 
     private void GenerateRibbonMesh()
     {
+        Vector3 origin = points[0];
+
         int pointCount = points.Count;
         if (pointCount < 2) return;
 
@@ -153,8 +155,7 @@ public class FlameTrailGeneration : MonoBehaviour
         triangleBuffer.Clear();
 
         float totalDistance = 0f;
-        List<float> distances = new();
-        distances.Add(0f);
+        List<float> distances = new() { 0f };
 
         for (int i = 1; i < pointCount; i++)
         {
@@ -177,8 +178,9 @@ public class FlameTrailGeneration : MonoBehaviour
             Vector3 right = Vector3.Cross(forward, normal).normalized * (trailWidth * 0.5f);
             Vector3 up = normal * colliderHeight;
 
-            Vector3 bottomLeft = points[i] - right;
-            Vector3 bottomRight = points[i] + right;
+            Vector3 basePoint = points[i] - origin;
+            Vector3 bottomLeft = basePoint - right;
+            Vector3 bottomRight = basePoint + right;
             Vector3 topLeft = bottomLeft + up;
             Vector3 topRight = bottomRight + up;
 

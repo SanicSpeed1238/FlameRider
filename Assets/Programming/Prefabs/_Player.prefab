@@ -11214,9 +11214,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8041594755808223205}
     m_Modifications:
+    - target: {fileID: 1634253506768556595, guid: 9413234a85f21fb409dbfe83fc69adf9, type: 3}
+      propertyPath: moveWithTransform
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3419208301517029198, guid: 9413234a85f21fb409dbfe83fc69adf9, type: 3}
       propertyPath: m_Name
       value: vfx_TrailGenerate
+      objectReference: {fileID: 0}
+    - target: {fileID: 3419208301517029198, guid: 9413234a85f21fb409dbfe83fc69adf9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6012522989522194087, guid: 9413234a85f21fb409dbfe83fc69adf9, type: 3}
       propertyPath: m_LocalPosition.x
@@ -11228,7 +11236,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6012522989522194087, guid: 9413234a85f21fb409dbfe83fc69adf9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1
+      value: -2.5
       objectReference: {fileID: 0}
     - target: {fileID: 6012522989522194087, guid: 9413234a85f21fb409dbfe83fc69adf9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -11257,6 +11265,10 @@ PrefabInstance:
     - target: {fileID: 6012522989522194087, guid: 9413234a85f21fb409dbfe83fc69adf9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8528820085743210908, guid: 9413234a85f21fb409dbfe83fc69adf9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

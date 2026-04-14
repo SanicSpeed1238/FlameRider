@@ -46,9 +46,10 @@ Material:
     m_Ints: []
     m_Floats:
     - _ColorMask: 15
-    - _Delay: 0.5
+    - _Delay: 1
     - _Direction: -3.5
-    - _Speed: 3
+    - _Offset: 0
+    - _Speed: 2
     - _Stencil: 0
     - _StencilComp: 8
     - _StencilOp: 0

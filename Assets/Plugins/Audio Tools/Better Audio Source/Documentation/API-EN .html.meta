@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d55fad1b5bbd47149bd99fed9b6de295
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185585
+  packageName: Better Audio Source
+  packageVersion: 1.0.0
+  assetPath: Assets/BetterAudio/Source/Documentation/API-EN .html
+  uploadId: 486408

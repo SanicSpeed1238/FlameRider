@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 73cfda6828e12024c991b6f3c7a543b1
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185585
+  packageName: Better Audio Source
+  packageVersion: 1.0.0
+  assetPath: Assets/BetterAudio/Source/Documentation/changelog.txt
+  uploadId: 486408

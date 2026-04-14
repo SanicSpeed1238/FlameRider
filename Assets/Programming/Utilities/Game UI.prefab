@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6427761849522889674}
   - component: {fileID: 4380199920888675510}
   - component: {fileID: 3408266049149530425}
-  - component: {fileID: 534110029540581546}
   m_Layer: 5
   m_Name: Final Time
   m_TagString: Untagged
@@ -138,63 +137,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &534110029540581546
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 126681948830516253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  AnimationType: 1
-  PlayAutomatic: 1
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: -2000, y: -100, z: 0}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: -440, y: -100, z: 0}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 2.2
-  _time: 0.3
-  _easeType: 1
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 1
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7108073483332262172}
-        m_TargetAssemblyTypeName: WinScreen, Assembly-CSharp
-        m_MethodName: ShowFinalTime
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &441031795557710355
 GameObject:
   m_ObjectHideFlags: 0
@@ -206,9 +148,8 @@ GameObject:
   - component: {fileID: 2576114829604655585}
   - component: {fileID: 1674511606774636985}
   - component: {fileID: 1469875283877243964}
-  - component: {fileID: 1159695390520439939}
   m_Layer: 5
-  m_Name: Title
+  m_Name: Header
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -332,51 +273,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &1159695390520439939
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 441031795557710355}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  AnimationType: 1
-  PlayAutomatic: 1
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: 0, y: 620, z: 0}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: 0, y: 250, z: 0}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 0
-  _time: 0.1
-  _easeType: 1
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 0
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &495727548018908511
 GameObject:
   m_ObjectHideFlags: 0
@@ -544,7 +440,6 @@ GameObject:
   - component: {fileID: 244699535964671277}
   - component: {fileID: 4919892777931500815}
   - component: {fileID: 1771711233702895136}
-  - component: {fileID: 1880304314311986454}
   m_Layer: 5
   m_Name: Exit
   m_TagString: Untagged
@@ -711,51 +606,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &1880304314311986454
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1016016346230581622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  AnimationType: 1
-  PlayAutomatic: 1
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: 440, y: 215, z: 0}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: -400, y: 215, z: 0}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 5.2
-  _time: 0.3
-  _easeType: 1
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 0
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1091906771158562564
 GameObject:
   m_ObjectHideFlags: 0
@@ -1454,7 +1304,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8159357524808931818}
   - component: {fileID: 3566036805270024901}
-  - component: {fileID: 387630261961654308}
   m_Layer: 5
   m_Name: Player HUD
   m_TagString: Untagged
@@ -1505,51 +1354,6 @@ MonoBehaviour:
   lapNumber: {fileID: 3069855956452277669}
   resumeButton: {fileID: 3759180358270003511}
   replayButton: {fileID: 7700530592480700542}
---- !u!114 &387630261961654308
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2637710690395707169}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  AnimationType: 0
-  PlayAutomatic: 0
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: 1, y: 1, z: 1}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: 0, y: 0, z: 0}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 0
-  _time: 0.2
-  _easeType: 1
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 1
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &2698484110694807052
 GameObject:
   m_ObjectHideFlags: 0
@@ -1801,8 +1605,6 @@ GameObject:
   - component: {fileID: 4029562830501147260}
   - component: {fileID: 1124125681345643980}
   - component: {fileID: 545808074904976273}
-  - component: {fileID: 2740799066564380946}
-  - component: {fileID: 6091961302575733556}
   m_Layer: 5
   m_Name: Message
   m_TagString: Untagged
@@ -1928,108 +1730,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &2740799066564380946
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3717891518653421561}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: Show Message
-  AnimationType: 1
-  PlayAutomatic: 0
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: -2000, y: 200, z: 0}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: 0, y: 200, z: 0}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 0
-  _time: 0.3
-  _easeType: 1
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 1
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6091961302575733556}
-        m_TargetAssemblyTypeName: GogoGaga.TME.LeantweenCustomAnimator, Assembly-CSharp-firstpass
-        m_MethodName: PlayAnimation
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
---- !u!114 &6091961302575733556
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3717891518653421561}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: Remove Message
-  AnimationType: 0
-  PlayAutomatic: 0
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: 1, y: 1, z: 1}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: 2, y: 0, z: 1}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 1
-  _time: 0.15
-  _easeType: 1
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 1
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &3759180358270003511
 GameObject:
   m_ObjectHideFlags: 0
@@ -2043,7 +1743,6 @@ GameObject:
   - component: {fileID: 5597053767093792785}
   - component: {fileID: 3246247215564999809}
   - component: {fileID: 39233219259345375}
-  - component: {fileID: 8933464409422884662}
   m_Layer: 5
   m_Name: Resume
   m_TagString: Untagged
@@ -2210,51 +1909,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &8933464409422884662
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3759180358270003511}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  AnimationType: 1
-  PlayAutomatic: 1
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: -250, y: -50, z: 0}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: 0, y: -50, z: 0}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 0
-  _time: 0.1
-  _easeType: 1
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 0
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &3974784379547371144
 GameObject:
   m_ObjectHideFlags: 0
@@ -2622,7 +2276,6 @@ GameObject:
   - component: {fileID: 1250078215202077901}
   - component: {fileID: 6756321647932202609}
   - component: {fileID: 6744958930617570179}
-  - component: {fileID: 8880627920380471626}
   m_Layer: 5
   m_Name: Backdrop
   m_TagString: Untagged
@@ -2687,51 +2340,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8880627920380471626
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4777535183402409896}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  AnimationType: 3
-  PlayAutomatic: 1
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: 0, y: 0, z: 0}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: 0, y: 0, z: 0}
-  endValue: 0.6
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 0
-  _time: 2
-  _easeType: 15
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 1
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &4943383697309193414
 GameObject:
   m_ObjectHideFlags: 0
@@ -2745,7 +2353,6 @@ GameObject:
   - component: {fileID: 3735110840430348275}
   - component: {fileID: 1913680988189571593}
   - component: {fileID: 2810592710167609441}
-  - component: {fileID: 3287700165801448238}
   m_Layer: 5
   m_Name: Exit
   m_TagString: Untagged
@@ -2912,51 +2519,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &3287700165801448238
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4943383697309193414}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  AnimationType: 1
-  PlayAutomatic: 1
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: 250, y: -300, z: 0}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: 0, y: -300, z: 0}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 0
-  _time: 0.1
-  _easeType: 1
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 0
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &4960654036912915792
 GameObject:
   m_ObjectHideFlags: 0
@@ -3043,9 +2605,8 @@ GameObject:
   - component: {fileID: 514187204538716382}
   - component: {fileID: 1616387066977170212}
   - component: {fileID: 2527092725324197869}
-  - component: {fileID: 3250301774378618410}
   m_Layer: 5
-  m_Name: Title
+  m_Name: Header
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3169,51 +2730,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &3250301774378618410
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5360067051194239313}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  AnimationType: 1
-  PlayAutomatic: 1
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: 50, y: 500, z: 0}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: 50, y: -50, z: 0}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 0
-  _time: 2
-  _easeType: 15
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 0
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &5491457371154961278
 GameObject:
   m_ObjectHideFlags: 0
@@ -3225,7 +2741,6 @@ GameObject:
   - component: {fileID: 851222366993618794}
   - component: {fileID: 8740266124769520207}
   - component: {fileID: 229512756030905706}
-  - component: {fileID: 1299003120788634217}
   m_Layer: 5
   m_Name: Speed Value
   m_TagString: Untagged
@@ -3351,63 +2866,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &1299003120788634217
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5491457371154961278}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  AnimationType: 1
-  PlayAutomatic: 0
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: -320, y: 35, z: 0}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: -320, y: 75, z: 0}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 0
-  _time: 0.15
-  _easeType: 34
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 1
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3566036805270024901}
-        m_TargetAssemblyTypeName: PlayerHUD, Assembly-CSharp
-        m_MethodName: SetTweenPlaying
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &6520435095261868141
 GameObject:
   m_ObjectHideFlags: 0
@@ -3555,7 +3013,6 @@ GameObject:
   - component: {fileID: 4883453473225460280}
   - component: {fileID: 728526324473230884}
   - component: {fileID: 7245537155533133444}
-  - component: {fileID: 7022021706039259093}
   m_Layer: 5
   m_Name: Countdown
   m_TagString: Untagged
@@ -3681,51 +3138,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &7022021706039259093
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6712460998373548889}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  AnimationType: 1
-  PlayAutomatic: 0
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: 0, y: 200, z: 0}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: 0, y: 150, z: 0}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 0
-  _time: 0.1
-  _easeType: 33
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 1
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &6870511717085500972
 GameObject:
   m_ObjectHideFlags: 0
@@ -3819,7 +3231,6 @@ GameObject:
   - component: {fileID: 1551261018555780099}
   - component: {fileID: 3004530234993000567}
   - component: {fileID: 5871412056706933136}
-  - component: {fileID: 7574675684017269834}
   m_Layer: 5
   m_Name: Replay
   m_TagString: Untagged
@@ -3986,51 +3397,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &7574675684017269834
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7700530592480700542}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12a76ff6ca05a5d41a1a08e109e3f49b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  AnimationType: 1
-  PlayAutomatic: 1
-  OverrideStartValues: 1
-  StartTargetType: 0
-  StartTargetTranform: {fileID: 0}
-  start_vector: {x: 440, y: 430, z: 0}
-  startValue: 0
-  DontOverrideEndProperty: 0
-  EndTargetType: 0
-  EndTargetTranform: {fileID: 0}
-  end_vector: {x: -400, y: 430, z: 0}
-  endValue: 0
-  RotationAxis: 0
-  RotationPerSec: 0
-  _delay: 5
-  _time: 0.3
-  _easeType: 1
-  StopOtherTweensOnThis: 0
-  DestroyOnCompletion: 0
-  PlayInDeltaTime: 0
-  OnStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_Vector:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUpdate_float:
-    m_PersistentCalls:
-      m_Calls: []
-  OnCompletion:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &7815112444858060397
 GameObject:
   m_ObjectHideFlags: 0

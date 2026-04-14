@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2d7fc4ac3e7c00041b7a0bb10cdaed43
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185585
+  packageName: Better Audio Source
+  packageVersion: 1.0.0
+  assetPath: Assets/BetterAudio/Source/Demo/Demo.unity
+  uploadId: 486408

@@ -1,4 +1,3 @@
-using GogoGaga.TME;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -109,7 +108,6 @@ public class GameState : MonoBehaviour
 
         PlayerHUD.Instance.DisplayMessage(string.Empty);
         PlayerHUD.Instance.SetSelectedButton(playerHUD.GetComponent<PlayerHUD>().replayButton);
-        playerHUD.GetComponent<LeantweenCustomAnimator>().PlayAnimation();
         winScreen.SetActive(true);
     }
 

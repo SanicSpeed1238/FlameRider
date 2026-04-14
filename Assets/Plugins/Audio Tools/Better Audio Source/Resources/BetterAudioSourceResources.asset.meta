@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d1230ce6c2170f549bc635f8ea73380d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185585
+  packageName: Better Audio Source
+  packageVersion: 1.0.0
+  assetPath: Assets/BetterAudio/Source/Resources/BetterAudioSourceResources.asset
+  uploadId: 486408

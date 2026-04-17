@@ -31,6 +31,12 @@ public class PlayerController : MonoBehaviour
     [Range(10, 100)]
     [SerializeField] float jumpHeight;
 
+    [Header("Important Components")]
+    [SerializeField] FlameTrailCheck flameTrailCheck;
+    [SerializeField] Transform groundDetectOrigin;
+    [SerializeField] LayerMask groundLayer;
+    [SerializeField] LayerMask wallLayer;   
+
     // Important References
     Rigidbody playerRB;
     PlayerAnimator playerAnimator;
@@ -62,12 +68,6 @@ public class PlayerController : MonoBehaviour
     bool hasJumped;
     float jumpTimer;
     readonly float jumpTime = 0.2f;
-
-    // Variables for Physics
-    LayerMask groundLayer;
-    LayerMask wallLayer;
-    Transform detectionOrigin;
-    FlameTrailCheck trailDetection;
 
     // Variables for Tracking
     Transform currentCheckpoint;
@@ -111,11 +111,6 @@ public class PlayerController : MonoBehaviour
         playerAnimator = GetComponentInChildren<PlayerAnimator>();
         playerVFX = GetComponentInChildren<PlayerEffects>();
         playerSFX = GetComponentInChildren<PlayerAudio>();
-
-        groundLayer = LayerMask.GetMask("Ground");
-        wallLayer = LayerMask.GetMask("Walls");
-        detectionOrigin = transform.Find("Detection");
-        trailDetection = GetComponentInChildren<FlameTrailCheck>();
 
         lapsCompleted = 0;
         passedCheckpoint = -1;
@@ -462,7 +457,7 @@ public class PlayerController : MonoBehaviour
                     }
                     else
                     {  
-                        PlayerHUD.Instance.DisplayMessage("LAP " + (lapsCompleted + 1) + "!");
+                        PlayerHUD.Instance.DisplayMessage("Lap " + (lapsCompleted + 1) + "!");
                         GameState.Instance.lapSound.PlayOneShot(GameState.Instance.lapSound.clip);
                     }
                 }
@@ -488,18 +483,23 @@ public class PlayerController : MonoBehaviour
             }
         }
         #endregion
-
+        
         #region Physics Calculations
         void CheckGrounded()
         {
-            Vector3 origin = detectionOrigin.position;
+            Vector3 origin = groundDetectOrigin.position;
             Vector3 direction = -playerRB.transform.up;
-            float rayCastLength = trailDetection.raycastDistance;
-            float rayCastRadius = trailDetection.rayCastRadius;
+            float rayCastLength = flameTrailCheck.raycastDistance;
+            float rayCastRadius = flameTrailCheck.rayCastRadius;
 
-            Debug.DrawRay(origin, direction * rayCastLength, Color.yellow);
             isGrounded = Physics.SphereCast(origin, rayCastRadius, direction, out RaycastHit ground, rayCastLength, groundLayer) && !hasJumped;
             AlignToGround(ground);
+
+            if (!isGrounded)
+            {
+                if (Physics.Raycast(origin, playerRB.transform.forward, out RaycastHit hit, rayCastLength * 2f, groundLayer))
+                    playerRB.MoveRotation(Quaternion.LookRotation(playerRB.transform.forward, hit.normal));
+            }
 
             playerAnimator.SetGrounded(isGrounded);
             if (isRigid && isGrounded) isRigid = false;
@@ -533,8 +533,8 @@ public class PlayerController : MonoBehaviour
         }
         Vector3 VelocityAdjustedToSlope(Vector3 playerVelocityVector)
         {
-            var ray = new Ray(detectionOrigin.position, -playerRB.transform.up);
-            float rayCastLength = (trailDetection.raycastDistance + 0.2f) + (currentSpeed * 0.01f);
+            var ray = new Ray(groundDetectOrigin.position, -playerRB.transform.up);
+            float rayCastLength = (flameTrailCheck.raycastDistance + 0.2f) + (currentSpeed * 0.01f);
 
             if (Physics.Raycast(ray, out RaycastHit hit, rayCastLength, groundLayer) && isGrounded)
             {

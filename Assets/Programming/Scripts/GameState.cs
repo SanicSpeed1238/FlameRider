@@ -69,7 +69,7 @@ public class GameState : MonoBehaviour
             yield return new WaitForSeconds(1f);
 
             PlayerHUD.Instance.DisplayCountdown(0);
-            PlayerHUD.Instance.DisplayMessage("GO !!!");
+            PlayerHUD.Instance.DisplayMessage("Go !!!");
             startSound.PlayOneShot(startSound.clip);
             gameMusic.Play();
             isPlaying = true;          
@@ -100,7 +100,7 @@ public class GameState : MonoBehaviour
     {
         isPlaying = false;
 
-        PlayerHUD.Instance.DisplayMessage("FINISH!");
+        PlayerHUD.Instance.DisplayMessage("Finish!");
         gameMusic.Stop();
         resultsMusic.Play();
         startSound.PlayOneShot(startSound.clip);

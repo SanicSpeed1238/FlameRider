@@ -20,6 +20,8 @@ public class FlameTrailGeneration : MonoBehaviour
 
     // Trail Data
 
+    GameObject currentTrail;
+
     private Vector3 lastPoint = Vector3.zero;
     private List<Vector3> points = new();
     private List<Vector3> normals = new();
@@ -55,7 +57,7 @@ public class FlameTrailGeneration : MonoBehaviour
             float dist = Vector3.Distance(playerRB.position, lastPoint);
             if (dist >= pointSpacing)
             {
-                AddPoint(transform.position);
+                AddPoint(playerRB.position);
             }
         }
     }
@@ -64,24 +66,26 @@ public class FlameTrailGeneration : MonoBehaviour
 
     public void StartBoostTrail()
     {
-        GameObject trailObj = Instantiate(trailPrefab, transform.position, Quaternion.identity);
+        currentTrail = Instantiate(trailPrefab, Vector3.zero, Quaternion.identity);
 
-        flameParticles = trailObj.GetComponentInChildren<ParticleSystem>();
-        meshRenderer = trailObj.AddComponent<MeshRenderer>();
-        meshFilter = trailObj.AddComponent<MeshFilter>();
+        flameParticles = currentTrail.GetComponentInChildren<ParticleSystem>();
+        meshRenderer = currentTrail.AddComponent<MeshRenderer>();
+        meshFilter = currentTrail.AddComponent<MeshFilter>();
         meshCollider = meshFilter.gameObject.AddComponent<MeshCollider>();
 
         meshReference = new Mesh { name = "FlameTrailMesh" };
         meshReference.MarkDynamic();
         meshFilter.sharedMesh = meshReference;
         meshRenderer.material = trailMaterial;
+        meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        meshRenderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
+        meshRenderer.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
 
         points.Clear();
         normals.Clear();
-
         pointsSinceLastBake = 0;
 
-        AddPoint(transform.position);
+        AddPoint(playerRB.position);
 
         generating = true;
     }
@@ -91,6 +95,7 @@ public class FlameTrailGeneration : MonoBehaviour
         generating = false;
         CreateTrail();
 
+        RepositionTrailPivot();
         points.Clear();
         normals.Clear();
 
@@ -121,20 +126,19 @@ public class FlameTrailGeneration : MonoBehaviour
             }
         }
     }
-
-    private void AddPoint(Vector3 point)
+    
+    private void AddPoint(Vector3 pointPosition)
     {
         Vector3 normal = playerRB.transform.up;
-
-        if (Physics.Raycast(point + playerRB.transform.up, -playerRB.transform.up, out RaycastHit hit, 10f))
+        if (Physics.Raycast(pointPosition + playerRB.transform.up, -playerRB.transform.up, out RaycastHit hit, 10f))
         {
-            point = hit.point + hit.normal * 0.05f;
+            pointPosition = hit.point + hit.normal * 0.02f;
             normal = hit.normal;
         }
-        points.Add(point);
+        points.Add(pointPosition);
         normals.Add(normal.normalized);
 
-        lastPoint = point;
+        lastPoint = pointPosition;
         pointsSinceLastBake++;
         if (pointsSinceLastBake >= meshBakeInterval)
         {
@@ -145,8 +149,6 @@ public class FlameTrailGeneration : MonoBehaviour
 
     private void GenerateRibbonMesh()
     {
-        Vector3 origin = points[0];
-
         int pointCount = points.Count;
         if (pointCount < 2) return;
 
@@ -178,7 +180,7 @@ public class FlameTrailGeneration : MonoBehaviour
             Vector3 right = Vector3.Cross(forward, normal).normalized * (trailWidth * 0.5f);
             Vector3 up = normal * colliderHeight;
 
-            Vector3 basePoint = points[i] - origin;
+            Vector3 basePoint = points[i];
             Vector3 bottomLeft = basePoint - right;
             Vector3 bottomRight = basePoint + right;
             Vector3 topLeft = bottomLeft + up;
@@ -225,6 +227,30 @@ public class FlameTrailGeneration : MonoBehaviour
 
         meshReference.RecalculateNormals();
         meshReference.RecalculateBounds();
+    }
+
+    private void RepositionTrailPivot()
+    {
+        if (meshReference == null || currentTrail == null)
+            return;
+
+        meshReference.RecalculateBounds();
+        Vector3 center = points[0];
+        currentTrail.transform.position += center;
+
+        Vector3[] verts = meshReference.vertices;
+        for (int i = 0; i < verts.Length; i++)
+        {
+            verts[i] -= center;
+        }
+        meshReference.vertices = verts;
+        meshReference.RecalculateBounds();
+
+        if (meshCollider != null)
+        {
+            meshCollider.sharedMesh = null;
+            meshCollider.sharedMesh = meshReference;
+        }
     }
 
     private void BakeColliderMesh()

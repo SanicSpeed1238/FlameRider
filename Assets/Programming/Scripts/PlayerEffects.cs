@@ -3,6 +3,7 @@ using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using DG.Tweening;
 
 public class PlayerEffects : MonoBehaviour
 {
@@ -13,16 +14,18 @@ public class PlayerEffects : MonoBehaviour
 
     [Header("Important References")]
     public Volume postProcessVolume;
+    public Transform cameraFollowTransform;
 
     // Other Effects
     // -------------
 
-    // Camera FOV
+    // Camera Effects
     float gameFOV;
+    Vector3 originalCameraFollowPos;
     Coroutine currentZoomCoroutine;
     CinemachineCamera gameCamera;
 
-    // Motion Blur
+    // Post Processing Effects
     MotionBlur motionBlur;
     Coroutine motionBlurCoroutine;   
 
@@ -68,26 +71,38 @@ public class PlayerEffects : MonoBehaviour
         }
     }
 
+    public void ShakeCamera(float duration, float strength, int vibrato)
+    {
+        if (cameraFollowTransform == null) return;
+        cameraFollowTransform.DOKill();
+
+        originalCameraFollowPos = cameraFollowTransform.localPosition;
+        cameraFollowTransform.localPosition = originalCameraFollowPos;
+
+        cameraFollowTransform.DOShakePosition(duration, strength, vibrato, 90f, false, true)
+            .OnComplete(() => {cameraFollowTransform.localPosition = originalCameraFollowPos;});
+    }
+
     public void ActivateBoostEffect(bool activate)
     {
         if (currentZoomCoroutine != null) StopCoroutine(currentZoomCoroutine);
 
         if (activate)
         {       
-            currentZoomCoroutine = StartCoroutine(CameraZoomOut(70f));
+            currentZoomCoroutine = StartCoroutine(CameraZoomOut(90f, 0.25f));
             speedLines.Play();
+            ShakeCamera(0.25f, 5f, 100);
         }
         else
         {
-            currentZoomCoroutine = StartCoroutine(CameraZoomOut(gameFOV));
+            currentZoomCoroutine = StartCoroutine(CameraZoomOut(gameFOV, 0.5f));
             speedLines.Stop();
         }
     }
-    IEnumerator CameraZoomOut(float targetFOV)
+    IEnumerator CameraZoomOut(float targetFOV, float duration)
     {
         float startFOV = gameCamera.Lens.FieldOfView;
         float endFOV = targetFOV;
-        float duration = 0.2f;
         float elapsed = 0f;
 
         while (elapsed < duration)
@@ -98,6 +113,7 @@ public class PlayerEffects : MonoBehaviour
         }
         gameCamera.Lens.FieldOfView = endFOV;
     }
+
 
     public void SetMotionBlur(float targetIntensity, float duration = 0.2f)
     {

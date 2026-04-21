@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour
     float currentFlameEnergy;
     bool onFlameTrail;
     float offFlameTrailTimer;
-    readonly float offFlameTrailTime = 0.8f;
+    readonly float offFlameTrailTime = 0.4f;
 
     // Variables for Aerials
     bool hasJumped;

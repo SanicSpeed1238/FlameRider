@@ -23,6 +23,7 @@ public class BasicComputerPlayer : MonoBehaviour
     private int currentIndex = 0;
     private Vector3 targetPosition;
     private List<Transform> checkPoints = new();
+    private TrackManager trackManager;
 
     IEnumerator Start()
     {
@@ -30,8 +31,18 @@ public class BasicComputerPlayer : MonoBehaviour
         flameTrail = GetComponent<FlameTrailGeneration>();
         groundLayer = LayerMask.GetMask("Ground");
 
-        GetCheckpoints();
-        GetTargetPosition();
+        trackManager = GameObject.FindAnyObjectByType<TrackManager>();
+        if (trackManager == null || trackManager.checkPoints == null)
+        {
+            targetPosition = transform.position;
+            yield break;
+        }
+        else
+        {
+            GetCheckpointList();
+            GetTargetPosition();
+        }
+        
 
         if (canAutoMove)
         {
@@ -42,27 +53,22 @@ public class BasicComputerPlayer : MonoBehaviour
             StartCoroutine(RandomBoostRoutine());
         }
     }
-    private void GetCheckpoints()
-    {
-        TrackManager trackManager = GameObject.FindAnyObjectByType<TrackManager>();
+    private void GetCheckpointList()
+    {        
+        if (!trackManager) return;
 
         checkPoints.Clear();
-
-        if (trackManager == null || trackManager.checkPoints == null)
-            return;
-
         foreach (GameObject checkPoint in trackManager.checkPoints)
         {
             if (checkPoint != null)
                 checkPoints.Add(checkPoint.transform);
         }
-
         currentIndex = 0;
     }
 
     public void SetAutoMove()
     {
-        if (checkPoints.Count == 0) GetCheckpoints();
+        if (checkPoints.Count == 0) GetCheckpointList();
         canAutoMove = true;
         rigbody = GetComponent<Rigidbody>();
     }
@@ -86,6 +92,8 @@ public class BasicComputerPlayer : MonoBehaviour
     }
     private void GetTargetPosition()
     {
+        if (checkPoints.Count == 0) return;
+
         Transform target = checkPoints[currentIndex].transform;
 
         float randomOffset = Random.Range(-turnInfluence, turnInfluence);

@@ -61,13 +61,13 @@ public class PlayerEffects : MonoBehaviour
     {
         if (activate)
         {
-            flameLines.Play();
-            trailRide.Play();
+            if (!trailRide.isPlaying) trailRide.Play();
+            if (!flameLines.isPlaying) flameLines.Play();          
         }
         else
         {
-            flameLines.Stop();
             trailRide.Stop();
+            flameLines.Stop();           
         }
     }
 

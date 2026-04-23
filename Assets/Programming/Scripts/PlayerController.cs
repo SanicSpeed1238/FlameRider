@@ -6,9 +6,9 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("Speed")]
-    [Range(100, 200)]
+    [Range(100, 300)]
     [SerializeField] float baseSpeed;
-    [Range(10, 100)]
+    [Range(10, 200)]
     [SerializeField] float accelerationRate;
     [Range(100, 200)]
     [SerializeField] float decelerationRate;
@@ -22,9 +22,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float driftAcceleration;
 
     [Header("Boost")]
-    [Range(1,50)]
+    [Range(1,10)]
     [SerializeField] float boostRate;
-    [Range(1,50)]
+    [Range(1,20)]
     [SerializeField] float energyRate;   
 
     [Header("Aerials")]
@@ -163,9 +163,13 @@ public class PlayerController : MonoBehaviour
         // Accelerate or Decelerate based on input and/or conditions
         if (inputAccel > 0 || (isBoosting || onFlameTrail))
         {
-            float forwardInput = (isBoosting || onFlameTrail) ? 1 : inputAccel;
-            currentSpeed += forwardInput * ((currentSpeed < baseSpeed || maxSpeed > baseSpeed) ? accelerationRate : (accelerationRate * 0.01f)) * Time.fixedDeltaTime;
+            float forwardInput = inputAccel;
+            if (onFlameTrail) forwardInput = 1;
+            if (isBoosting) forwardInput = boostRate;
+
+            currentSpeed += forwardInput * accelerationRate * Time.fixedDeltaTime;
             if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+
             playerSFX.StartSound(playerSFX.movingSound);
         }
         else
@@ -173,6 +177,7 @@ public class PlayerController : MonoBehaviour
             float decelerationInput = inputBrake + 0.1f;
             currentSpeed -= decelerationInput * decelerationRate * Time.fixedDeltaTime;
             if (currentSpeed < 0f) currentSpeed = 0f;
+
             playerSFX.StopSound(playerSFX.movingSound);
         }
         
@@ -223,7 +228,7 @@ public class PlayerController : MonoBehaviour
 
             maxSpeed += boostRate * Time.fixedDeltaTime;
 
-            currentFlameEnergy -= Time.fixedDeltaTime * (energyRate * 1.5f);
+            currentFlameEnergy -= Time.fixedDeltaTime * (energyRate * 1.2f);
             if (currentFlameEnergy <= 0f) StopBoost();
             PlayerHUD.Instance.UpdateFireEnergy(currentFlameEnergy);
         }

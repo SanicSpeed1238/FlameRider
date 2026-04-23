@@ -8,12 +8,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Display
-    second: {fileID: 2100000, guid: b1b27426ed601b444bbb38aa35fa29fb, type: 2}
+    second: {fileID: 2100000, guid: 2c123379cd27b484182b8d974c02aa59, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Floor
-    second: {fileID: 2100000, guid: 16e8e2c4a88677946a547310c29fb468, type: 2}
+    second: {fileID: 2100000, guid: b1b27426ed601b444bbb38aa35fa29fb, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -33,7 +33,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Wall
-    second: {fileID: 2100000, guid: b1b27426ed601b444bbb38aa35fa29fb, type: 2}
+    second: {fileID: 2100000, guid: e8989ead34d199b4cb46e6f8817a1879, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

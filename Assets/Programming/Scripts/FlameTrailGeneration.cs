@@ -96,8 +96,9 @@ public class FlameTrailGeneration : MonoBehaviour
         CreateTrail();
 
         RepositionTrailPivot();
+        currentTrail.GetComponent<FlameTrailObject>().CullParticles();
         points.Clear();
-        normals.Clear();
+        normals.Clear();       
 
         meshReference = null;
         meshCollider = null;
@@ -274,7 +275,7 @@ public class FlameTrailGeneration : MonoBehaviour
             shape.shapeType = ParticleSystemShapeType.Mesh;
             shape.mesh = meshReference;
 
-            float targetRate = Mathf.Clamp(1000f + (points.Count * 5f), 1000f, 10000f);
+            float targetRate = Mathf.Clamp(100f + (points.Count * 10f), 100f, 10000f);
             var emission = flameParticles.emission;
             emission.rateOverTime = targetRate;
         }

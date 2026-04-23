@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8451432777308763579}
   - component: {fileID: 2627834006104233823}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Moving
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,7 +140,7 @@ GameObject:
   - component: {fileID: 8041594755808223205}
   - component: {fileID: 8329574284908795240}
   - component: {fileID: 4203048774529819343}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: VFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -210,7 +210,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1820508078974738952}
   - component: {fileID: 2604202588097692195}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Drifting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5362,7 +5362,7 @@ GameObject:
   m_Component:
   - component: {fileID: 261891734790568629}
   - component: {fileID: 936198908543993397}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: SFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5461,15 +5461,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 921123255622b9240a9196c14968f457, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseSpeed: 200
-  accelerationRate: 90
-  decelerationRate: 120
+  baseSpeed: 220
+  accelerationRate: 100
+  decelerationRate: 140
   steerSensitivity: 5
   driftStrength: 8
   driftAcceleration: 85
   boostRate: 2
   energyRate: 10
-  jumpHeight: 60
+  jumpHeight: 64
   flameTrailCheck: {fileID: 1607376830390085292}
   groundDetectOrigin: {fileID: 6816848645696811756}
   groundLayer:
@@ -5492,7 +5492,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trailPrefab: {fileID: 8718537156586937533, guid: 685d3123746034647bf18631593013c6, type: 3}
   trailMaterial: {fileID: 2100000, guid: e356b697a72788a4d984da63d48c8d14, type: 2}
-  trailWidth: 4
+  trailWidth: 4.5
   ringPrefab: {fileID: 1194431429511067260, guid: 3f99f4c7fc57884468076383d49daa4b, type: 3}
 --- !u!114 &6839355430846264356
 MonoBehaviour:
@@ -5724,7 +5724,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6736897319297634996}
   - component: {fileID: 3941333341020516316}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Boosting
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5853,7 +5853,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2163903331306652964}
   - component: {fileID: 4497951519794226854}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Jump
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5983,7 +5983,7 @@ GameObject:
   - component: {fileID: 3467758766863936452}
   - component: {fileID: 3824198351847844785}
   - component: {fileID: 8644657992536739413}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6043,6 +6043,134 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &6148178978986758129
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6752987943675677622}
+  - component: {fileID: 4871576426624923510}
+  - component: {fileID: 7170452391703278280}
+  m_Layer: 0
+  m_Name: Screen Camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6752987943675677622
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6148178978986758129}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.03357423, y: 0.4458836, z: 0.016739491, w: 0.89430434}
+  m_LocalPosition: {x: -1.65, y: 1.24, z: -1.29}
+  m_LocalScale: {x: 0.28572997, y: 0.2857299, z: 0.28572994}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4717878185021486799}
+  m_LocalEulerAnglesHint: {x: -4.3, y: 53, z: 0}
+--- !u!20 &4871576426624923510
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6148178978986758129}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.39215687, g: 0.39215687, b: 0.39215687, a: 1}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 900
+  field of view: 15
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: -1
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 1021
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 8400000, guid: d3bf54d7de4ba224ca7f47f1f6a02682, type: 2}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!114 &7170452391703278280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6148178978986758129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!1 &6463765121820753494
 GameObject:
   m_ObjectHideFlags: 0
@@ -6053,7 +6181,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6655490698823476988}
   - component: {fileID: 8898606625517322083}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Respawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11076,7 +11204,7 @@ Transform:
   m_GameObject: {fileID: 6899112091988027959}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: -0.5}
+  m_LocalPosition: {x: 0, y: 2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11092,7 +11220,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6631548575851685328}
   - component: {fileID: 1159089648442063047}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Idle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11405,6 +11533,14 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: c8bb534d80adfb742a8c32be6c4a1f9a, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b1b27426ed601b444bbb38aa35fa29fb, type: 2}
+    - target: {fileID: -7511558181221131132, guid: c8bb534d80adfb742a8c32be6c4a1f9a, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9db3a3997ec97414294141d0294375e4, type: 2}
     - target: {fileID: 919132149155446097, guid: c8bb534d80adfb742a8c32be6c4a1f9a, type: 3}
       propertyPath: m_Name
       value: mdl_Motorcycle
@@ -11643,7 +11779,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 4167280743394806330, guid: 36fe25d8b53b06a4eb5775a3616ae9d6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6752987943675677622}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1964431648104964000, guid: 36fe25d8b53b06a4eb5775a3616ae9d6, type: 3}
       insertIndex: -1
@@ -11734,6 +11873,11 @@ MonoBehaviour:
   m_ForceModule: {fileID: 0}
   m_ForceScale: 1
   m_SimulateSpace: {fileID: 3467758766863936452}
+--- !u!4 &4717878185021486799 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4167280743394806330, guid: 36fe25d8b53b06a4eb5775a3616ae9d6, type: 3}
+  m_PrefabInstance: {fileID: 8695433796672732405}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6013735255766579644 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6063684933989235383, guid: 36fe25d8b53b06a4eb5775a3616ae9d6, type: 3}

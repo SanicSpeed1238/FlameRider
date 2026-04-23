@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Checkpoint
   - Deadzone
+  - Fire
   layers:
   - Default
   - TransparentFX
@@ -17,7 +18,7 @@ TagManager:
   - Trail
   - Triggers
   - Walls
-  - Animation
+  - 
   - 
   - 
   - 

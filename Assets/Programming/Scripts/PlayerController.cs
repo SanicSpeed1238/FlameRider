@@ -79,6 +79,7 @@ public class PlayerController : MonoBehaviour
     bool isDrifting;
     bool isGrounded;
     bool isRigid;
+    bool isAutomated;
     bool isRespawning;
     bool isFinished;
 
@@ -121,7 +122,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         //---------------------
-        if (isFinished) return;
         if (!CanInput()) return;
         //---------------------
 
@@ -140,7 +140,6 @@ public class PlayerController : MonoBehaviour
         CheckGrounded();
 
         //---------------------
-        if (isFinished) return;
         if (!CanInput()) return;
         //---------------------
 
@@ -636,7 +635,7 @@ public class PlayerController : MonoBehaviour
     }
     private bool CanInput()
     {
-        if (GameState.Instance.isPlaying && !isRespawning) return true;
+        if (GameState.Instance.isPlaying && !isRespawning && !isAutomated && !isFinished) return true;
         else return false;
     }
     #endregion

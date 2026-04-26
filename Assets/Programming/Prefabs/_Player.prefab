@@ -337,7 +337,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1111389145686749812}
-  - component: {fileID: 4454345288226441092}
   m_Layer: 0
   m_Name: Center Pivot
   m_TagString: Untagged
@@ -360,18 +359,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4443713654875060259}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4454345288226441092
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1978295874099541463}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 486cf390277186540803a2802d73bb12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3504405348446617375
 GameObject:
   m_ObjectHideFlags: 0
@@ -1437,7 +1424,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6816848645696811756}
   - component: {fileID: 1607376830390085292}
-  - component: {fileID: 5974903865956122350}
   m_Layer: 0
   m_Name: Ground Detection
   m_TagString: Untagged
@@ -1475,18 +1461,6 @@ MonoBehaviour:
   raycastDistance: 1.5
   rayCastRadius: 0.4
   debugRay: 0
---- !u!114 &5974903865956122350
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8261659653945863096}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 486cf390277186540803a2802d73bb12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &787979880636099251
 PrefabInstance:
   m_ObjectHideFlags: 0

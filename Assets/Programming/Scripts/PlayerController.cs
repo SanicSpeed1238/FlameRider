@@ -188,7 +188,7 @@ public class PlayerController : MonoBehaviour
 
         // Naturally regen fire energy, auto boost if energy full
         if (inputAccel > 0 && !isBoosting) RegenerateFireEngery(0.5f);
-        if (currentFlameEnergy == 100f && (isGrounded && currentSpeed >= baseSpeed)) StartBoost();
+        if (currentFlameEnergy == 100f && currentSpeed >= baseSpeed) StartBoost();
 
         // Calculate real speed and display on UI
         float transformSpeed = Mathf.Abs(Vector3.Dot(playerRB.linearVelocity, playerRB.transform.forward));
@@ -256,11 +256,14 @@ public class PlayerController : MonoBehaviour
     {
         if (!flameTrail.IsGenerating() && currentFlameEnergy > 0)
         {
-            isBoosting = true;
-            flameTrail.StartBoostTrail();
-            playerVFX.ActivateTrailGenerate(true);
-            playerVFX.ActivateBoostEffect(true);
-            playerSFX.StartSound(playerSFX.boostingSound);
+            if (isGrounded && !isDrifting)
+            {
+                isBoosting = true;
+                flameTrail.StartBoostTrail();
+                playerVFX.ActivateTrailGenerate(true);
+                playerVFX.ActivateBoostEffect(true);
+                playerSFX.StartSound(playerSFX.boostingSound);
+            }  
         } 
     }
     void StopBoost()
@@ -369,11 +372,12 @@ public class PlayerController : MonoBehaviour
             else if (driftDirection >= .5f) driftDirection = 1;
             else { return; }
 
-            isDrifting = true;            
             currentDrift = 0.1f;
-
+            isDrifting = true;            
             playerAnimator.DriftAnimation(true, driftDirection);
-            playerVFX.ActivateDriftEffect(true);        
+            playerVFX.ActivateDriftEffect(true);
+
+            StopBoost();
         }    
     }
     void StopDrift()
@@ -449,7 +453,7 @@ public class PlayerController : MonoBehaviour
 
                     if (lapsCompleted == 3)
                     {
-                        GameState.Instance.WinGame();
+                        GameState.Instance.PlayResultsSequence();
                         PlayerHUD.Instance.UpdateLapNumber(3);
 
                         playerVFX.StopAllEffects();

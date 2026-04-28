@@ -14,7 +14,7 @@ public class PauseScreen : MonoBehaviour
     {
         Time.timeScale = 0;
         GameState.Instance.isPlaying = false;
-        GameState.Instance.LowerGameVolume(true);
+        GameState.Instance.LowerGameMusic(true);
         PlayerHUD.Instance.SetSelectedButton(PlayerHUD.Instance.resumeButton);
     }
 
@@ -22,7 +22,7 @@ public class PauseScreen : MonoBehaviour
     {
         Time.timeScale = 1;
         GameState.Instance.isPlaying = true;
-        GameState.Instance.LowerGameVolume(false);
+        GameState.Instance.LowerGameMusic(false);
         this.gameObject.SetActive(false);
     }
 

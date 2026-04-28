@@ -4,7 +4,7 @@ using EasyTransition;
 using TMPro;
 using System.Collections;
 
-public class WinScreen : MonoBehaviour
+public class ResultsScreen : MonoBehaviour
 {
     [Header("UI Elements")]
     public TextMeshProUGUI finalTimeValueText;

@@ -9,7 +9,7 @@ public class GameState : MonoBehaviour
 
     [Header("Important References")]
     public GameObject playerHUD;
-    public GameObject winScreen;
+    public GameObject resultsScreen;
     public GameObject pauseScreen;
 
     [Header("Audio Sources")]
@@ -108,7 +108,7 @@ public class GameState : MonoBehaviour
 
         PlayerHUD.Instance.DisplayMessage(string.Empty);
         PlayerHUD.Instance.SetSelectedButton(playerHUD.GetComponent<PlayerHUD>().replayButton);
-        winScreen.SetActive(true);
+        resultsScreen.SetActive(true);
     }
 
     public void LowerGameVolume(bool paused)

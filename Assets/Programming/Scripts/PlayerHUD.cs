@@ -12,9 +12,15 @@ public class PlayerHUD : MonoBehaviour
     public TextMeshProUGUI countdownNumbers;
     public TextMeshProUGUI messageText;
 
-    [Header("Player Status")]
-    public Slider fireEnergy;
+    [Header("Fire Energy")]
+    public Slider fireEnergy;   
+
+    [Header("Current Speed")]
     public TextMeshProUGUI speedValue;
+    public Animator speedAnimator;
+    public float speedAnimationScale;
+    public float speedFontSizeMax;
+    private float speedFontSizeBase;
 
     [Header("Track Progress")]
     public TextMeshProUGUI timerValue;
@@ -26,9 +32,6 @@ public class PlayerHUD : MonoBehaviour
 
     // Other Variables Needed
     private EventSystem eventSystem;
-    private int speedValueStep;
-    private float speedValueRecord;
-    private Color speedValueColor;
 
     private void Awake()
     {
@@ -37,8 +40,6 @@ public class PlayerHUD : MonoBehaviour
     private void Start()
     {
         eventSystem = EventSystem.current;
-        speedValueStep = 0;
-        speedValueColor = speedValue.color;
     }
 
     public void DisplayMessage(string message)
@@ -87,40 +88,29 @@ public class PlayerHUD : MonoBehaviour
     public void UpdateSpeedValue(float playerSpeed, float baseSpeed)
     {
         int intSpeed = Mathf.RoundToInt(playerSpeed);
-        speedValue.text = intSpeed.ToString();
+        float normalizedSpeed = Mathf.Clamp01(playerSpeed / (baseSpeed * 2f));        
+        string characterSpacing = "<mspace=115>";
+        speedValue.text = string.Format(characterSpacing + intSpeed.ToString());
 
-        int newSpeedValueIncrement = intSpeed / 50;
+        speedAnimator.speed = Mathf.Clamp(normalizedSpeed * speedAnimationScale, 0.5f, speedAnimationScale);
+        if (speedAnimator.speed <= 0.51f) speedAnimator.speed = 0f;
 
-        bool passedRecord =
-            playerSpeed > baseSpeed &&
-            newSpeedValueIncrement != speedValueStep &&
-            Mathf.Abs(playerSpeed - speedValueRecord) > 5f;
+        if (speedFontSizeBase == 0) speedFontSizeBase = speedValue.fontSize;
+        float targetSize = Mathf.Lerp(speedFontSizeBase, speedFontSizeMax, normalizedSpeed);
+        speedValue.fontSize = targetSize;
 
-        if (passedRecord)
+        Color targetColor;
+        if (normalizedSpeed < 0.5f)
         {
-            speedValueStep = newSpeedValueIncrement;
-            speedValueRecord = playerSpeed;
-
-            Transform t = speedValue.transform;
-
-            DOTween.Kill("speedPunch");
-            t.localScale = Vector3.one;
-
-            Sequence seq = DOTween.Sequence();
-            seq.SetId("speedPunch");
-
-            // Punch Animation
-            float punchRelative = Mathf.Clamp01(intSpeed / 1000f);
-            float punchStrength = Mathf.Lerp(0.2f, 2f, punchRelative);
-
-            seq.Append(
-                t.DOPunchScale(Vector3.one * punchStrength, 0.3f, 8, 0.8f)
-            );
-
-            // Color flash (optional - keeping your commented logic)
-            // seq.Join(speedValue.DOColor(Color.white, 0.1f));
-            // seq.Append(speedValue.DOColor(speedValueColor, 0.2f));
+            float t = normalizedSpeed / 0.5f;
+            targetColor = Color.Lerp(Color.white, Color.yellow, t);
         }
+        else
+        {
+            float t = (normalizedSpeed - 0.5f) / 0.5f;
+            targetColor = Color.Lerp(Color.yellow, Color.red, t);
+        }
+        speedValue.DOColor(targetColor, 0.1f);
     }
 
     public void UpdateTimerValue(float timeElapsed)
@@ -129,7 +119,8 @@ public class PlayerHUD : MonoBehaviour
         int seconds = Mathf.FloorToInt(timeElapsed % 60f);
         int milliseconds = Mathf.FloorToInt((timeElapsed * 1000f) % 1000f);
 
-        timerValue.text = string.Format("{0}:{1:00}:{2:000}", minutes, seconds, milliseconds);
+        string characterSpacing = "<mspace=45>";
+        timerValue.text = string.Format(characterSpacing + "{0}:{1:00}:{2:000}", minutes, seconds, milliseconds);
     }
 
     public void UpdateLapNumber(int lap)

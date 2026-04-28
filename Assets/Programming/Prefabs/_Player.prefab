@@ -468,11 +468,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 921123255622b9240a9196c14968f457, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseSpeed: 220
+  baseSpeed: 250
   accelerationRate: 100
   decelerationRate: 140
-  steerSensitivity: 5
-  driftStrength: 8
+  steerSensitivity: 6
+  driftStrength: 8.5
   driftAcceleration: 85
   boostRate: 2
   energyRate: 10
@@ -1495,7 +1495,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6012522989522194087, guid: 9413234a85f21fb409dbfe83fc69adf9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6012522989522194087, guid: 9413234a85f21fb409dbfe83fc69adf9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1609,13 +1609,17 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: c8bb534d80adfb742a8c32be6c4a1f9a, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: d9d94898406ac3b458f31069aca8911d, type: 2}
+    - target: {fileID: -7511558181221131132, guid: c8bb534d80adfb742a8c32be6c4a1f9a, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: b1b27426ed601b444bbb38aa35fa29fb, type: 2}
+      objectReference: {fileID: 2100000, guid: 2d2952348e7606a48a24dd6dae157c01, type: 2}
     - target: {fileID: -7511558181221131132, guid: c8bb534d80adfb742a8c32be6c4a1f9a, type: 3}
       propertyPath: 'm_Materials.Array.data[2]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9db3a3997ec97414294141d0294375e4, type: 2}
+      objectReference: {fileID: 2100000, guid: cc011159993260e458cbdd2051b94864, type: 2}
     - target: {fileID: 919132149155446097, guid: c8bb534d80adfb742a8c32be6c4a1f9a, type: 3}
       propertyPath: m_Name
       value: mdl_Motorcycle

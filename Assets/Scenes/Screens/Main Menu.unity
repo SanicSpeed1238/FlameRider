@@ -281,15 +281,15 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 019828f633db9c7468fcd07299711f9b, type: 2}
-  m_sharedMaterial: {fileID: -5138082735229576594, guid: 019828f633db9c7468fcd07299711f9b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 04aa8be8f3a0aa44e89e1cb52466a3cf, type: 2}
+  m_sharedMaterial: {fileID: -5138082735229576594, guid: 04aa8be8f3a0aa44e89e1cb52466a3cf, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278205695
-  m_fontColor: {r: 1, g: 0.23529412, b: 0, a: 1}
+    rgba: 4278204415
+  m_fontColor: {r: 1, g: 0.21568628, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -546,8 +546,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: '<u>Unity Asset Packages</u>
 
-    DOTween, Dreamteck Splines, Animancer,    
-    Easy Transitions, EZSoftBone, SpectraMotions, Better Audio, Procedural Skybox'
+    Better Audio, DOTween, Dreamteck Splines,
+    Easy Transitions, EZSoftBone, SpectraMotions Animations, Procedural Skybox, UMotion
+    Pro'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 900ba9d420ba1bd48b259947deeb4660, type: 2}
   m_sharedMaterial: {fileID: -7125801088264951541, guid: 900ba9d420ba1bd48b259947deeb4660, type: 2}
@@ -872,7 +873,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 1, g: 0.88235295, b: 0, a: 1}
     m_PressedColor: {r: 1, g: 0.39215687, b: 0, a: 1}
     m_SelectedColor: {r: 1, g: 0.88235295, b: 0, a: 1}
-    m_DisabledColor: {r: 0.5471698, g: 0.23529412, b: 0, a: 1}
+    m_DisabledColor: {r: 1, g: 0.21568628, b: 0, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.05
   m_SpriteState:
@@ -1147,15 +1148,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: Credits
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 019828f633db9c7468fcd07299711f9b, type: 2}
-  m_sharedMaterial: {fileID: -5138082735229576594, guid: 019828f633db9c7468fcd07299711f9b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 04aa8be8f3a0aa44e89e1cb52466a3cf, type: 2}
+  m_sharedMaterial: {fileID: -5138082735229576594, guid: 04aa8be8f3a0aa44e89e1cb52466a3cf, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278205695
-  m_fontColor: {r: 1, g: 0.23529412, b: 0, a: 1}
+    rgba: 4278204415
+  m_fontColor: {r: 1, g: 0.21568628, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1461,7 +1462,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 1, g: 0.88235295, b: 0, a: 1}
     m_PressedColor: {r: 1, g: 0.3921569, b: 0, a: 1}
     m_SelectedColor: {r: 1, g: 0.88235295, b: 0, a: 1}
-    m_DisabledColor: {r: 0.54901963, g: 0.23529413, b: 0, a: 1}
+    m_DisabledColor: {r: 1, g: 0.21568628, b: 0, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.05
   m_SpriteState:
@@ -2119,7 +2120,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 1, g: 0.88235295, b: 0, a: 1}
     m_PressedColor: {r: 1, g: 0.39215687, b: 0, a: 1}
     m_SelectedColor: {r: 1, g: 0.88235295, b: 0, a: 1}
-    m_DisabledColor: {r: 0.5471698, g: 0.23529412, b: 0, a: 1}
+    m_DisabledColor: {r: 1, g: 0.21568628, b: 0, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.05
   m_SpriteState:
@@ -4029,15 +4030,15 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 019828f633db9c7468fcd07299711f9b, type: 2}
-  m_sharedMaterial: {fileID: -5138082735229576594, guid: 019828f633db9c7468fcd07299711f9b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 04aa8be8f3a0aa44e89e1cb52466a3cf, type: 2}
+  m_sharedMaterial: {fileID: -5138082735229576594, guid: 04aa8be8f3a0aa44e89e1cb52466a3cf, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278205695
-  m_fontColor: {r: 1, g: 0.23529412, b: 0, a: 1}
+    rgba: 4278204415
+  m_fontColor: {r: 1, g: 0.21568628, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -10032,15 +10033,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: BACK
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 019828f633db9c7468fcd07299711f9b, type: 2}
-  m_sharedMaterial: {fileID: -5138082735229576594, guid: 019828f633db9c7468fcd07299711f9b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 04aa8be8f3a0aa44e89e1cb52466a3cf, type: 2}
+  m_sharedMaterial: {fileID: -5138082735229576594, guid: 04aa8be8f3a0aa44e89e1cb52466a3cf, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278205695
-  m_fontColor: {r: 1, g: 0.23529412, b: 0, a: 1}
+    rgba: 4278204415
+  m_fontColor: {r: 1, g: 0.21568628, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -10098,7 +10099,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &2086524505
@@ -10284,7 +10285,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 1, g: 0.88235295, b: 0, a: 1}
     m_PressedColor: {r: 1, g: 0.39215687, b: 0, a: 1}
     m_SelectedColor: {r: 1, g: 0.88235295, b: 0, a: 1}
-    m_DisabledColor: {r: 0.5471698, g: 0.23529412, b: 0, a: 1}
+    m_DisabledColor: {r: 1, g: 0.21568628, b: 0, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.05
   m_SpriteState:
@@ -10400,8 +10401,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: '<u>VFX and Shaders</u>
 
-    HUN0 Stylized Fire, Vefects Stylized Fire,
-    Cartoon FX Remaster, NAMU Stylized VFX'
+    Vefects Stylized Fire, NAMU Stylized VFX,
+    Cartoon FX Remaster'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 900ba9d420ba1bd48b259947deeb4660, type: 2}
   m_sharedMaterial: {fileID: -7125801088264951541, guid: 900ba9d420ba1bd48b259947deeb4660, type: 2}

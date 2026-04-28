@@ -36,7 +36,7 @@ public class FlameTrailGeneration : MonoBehaviour
     private readonly int meshBakeInterval = 2;
     private readonly float pointSpacing = 0.5f;
     private readonly float textureTiling = 0.1f;
-    private readonly int colliderBakeInterval = 20;
+    private readonly int colliderBakeInterval = 50;
     private readonly float colliderHeight = 0.5f;
 
     // Mesh Components
@@ -260,7 +260,7 @@ public class FlameTrailGeneration : MonoBehaviour
 
     private void BakeColliderMesh()
     {
-        if (meshCollider != null || meshReference.vertexCount < 3)
+        if (meshCollider != null && meshReference.vertexCount >= 3)
         {
             meshReference.RecalculateBounds();
             meshCollider.sharedMesh = null;
@@ -271,11 +271,9 @@ public class FlameTrailGeneration : MonoBehaviour
         if (flameParticles != null)
         {
             var shape = flameParticles.shape;
-            shape.enabled = true;
-            shape.shapeType = ParticleSystemShapeType.Mesh;
             shape.mesh = meshReference;
 
-            float targetRate = Mathf.Clamp(100f + (points.Count * 10f), 100f, 10000f);
+            float targetRate = Mathf.Clamp(100f + (points.Count * 4f), 100f, 1000f);
             var emission = flameParticles.emission;
             emission.rateOverTime = targetRate;
         }

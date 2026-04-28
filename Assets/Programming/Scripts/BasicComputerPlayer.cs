@@ -16,7 +16,7 @@ public class BasicComputerPlayer : MonoBehaviour
     [Header("Important References")]
     public bool canAutoMove;
 
-    private Rigidbody rigbody;
+    private Rigidbody playerRB;
     private FlameTrailGeneration flameTrail;
     private LayerMask groundLayer;
 
@@ -25,9 +25,9 @@ public class BasicComputerPlayer : MonoBehaviour
     private List<Transform> checkPoints = new();
     private TrackManager trackManager;
 
-    IEnumerator Start()
+    void Start()
     {
-        rigbody = GetComponent<Rigidbody>();
+        playerRB = GetComponent<Rigidbody>();
         flameTrail = GetComponent<FlameTrailGeneration>();
         groundLayer = LayerMask.GetMask("Ground");
 
@@ -35,22 +35,12 @@ public class BasicComputerPlayer : MonoBehaviour
         if (trackManager == null || trackManager.checkPoints == null)
         {
             targetPosition = transform.position;
-            yield break;
+            return;
         }
         else
         {
             GetCheckpointList();
             GetTargetPosition();
-        }
-        
-
-        if (canAutoMove)
-        {
-            canAutoMove = false;
-            yield return new WaitForSeconds(5f);
-
-            canAutoMove = true;
-            StartCoroutine(RandomBoostRoutine());
         }
     }
     private void GetCheckpointList()
@@ -66,17 +56,22 @@ public class BasicComputerPlayer : MonoBehaviour
         currentIndex = 0;
     }
 
-    public void SetAutoMove()
+    public void StartComputerPlayer()
+    {
+        canAutoMove = true;
+        StartCoroutine(RandomBoostRoutine());
+    }
+    public void AutoMovePlayer()
     {
         if (checkPoints.Count == 0) GetCheckpointList();
         canAutoMove = true;
-        rigbody = GetComponent<Rigidbody>();
+        playerRB = GetComponent<Rigidbody>();
     }
+
     private void FixedUpdate()
     {
         if (canAutoMove) MoveTowardsTarget();
     }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Checkpoint"))
@@ -104,8 +99,8 @@ public class BasicComputerPlayer : MonoBehaviour
     {
         AlignToGround();
 
-        Vector3 rawDirection = (targetPosition - rigbody.position);
-        if (Physics.Raycast(rigbody.position, -transform.up, out RaycastHit groundHit, 2f, groundLayer))
+        Vector3 rawDirection = (targetPosition - playerRB.position);
+        if (Physics.Raycast(playerRB.position, -transform.up, out RaycastHit groundHit, 2f, groundLayer))
         {
             rawDirection = Vector3.ProjectOnPlane(rawDirection, groundHit.normal);
         }
@@ -114,17 +109,17 @@ public class BasicComputerPlayer : MonoBehaviour
         if (direction.sqrMagnitude > 0.001f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction, transform.up);
-            rigbody.MoveRotation(Quaternion.Slerp(rigbody.rotation, targetRotation, Time.fixedDeltaTime * 10f));
+            playerRB.MoveRotation(Quaternion.Slerp(playerRB.rotation, targetRotation, Time.fixedDeltaTime * 10f));
         }
 
         Vector3 playerVelocity = baseSpeed * transform.forward;
         playerVelocity = VelocityAdjustedToSlope(playerVelocity);
-        rigbody.linearVelocity = playerVelocity;
+        playerRB.linearVelocity = playerVelocity;
     }
     private void AlignToGround()
     {
-        Vector3 origin = rigbody.position;
-        Vector3 direction = -rigbody.transform.up;
+        Vector3 origin = playerRB.position;
+        Vector3 direction = -playerRB.transform.up;
         float distance = 2f;
         bool isGrounded = Physics.Raycast(origin, direction, out RaycastHit ground, distance, groundLayer);
 
@@ -133,7 +128,7 @@ public class BasicComputerPlayer : MonoBehaviour
             Vector3 groundNormal = ground.normal;
 
             float gravityStrength = Physics.gravity.magnitude;
-            rigbody.AddForce(-groundNormal * gravityStrength, ForceMode.Acceleration);
+            playerRB.AddForce(-groundNormal * gravityStrength, ForceMode.Acceleration);
 
             Vector3 forwardProjected = Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized;
 
@@ -141,11 +136,11 @@ public class BasicComputerPlayer : MonoBehaviour
                 forwardProjected = transform.forward;
 
             Quaternion targetRotation = Quaternion.LookRotation(forwardProjected, groundNormal);
-            rigbody.MoveRotation(targetRotation);
+            playerRB.MoveRotation(targetRotation);
         }
         else
         {
-            rigbody.AddForce(Physics.gravity, ForceMode.Acceleration);
+            playerRB.AddForce(Physics.gravity, ForceMode.Acceleration);
 
             float uprightSpeed = 2f;
 
@@ -156,14 +151,14 @@ public class BasicComputerPlayer : MonoBehaviour
 
             Quaternion uprightTarget = Quaternion.LookRotation(forwardProjected, Vector3.up);
 
-            rigbody.MoveRotation(
-                Quaternion.Slerp(rigbody.rotation, uprightTarget, uprightSpeed * Time.fixedDeltaTime)
+            playerRB.MoveRotation(
+                Quaternion.Slerp(playerRB.rotation, uprightTarget, uprightSpeed * Time.fixedDeltaTime)
             );
         }
     }
     private Vector3 VelocityAdjustedToSlope(Vector3 velocity)
     {
-        Ray ray = new(rigbody.position, -rigbody.transform.up);
+        Ray ray = new(playerRB.position, -playerRB.transform.up);
 
         if (Physics.Raycast(ray, out RaycastHit hit, 2f, groundLayer))
         {

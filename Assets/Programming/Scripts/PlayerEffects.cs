@@ -20,7 +20,7 @@ public class PlayerEffects : MonoBehaviour
     // -------------
 
     // Camera Effects
-    float gameFOV;
+    float fieldOfVision;
     Vector3 originalCameraFollowPos;
     Coroutine currentZoomCoroutine;
     CinemachineCamera gameCamera;
@@ -37,7 +37,9 @@ public class PlayerEffects : MonoBehaviour
     {
         CameraManager cameraManager = GameObject.FindFirstObjectByType<CameraManager>();
         gameCamera = cameraManager.gameplayCamera.GetComponent<CinemachineCamera>();
-        gameFOV = gameCamera.Lens.FieldOfView;
+
+        originalCameraFollowPos = cameraFollowTransform.localPosition;
+        fieldOfVision = gameCamera.Lens.FieldOfView;        
         speedLines = cameraManager.speedLines;
         flameLines = cameraManager.flameLines;
 
@@ -76,9 +78,7 @@ public class PlayerEffects : MonoBehaviour
         if (cameraFollowTransform == null) return;
         cameraFollowTransform.DOKill();
 
-        originalCameraFollowPos = cameraFollowTransform.localPosition;
         cameraFollowTransform.localPosition = originalCameraFollowPos;
-
         cameraFollowTransform.DOShakePosition(duration, strength, vibrato, 90f, false, true)
             .OnComplete(() => {cameraFollowTransform.localPosition = originalCameraFollowPos;});
     }
@@ -95,7 +95,7 @@ public class PlayerEffects : MonoBehaviour
         }
         else
         {
-            currentZoomCoroutine = StartCoroutine(CameraZoomOut(gameFOV, 0.5f));
+            currentZoomCoroutine = StartCoroutine(CameraZoomOut(fieldOfVision, 0.5f));
             speedLines.Stop();
         }
     }
@@ -113,7 +113,6 @@ public class PlayerEffects : MonoBehaviour
         }
         gameCamera.Lens.FieldOfView = endFOV;
     }
-
 
     public void SetMotionBlur(float targetIntensity, float duration = 0.2f)
     {

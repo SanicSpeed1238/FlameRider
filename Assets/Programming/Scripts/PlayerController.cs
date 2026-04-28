@@ -456,7 +456,7 @@ public class PlayerController : MonoBehaviour
                         playerSFX.StopAllAudio();
                         playerAnimator.SetGrounded(true);
 
-                        GetComponent<BasicComputerPlayer>().SetAutoMove();
+                        GetComponent<BasicComputerPlayer>().AutoMovePlayer();
                         isFinished = true;
                     }
                     else

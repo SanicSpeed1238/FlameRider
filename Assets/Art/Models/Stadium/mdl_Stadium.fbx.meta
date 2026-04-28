@@ -13,12 +13,12 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Floor
-    second: {fileID: 2100000, guid: b1b27426ed601b444bbb38aa35fa29fb, type: 2}
+    second: {fileID: 2100000, guid: 3cf130476d3f6e149931ef8b9324de38, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Ground
-    second: {fileID: 2100000, guid: 94b48d6f9acecca4ca105120dd5644cd, type: 2}
+    second: {fileID: 2100000, guid: 3cf130476d3f6e149931ef8b9324de38, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -33,7 +33,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Wall
-    second: {fileID: 2100000, guid: e8989ead34d199b4cb46e6f8817a1879, type: 2}
+    second: {fileID: 2100000, guid: 3cf130476d3f6e149931ef8b9324de38, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

@@ -78,4 +78,10 @@ public class PlayerAnimator : MonoBehaviour
         playerAnim.SetBool("Drifting", activate);
         playerAnim.SetFloat("Direction", direction);
     }
+
+    public void BrakeAnimation(bool activate)
+    {
+        motorcycleAnim.SetBool("Braking", activate);
+        playerAnim.SetBool("Braking", activate);
+    }
 }

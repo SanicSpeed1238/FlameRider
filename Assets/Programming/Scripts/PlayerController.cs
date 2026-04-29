@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] FlameTrailCheck flameTrailCheck;
     [SerializeField] Transform groundDetectOrigin;
     [SerializeField] LayerMask groundLayer;
-    [SerializeField] LayerMask wallLayer;   
+    [SerializeField] LayerMask wallLayer;
 
     // Important References
     Rigidbody playerRB;
@@ -70,6 +70,7 @@ public class PlayerController : MonoBehaviour
     readonly float jumpTime = 0.2f;
 
     // Variables for Tracking
+    TrackManager trackManager;
     Transform currentCheckpoint;
     int passedCheckpoint;
     int lapsCompleted;
@@ -113,9 +114,11 @@ public class PlayerController : MonoBehaviour
         playerVFX = GetComponentInChildren<PlayerEffects>();
         playerSFX = GetComponentInChildren<PlayerAudio>();
 
+        trackManager = GameObject.FindAnyObjectByType<TrackManager>();
         lapsCompleted = 0;
         passedCheckpoint = -1;
-        currentCheckpoint = GetInitialCheckpoint();
+        currentCheckpoint = GetInitialCheckpoint();       
+        if (GameState.Instance.testResults) OverrideInitialCheckpoint();
     }
     #endregion
 
@@ -135,23 +138,20 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate()
     {
-        // Essential Updates
-
-        CheckGrounded();
-
         //---------------------
         if (!CanInput()) return;
         //---------------------
 
         // Player Actions
 
+        CheckGrounded();
+        JumpPhysics();
+
         AcceleratePhysics();
         SteerPhysics();
 
         BoostPhysics();    
-        DriftPhysics();
-
-        JumpPhysics();
+        DriftPhysics();        
     }
 
     #region Accelerate
@@ -177,6 +177,7 @@ public class PlayerController : MonoBehaviour
             currentSpeed -= decelerationInput * decelerationRate * Time.fixedDeltaTime;
             if (currentSpeed < 0f) currentSpeed = 0f;
 
+            playerAnimator.BrakeAnimation(inputBrake == 1);
             playerSFX.StopSound(playerSFX.movingSound);
         }
         
@@ -372,12 +373,12 @@ public class PlayerController : MonoBehaviour
             else if (driftDirection >= .5f) driftDirection = 1;
             else { return; }
 
-            currentDrift = 0.1f;
+            if (driftDirection != 0) StopBoost();
+           
             isDrifting = true;            
             playerAnimator.DriftAnimation(true, driftDirection);
-            playerVFX.ActivateDriftEffect(true);
-
-            StopBoost();
+            playerVFX.ActivateDriftEffect(driftDirection != 0);
+            currentDrift = 0.1f;
         }    
     }
     void StopDrift()
@@ -443,37 +444,7 @@ public class PlayerController : MonoBehaviour
         {
             if (other.CompareTag("Checkpoint"))
             {
-                currentCheckpoint = other.gameObject.transform;
-                int checkpointIndex = Array.IndexOf(other.GetComponentInParent<TrackManager>().checkPoints, other.gameObject);
-
-                if (checkpointIndex == 0 && passedCheckpoint >= other.GetComponentInParent<TrackManager>().checkPoints.Length - 15)
-                {
-                    lapsCompleted++;
-                    PlayerHUD.Instance.UpdateLapNumber(lapsCompleted + 1);
-
-                    if (lapsCompleted == 3)
-                    {
-                        GameState.Instance.PlayResultsSequence();
-                        PlayerHUD.Instance.UpdateLapNumber(3);
-
-                        playerVFX.StopAllEffects();
-                        playerSFX.StopAllAudio();
-                        playerAnimator.SetGrounded(true);
-
-                        GetComponent<BasicComputerPlayer>().AutoMovePlayer();
-                        isFinished = true;
-                    }
-                    else
-                    {  
-                        PlayerHUD.Instance.DisplayMessage("Lap " + (lapsCompleted + 1) + "!");
-                        GameState.Instance.lapSound.PlayOneShot(GameState.Instance.lapSound.clip);
-                    }
-                }
-
-                else if (passedCheckpoint < checkpointIndex && passedCheckpoint >= checkpointIndex - 15)
-                {
-                    passedCheckpoint = checkpointIndex;
-                }
+                UpdateCheckpoint(other.gameObject);
             }
 
             if (other.CompareTag("Deadzone"))
@@ -594,9 +565,44 @@ public class PlayerController : MonoBehaviour
             isRespawning = false;
         }
 
+        private void UpdateCheckpoint(GameObject checkpointTrigger)
+        {
+            if (!trackManager) return;
+
+            currentCheckpoint = checkpointTrigger.transform;
+            int checkpointIndex = Array.IndexOf(trackManager.checkPoints, checkpointTrigger);
+
+            if (checkpointIndex == 0 && passedCheckpoint >= trackManager.checkPoints.Length - trackManager.checkPointTolerance)
+            {
+                lapsCompleted++;
+                PlayerHUD.Instance.UpdateLapNumber(lapsCompleted + 1);
+
+                if (lapsCompleted < 3)
+                {
+                    PlayerHUD.Instance.DisplayMessage("Lap " + (lapsCompleted + 1) + "!");
+                    GameState.Instance.lapSound.PlayOneShot(GameState.Instance.lapSound.clip);
+                }
+                else
+                {
+                    isFinished = true;
+
+                    GetComponent<BasicComputerPlayer>().AutoMovePlayer(currentSpeed);
+                    playerAnimator.SetGrounded(true);
+                    playerVFX.StopAllEffects();
+                    playerSFX.StopAllAudio();
+
+                    GameState.Instance.PlayResultsSequence();
+                }
+            }
+
+            else if (passedCheckpoint < checkpointIndex && passedCheckpoint >= checkpointIndex - trackManager.checkPointTolerance)
+            {
+                passedCheckpoint = checkpointIndex;
+            }
+        }
+
         private Transform GetInitialCheckpoint()
         {
-            TrackManager trackManager = GameObject.FindAnyObjectByType<TrackManager>();
             if (trackManager == null)
             {
                 GameObject zeroTransform = new("temporary");
@@ -607,6 +613,15 @@ public class PlayerController : MonoBehaviour
 
             Transform initialPosition = trackManager.checkPoints[0].transform;
             return initialPosition;
+        }
+
+        private void OverrideInitialCheckpoint()
+        {
+            if (trackManager == null) return;
+
+            passedCheckpoint = trackManager.checkPoints.Length - 3;
+            currentCheckpoint = trackManager.checkPoints[^2].transform;
+            lapsCompleted = 2;
         }
         #endregion
 

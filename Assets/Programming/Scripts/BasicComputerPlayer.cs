@@ -10,8 +10,9 @@ public class BasicComputerPlayer : MonoBehaviour
     public float pointReachThreshold = 10f;
 
     [Header("Boost Settings")]
-    public float minBoostDelay = 2f;
-    public float maxBoostDelay = 8f;
+    public float minBoostDelay = 1f;
+    public float maxBoostDelay = 9f;
+    public float boostDuration = 3f;
 
     [Header("Important References")]
     public bool canAutoMove;
@@ -24,6 +25,11 @@ public class BasicComputerPlayer : MonoBehaviour
     private Vector3 targetPosition;
     private List<Transform> checkPoints = new();
     private TrackManager trackManager;
+
+    void Awake()
+    {
+        canAutoMove = false;
+    }
 
     void Start()
     {
@@ -61,11 +67,11 @@ public class BasicComputerPlayer : MonoBehaviour
         canAutoMove = true;
         StartCoroutine(RandomBoostRoutine());
     }
-    public void AutoMovePlayer()
+    public void AutoMovePlayer(float currentSpeed)
     {
-        if (checkPoints.Count == 0) GetCheckpointList();
         canAutoMove = true;
-        playerRB = GetComponent<Rigidbody>();
+        currentIndex = 1;
+        baseSpeed = currentSpeed;
     }
 
     private void FixedUpdate()
@@ -77,11 +83,8 @@ public class BasicComputerPlayer : MonoBehaviour
         if (other.CompareTag("Checkpoint"))
         {
             currentIndex++;
-            if (currentIndex >= checkPoints.Count)
-            {
-                currentIndex = 0;
-                StopAllCoroutines();
-            }
+            if (currentIndex >= checkPoints.Count) currentIndex = 0;
+
             GetTargetPosition();
         }
     }
@@ -97,6 +100,8 @@ public class BasicComputerPlayer : MonoBehaviour
     }
     private void MoveTowardsTarget()
     {
+        if (checkPoints.Count == 0) return;
+
         AlignToGround();
 
         Vector3 rawDirection = (targetPosition - playerRB.position);
@@ -180,7 +185,7 @@ public class BasicComputerPlayer : MonoBehaviour
             flameTrail.StartBoostTrail();
 
             // Boost lasts a random duration
-            float trailTime = Random.Range(1f, 3f);
+            float trailTime = Random.Range(1f, boostDuration);
             yield return new WaitForSeconds(trailTime);
 
             // Stop boost

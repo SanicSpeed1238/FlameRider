@@ -1,7 +1,8 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Audio;
+using UnityEngine.Events;
 using UnityEngine.Playables;
+using UnityEngine.Audio;
 
 public class GameState : MonoBehaviour
 {
@@ -18,16 +19,21 @@ public class GameState : MonoBehaviour
     [Header("Audio Sources")]
     public AudioMixer audioMixer;
     public AudioSource gameMusic;
-    public AudioSource resultsMusic;
     public AudioSource countdownSound;
     public AudioSource startSound;
     public AudioSource lapSound;
+    public AudioSource finishSound;
+
+    [Header("Event Dispatchers")]
+    public UnityEvent onRaceStart;
 
     [Header("Debugging Tools")]
     public bool disableIntro;
+    public bool testResults;
 
     // Variables Needed
     private float timeElapsed;
+    private float musicVolume;
     private Coroutine introCoroutine;
 
     private void Awake()
@@ -39,6 +45,7 @@ public class GameState : MonoBehaviour
         resultsSequence.SetActive(false);
 
         timeElapsed = 0f;
+        musicVolume = gameMusic.volume;
         audioMixer.SetFloat("sfxVolume", 0f);
     }
 
@@ -73,7 +80,7 @@ public class GameState : MonoBehaviour
         return timeElapsed;
     }
 
-    public void LowerGameMusic(bool lower)
+    public void LowerGameAudio(bool lower)
     {
         if (lower)
         {
@@ -82,7 +89,7 @@ public class GameState : MonoBehaviour
         }
         else
         {
-            gameMusic.volume = 0.45f;
+            gameMusic.volume = musicVolume;
             audioMixer.SetFloat("sfxVolume", 0f);
         }
     }
@@ -126,7 +133,7 @@ public class GameState : MonoBehaviour
         PlayerHUD.Instance.DisplayCountdown(0);
         PlayerHUD.Instance.DisplayMessage("Go !!!");
         startSound.PlayOneShot(startSound.clip);
-        gameMusic.Play();
+        onRaceStart.Invoke();
         isPlaying = true;
     }
     #endregion
@@ -164,15 +171,15 @@ public class GameState : MonoBehaviour
     {
         isPlaying = false;
 
-        PlayerHUD.Instance.DisplayMessage("Finish!");
-        gameMusic.Stop();
-        resultsMusic.Play();
-        startSound.PlayOneShot(startSound.clip);
-        yield return new WaitForSeconds(3f);
-
-        PlayerHUD.Instance.DisplayMessage(string.Empty);
-        PlayerHUD.Instance.SetSelectedButton(playerHUD.GetComponent<PlayerHUD>().replayButton);
+        playerHUD.SetActive(false);
         resultsScreen.SetActive(true);
+        resultsSequence.SetActive(true);
+
+        gameMusic.Stop();
+        startSound.PlayOneShot(finishSound.clip);
+
+        yield return new WaitForSeconds(3f);
+        PlayerHUD.Instance.SetSelectedButton(playerHUD.GetComponent<PlayerHUD>().replayButton);        
     }
     #endregion  
 }

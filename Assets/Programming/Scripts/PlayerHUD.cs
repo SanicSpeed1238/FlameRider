@@ -46,22 +46,17 @@ public class PlayerHUD : MonoBehaviour
     {
         messageText.text = message;
 
+        // Prepare DOTween
         RectTransform rect = messageText.rectTransform;
         rect.DOKill();
         float screenWidth = Screen.width;
         rect.anchoredPosition = new Vector2(-screenWidth, rect.anchoredPosition.y);
-        rect.localScale = Vector3.one;
         Sequence seq = DOTween.Sequence();
 
-        // 🔹 Slide in from left
-        seq.Append(rect.DOAnchorPosX(0, 0.5f).SetEase(Ease.OutCubic));
-
-        // 🔹 Wait in center
-        seq.AppendInterval(1.2f);
-
-        // 🔹 Zoom + fly out to the right
-        seq.Append(rect.DOAnchorPosX(screenWidth, 0.5f).SetEase(Ease.InBack));
-        seq.Join(rect.DOScale(1.5f, 0.5f));
+        // Animation: Move fast from left -> Slow in middle -> Move fast to the right
+        seq.Append(rect.DOAnchorPosX(0, 0.35f).SetEase(Ease.OutQuad));
+        seq.Append(rect.DOAnchorPosX(screenWidth * 0.2f, 1.0f).SetEase(Ease.Linear));
+        seq.Append(rect.DOAnchorPosX(screenWidth, 0.25f).SetEase(Ease.Linear));
     }
     public void DisplayCountdown(int num)
     {
@@ -69,15 +64,7 @@ public class PlayerHUD : MonoBehaviour
         if (num == 0) numText = string.Empty;
 
         countdownNumbers.text = numText;
-        countdownNumbers.transform.DOPunchScale(Vector3.one * 0.5f, 0.4f, 10, 1);
-
-        countdownNumbers.color = num switch
-        {
-            3 => Color.yellow,
-            2 => new Color(1f, 0.5f, 0f),
-            1 => Color.red,
-            _ => Color.white,
-        };
+        countdownNumbers.transform.DOPunchScale(Vector3.one * 0.25f, 0.15f, 12, 0.8f);
     }
 
     public void UpdateFireEnergy(float value)

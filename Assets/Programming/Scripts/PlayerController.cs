@@ -550,19 +550,36 @@ public class PlayerController : MonoBehaviour
         IEnumerator RespawnPlayer()
         {
             isRespawning = true;
+            ResetPlayerState();
 
             playerRB.position = currentCheckpoint.position;
             playerRB.rotation = currentCheckpoint.rotation;
             playerRB.linearVelocity = Vector3.down;
             currentSpeed = 0f;
 
-            StopBoost();
-            playerVFX.StopAllEffects();
-
             playerSFX.PlaySound(playerSFX.respawnSound);
             yield return new WaitForSeconds(1f);
 
             isRespawning = false;
+        }
+
+        public void SetAutomatedState(bool automated)
+        {
+            ResetPlayerState();
+            isAutomated = automated;
+            playerRB.isKinematic = automated;
+        }
+
+        private void ResetPlayerState()
+        {
+            inputAccel = 0f;
+            inputSteer = 0f;
+            StopBoost();
+            StopDrift();
+
+            playerAnimator.ResetAnimations();
+            playerVFX.StopAllEffects();
+            playerSFX.StopAllAudio();
         }
 
         private void UpdateCheckpoint(GameObject checkpointTrigger)

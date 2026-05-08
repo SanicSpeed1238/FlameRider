@@ -48,13 +48,7 @@ public class PlayerAnimator : MonoBehaviour
             elasticBones[i].localRotation = Quaternion.Slerp
                 (elasticBones[i].localRotation, originalRotations[i] * Quaternion.Euler(angle, 0f, 0f), Time.deltaTime * 10f);
         }
-    }
-
-    public void SetGrounded(bool grounded)
-    {
-        motorcycleAnim.SetBool("Grounded", grounded);
-        playerAnim.SetBool("Grounded", grounded);
-    }
+    }    
 
     public void SetSpeed(float speed)
     {
@@ -83,5 +77,19 @@ public class PlayerAnimator : MonoBehaviour
     {
         motorcycleAnim.SetBool("Braking", activate);
         playerAnim.SetBool("Braking", activate);
+    }
+
+    public void SetGrounded(bool grounded)
+    {
+        motorcycleAnim.SetBool("Grounded", grounded);
+        playerAnim.SetBool("Grounded", grounded);
+    }
+
+    public void ResetAnimations()
+    {
+        SteerAnimation(0f);
+        DriftAnimation(false, 0);
+        BrakeAnimation(false);
+        SetGrounded(true);
     }
 }

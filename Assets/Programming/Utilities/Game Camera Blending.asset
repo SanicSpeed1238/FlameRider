@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Game Camera Blending
   m_EditorClassIdentifier: 
   CustomBlends:
-  - From: Intro
+  - From: Intro Camera
     To: Gameplay Camera
     Blend:
-      Style: 1
+      Style: 0
       Time: 2
       CustomCurve:
         serializedVersion: 2

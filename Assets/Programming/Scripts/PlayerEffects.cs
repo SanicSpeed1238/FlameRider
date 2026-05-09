@@ -73,6 +73,21 @@ public class PlayerEffects : MonoBehaviour
         }
     }
 
+    public void ActivateBoostEffect(bool activate)
+    {
+        if (activate)
+        {           
+            speedLines.Play();
+            ShakeCamera(0.25f, 5f, 100);
+            SetCameraFOV(90f, 0.25f);
+        }
+        else
+        {           
+            speedLines.Stop();
+            SetCameraFOV(fieldOfVision, 0.5f);
+        }
+    }
+
     public void ShakeCamera(float duration, float strength, int vibrato)
     {
         if (cameraFollowTransform == null) return;
@@ -82,24 +97,32 @@ public class PlayerEffects : MonoBehaviour
         cameraFollowTransform.DOShakePosition(duration, strength, vibrato, 90f, false, true)
             .OnComplete(() => {cameraFollowTransform.localPosition = originalCameraFollowPos;});
     }
+    public void ShakeCameraAxis(float duration, float strength, int vibrato, bool shakeX, bool shakeY)
+    {
+        if (cameraFollowTransform == null) return;
+        cameraFollowTransform.DOKill();
 
-    public void ActivateBoostEffect(bool activate)
+        cameraFollowTransform.localPosition = originalCameraFollowPos;
+        Vector3 axisStrength = new(
+            shakeX ? strength : 0f,
+            shakeY ? strength : 0f,
+            0f
+        );
+
+        cameraFollowTransform
+            .DOShakePosition(duration, axisStrength, vibrato, 90f, false, true)
+            .OnComplete(() =>
+            {
+                cameraFollowTransform.localPosition = originalCameraFollowPos;
+            });
+    }
+
+    public void SetCameraFOV(float targetFOV, float duration)
     {
         if (currentZoomCoroutine != null) StopCoroutine(currentZoomCoroutine);
-
-        if (activate)
-        {       
-            currentZoomCoroutine = StartCoroutine(CameraZoomOut(90f, 0.25f));
-            speedLines.Play();
-            ShakeCamera(0.25f, 5f, 100);
-        }
-        else
-        {
-            currentZoomCoroutine = StartCoroutine(CameraZoomOut(fieldOfVision, 0.5f));
-            speedLines.Stop();
-        }
+        currentZoomCoroutine = StartCoroutine(LerpCameraFOV(targetFOV, duration));
     }
-    IEnumerator CameraZoomOut(float targetFOV, float duration)
+    IEnumerator LerpCameraFOV(float targetFOV, float duration)
     {
         float startFOV = gameCamera.Lens.FieldOfView;
         float endFOV = targetFOV;
@@ -122,9 +145,9 @@ public class PlayerEffects : MonoBehaviour
         if (motionBlurCoroutine != null)
             StopCoroutine(motionBlurCoroutine);
 
-        motionBlurCoroutine = StartCoroutine(LerpMotionBlurIntensity(targetIntensity, duration));
+        motionBlurCoroutine = StartCoroutine(LerpMotionBlur(targetIntensity, duration));
     }
-    private IEnumerator LerpMotionBlurIntensity(float target, float duration)
+    private IEnumerator LerpMotionBlur(float target, float duration)
     {
         if (!motionBlur.intensity.overrideState)
             motionBlur.intensity.overrideState = true;

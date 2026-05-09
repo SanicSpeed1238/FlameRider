@@ -66,6 +66,7 @@ public class PlayerController : MonoBehaviour
 
     // Variables for Aerials
     bool hasJumped;
+    bool hasLanded;
     float jumpTimer;
     readonly float jumpTime = 0.2f;
 
@@ -104,6 +105,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         playerRB = GetComponent<Rigidbody>();
+        hasLanded = true;
         maxSpeed = baseSpeed;
         if (driftStrength <= steerSensitivity) driftStrength = steerSensitivity + 0.1f;
 
@@ -337,15 +339,19 @@ public class PlayerController : MonoBehaviour
             else currentDrift = driftStrength;
 
             // Manipulate drift amount based on left stick direction
-            float driftInfluence = inputSteer;
-            if (driftDirection * inputSteer > 0f)
+            float driftInfluence = inputSteer;            
+            if (driftInfluence * driftDirection > 0f)
             {
                 driftInfluence += (currentSpeed / 100f) * driftDirection;
             }
-            else if (driftDirection * inputSteer <= 0f)
+            else if (driftInfluence * driftDirection < 0f)
             {
                 driftInfluence = 0f;
                 currentDrift = 0f;
+            }
+            else if (driftInfluence == 0)
+            {
+                currentDrift = 1f;
             }
 
             // Rotate the rigidbody based on initial drift direction, current strength, and influence from left stick
@@ -411,7 +417,20 @@ public class PlayerController : MonoBehaviour
         if (hasJumped)
         {
             jumpTimer += Time.fixedDeltaTime;
-            if (jumpTimer > jumpTime) hasJumped = false;
+            if (jumpTimer > jumpTime)
+            {
+                hasJumped = false;
+                hasLanded = false;
+            }
+        }
+    }
+
+    void LandedEffects()
+    {
+        if (!hasLanded)
+        {
+            hasLanded = true;
+            playerVFX.ShakeCameraAxis(0.2f, 1f, 10, false, true);
         }
     }
     #endregion
@@ -471,17 +490,22 @@ public class PlayerController : MonoBehaviour
             float rayCastLength = flameTrailCheck.raycastDistance;
             float rayCastRadius = flameTrailCheck.rayCastRadius;
 
+            // GROUND CHECK
             isGrounded = Physics.SphereCast(origin, rayCastRadius, direction, out RaycastHit ground, rayCastLength, groundLayer) && !hasJumped;
+
             AlignToGround(ground);
-
-            if (!isGrounded)
-            {
-                if (Physics.Raycast(origin, playerRB.transform.forward, out RaycastHit hit, rayCastLength * 2f, groundLayer))
-                    playerRB.MoveRotation(Quaternion.LookRotation(playerRB.transform.forward, hit.normal));
-            }
-
             playerAnimator.SetGrounded(isGrounded);
             if (isRigid && isGrounded) isRigid = false;
+
+            if (isGrounded)
+            {
+                LandedEffects();
+            }
+            else
+            {
+                if (Physics.SphereCast(origin, rayCastRadius, playerRB.transform.forward, out RaycastHit hit, rayCastLength * 2f, groundLayer))
+                    playerRB.MoveRotation(Quaternion.LookRotation(playerRB.transform.forward, hit.normal));
+            }         
         }
         void AlignToGround(RaycastHit ground)
         {

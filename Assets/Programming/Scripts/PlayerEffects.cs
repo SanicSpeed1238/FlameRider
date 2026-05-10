@@ -1,9 +1,8 @@
-using UnityEngine;
+using DG.Tweening;
 using System.Collections;
 using Unity.Cinemachine;
+using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
-using DG.Tweening;
 
 public class PlayerEffects : MonoBehaviour
 {
@@ -20,14 +19,9 @@ public class PlayerEffects : MonoBehaviour
     // -------------
 
     // Camera Effects
-    float fieldOfVision;
     Vector3 originalCameraFollowPos;
     Coroutine currentZoomCoroutine;
-    CinemachineCamera gameCamera;
-
-    // Post Processing Effects
-    MotionBlur motionBlur;
-    Coroutine motionBlurCoroutine;   
+    CinemachineCamera gameCamera;  
 
     // Screen Effects
     private ParticleSystem speedLines;
@@ -39,12 +33,8 @@ public class PlayerEffects : MonoBehaviour
         gameCamera = cameraManager.gameplayCamera.GetComponent<CinemachineCamera>();
 
         originalCameraFollowPos = cameraFollowTransform.localPosition;
-        fieldOfVision = gameCamera.Lens.FieldOfView;        
         speedLines = cameraManager.speedLines;
         flameLines = cameraManager.flameLines;
-
-        if (postProcessVolume != null && postProcessVolume.profile != null) 
-            postProcessVolume.profile.TryGet(out motionBlur);
     }
 
     public void ActivateDriftEffect(bool activate)
@@ -78,15 +68,24 @@ public class PlayerEffects : MonoBehaviour
         if (activate)
         {           
             speedLines.Play();
-            ShakeCamera(0.25f, 5f, 100);
             SetCameraFOV(90f, 0.25f);
+            ShakeCamera(0.3f, 10f, 500);
         }
         else
         {           
             speedLines.Stop();
-            SetCameraFOV(fieldOfVision, 0.5f);
+            SetCameraFOV(60f, 0.5f);
         }
     }
+
+    public void SteerCamera(float input, float maxAngle)
+    {
+        float targetCamAngle = input * maxAngle;
+        currentCamAngle = Mathf.SmoothDamp(currentCamAngle, targetCamAngle, ref yCamRotation, 0.2f);
+        cameraFollowTransform.localRotation = Quaternion.Euler(0f, currentCamAngle, 0f);
+    }
+        float currentCamAngle = 0f;
+        float yCamRotation;
 
     public void ShakeCamera(float duration, float strength, int vibrato)
     {
@@ -135,34 +134,6 @@ public class PlayerEffects : MonoBehaviour
             yield return null;
         }
         gameCamera.Lens.FieldOfView = endFOV;
-    }
-
-    public void SetMotionBlur(float targetIntensity, float duration = 0.2f)
-    {
-        if (motionBlur == null)
-            return;
-
-        if (motionBlurCoroutine != null)
-            StopCoroutine(motionBlurCoroutine);
-
-        motionBlurCoroutine = StartCoroutine(LerpMotionBlur(targetIntensity, duration));
-    }
-    private IEnumerator LerpMotionBlur(float target, float duration)
-    {
-        if (!motionBlur.intensity.overrideState)
-            motionBlur.intensity.overrideState = true;
-
-        float start = motionBlur.intensity.value;
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            motionBlur.intensity.value = Mathf.Lerp(start, target, elapsed / duration);
-            yield return null;
-        }
-
-        motionBlur.intensity.value = target;
     }
 
     public void StopAllEffects()

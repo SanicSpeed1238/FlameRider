@@ -199,7 +199,6 @@ public class PlayerController : MonoBehaviour
         
         // Visualization effects of speed
         playerAnimator.SetSpeed(transformSpeed);
-        playerVFX.SetMotionBlur(transformSpeed / 300f);
     }
     #endregion
 
@@ -295,6 +294,7 @@ public class PlayerController : MonoBehaviour
     {
         // Update animator based on left stick input
         if(!isDrifting) playerAnimator.SteerAnimation(inputSteer);
+        if (!steerUnstable) playerVFX.SteerCamera(inputSteer, 10f);
     }
     void SteerPhysics()
     {

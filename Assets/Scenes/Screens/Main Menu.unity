@@ -806,7 +806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f6ceedd64a59454ca617c7a9e980c77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playTransition: {fileID: 11400000, guid: c9f7b34f761c5c342ada8a4b2ab7a716, type: 2}
+  playTransition: {fileID: 11400000, guid: 013263c83b6a84c4d95beaa8bd163ac8, type: 2}
 --- !u!1 &404085878
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,7 +7,7 @@ public class MainMenu : MonoBehaviour
 
     public void PlayGame()
     {
-        TransitionManager.Instance().Transition("Fireball Stadium", playTransition, 2.5f);
+        TransitionManager.Instance().Transition("Fireball Stadium", playTransition, 1f);
     }
 
     public void QuitGame()

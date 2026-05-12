@@ -14,6 +14,7 @@ public class PlayerEffects : MonoBehaviour
     [Header("Important References")]
     public Volume postProcessVolume;
     public Transform cameraFollowTransform;
+    public bool humanPlayer;
 
     // Other Effects
     // -------------
@@ -29,12 +30,14 @@ public class PlayerEffects : MonoBehaviour
 
     void Start()
     {
-        CameraManager cameraManager = GameObject.FindFirstObjectByType<CameraManager>();
-        gameCamera = cameraManager.gameplayCamera.GetComponent<CinemachineCamera>();
-
-        originalCameraFollowPos = cameraFollowTransform.localPosition;
-        speedLines = cameraManager.speedLines;
-        flameLines = cameraManager.flameLines;
+        if (humanPlayer)
+        {
+            CameraManager cameraManager = GameObject.FindFirstObjectByType<CameraManager>();
+            gameCamera = cameraManager.gameplayCamera.GetComponent<CinemachineCamera>();
+            originalCameraFollowPos = cameraFollowTransform.localPosition;
+            speedLines = cameraManager.speedLines;
+            flameLines = cameraManager.flameLines;
+        }  
     }
 
     public void ActivateDriftEffect(bool activate)
@@ -53,17 +56,17 @@ public class PlayerEffects : MonoBehaviour
     {
         if (activate)
         {
-            if (!trailRide.isPlaying) trailRide.Play();
-            if (!flameLines.isPlaying) flameLines.Play();          
+            if (trailRide != null && !trailRide.isPlaying) trailRide.Play();
+            if (flameLines != null && !flameLines.isPlaying) flameLines.Play();          
         }
         else
         {
-            trailRide.Stop();
-            flameLines.Stop();           
+            if (trailRide != null) trailRide.Stop();
+            if (flameLines != null) flameLines.Stop();           
         }
     }
 
-    public void ActivateBoostEffect(bool activate)
+    public void ActivateBoostCameraFX(bool activate)
     {
         if (activate)
         {           
@@ -141,6 +144,6 @@ public class PlayerEffects : MonoBehaviour
         ActivateDriftEffect(false);
         ActivateTrailGenerate(false);
         ActivateTrailRide(false);
-        ActivateBoostEffect(false);
+        ActivateBoostCameraFX(false);
     }
 }

@@ -18,8 +18,12 @@ public class BasicComputerPlayer : MonoBehaviour
     public bool canAutoMove;
 
     private Rigidbody playerRB;
-    private FlameTrailGeneration flameTrail;
     private LayerMask groundLayer;
+    private readonly float rotationLerpSpeed = 5f;
+
+    private FlameTrailGeneration flameTrail;
+    private PlayerEffects playerVFX;
+    private PlayerAnimator playerAnimator;
 
     private int currentIndex = 0;
     private Vector3 targetPosition;
@@ -34,8 +38,11 @@ public class BasicComputerPlayer : MonoBehaviour
     void Start()
     {
         playerRB = GetComponent<Rigidbody>();
-        flameTrail = GetComponent<FlameTrailGeneration>();
         groundLayer = LayerMask.GetMask("Ground");
+
+        flameTrail = GetComponent<FlameTrailGeneration>();
+        playerVFX = GetComponentInChildren<PlayerEffects>();
+        playerAnimator = GetComponentInChildren<PlayerAnimator>();
 
         trackManager = GameObject.FindAnyObjectByType<TrackManager>();
         if (trackManager == null || trackManager.checkPoints == null)
@@ -105,7 +112,7 @@ public class BasicComputerPlayer : MonoBehaviour
         AlignToGround();
 
         Vector3 rawDirection = (targetPosition - playerRB.position);
-        if (Physics.Raycast(playerRB.position, -transform.up, out RaycastHit groundHit, 2f, groundLayer))
+        if (Physics.Raycast(playerRB.position, -playerRB.transform.up, out RaycastHit groundHit, 2f, groundLayer))
         {
             rawDirection = Vector3.ProjectOnPlane(rawDirection, groundHit.normal);
         }
@@ -113,11 +120,18 @@ public class BasicComputerPlayer : MonoBehaviour
         Vector3 direction = rawDirection.normalized;
         if (direction.sqrMagnitude > 0.001f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(direction, transform.up);
-            playerRB.MoveRotation(Quaternion.Slerp(playerRB.rotation, targetRotation, Time.fixedDeltaTime * 10f));
+            Quaternion targetRotation = Quaternion.LookRotation(direction, playerRB.transform.up);
+            playerRB.MoveRotation(Quaternion.Slerp(playerRB.rotation, targetRotation, Time.fixedDeltaTime * rotationLerpSpeed));
+            
+            // Calculate "L Stick Input" for Steer Animation
+            float angleDifference = Quaternion.Angle(playerRB.rotation, targetRotation);
+            float normalizedTurn = Mathf.Clamp(angleDifference / 15f, 0f, 1f);
+            float sign = Mathf.Sign(Vector3.Cross(playerRB.transform.forward, direction).y);
+            normalizedTurn *= sign;
+            playerAnimator.SteerAnimation(normalizedTurn);
         }
 
-        Vector3 playerVelocity = baseSpeed * transform.forward;
+        Vector3 playerVelocity = baseSpeed * playerRB.transform.forward;
         playerVelocity = VelocityAdjustedToSlope(playerVelocity);
         playerRB.linearVelocity = playerVelocity;
     }
@@ -135,10 +149,8 @@ public class BasicComputerPlayer : MonoBehaviour
             float gravityStrength = Physics.gravity.magnitude;
             playerRB.AddForce(-groundNormal * gravityStrength, ForceMode.Acceleration);
 
-            Vector3 forwardProjected = Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized;
-
-            if (forwardProjected.sqrMagnitude < 0.001f)
-                forwardProjected = transform.forward;
+            Vector3 forwardProjected = Vector3.ProjectOnPlane(playerRB.transform.forward, groundNormal).normalized;
+            if (forwardProjected.sqrMagnitude < 0.001f) forwardProjected = playerRB.transform.forward;
 
             Quaternion targetRotation = Quaternion.LookRotation(forwardProjected, groundNormal);
             playerRB.MoveRotation(targetRotation);
@@ -147,18 +159,11 @@ public class BasicComputerPlayer : MonoBehaviour
         {
             playerRB.AddForce(Physics.gravity, ForceMode.Acceleration);
 
-            float uprightSpeed = 2f;
-
-            Vector3 forwardProjected = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
-
-            if (forwardProjected.sqrMagnitude < 0.001f)
-                forwardProjected = transform.forward;
-
+            Vector3 forwardProjected = Vector3.ProjectOnPlane(playerRB.transform.forward, Vector3.up).normalized;
+            if (forwardProjected.sqrMagnitude < 0.001f) forwardProjected = playerRB.transform.forward;
             Quaternion uprightTarget = Quaternion.LookRotation(forwardProjected, Vector3.up);
 
-            playerRB.MoveRotation(
-                Quaternion.Slerp(playerRB.rotation, uprightTarget, uprightSpeed * Time.fixedDeltaTime)
-            );
+            playerRB.MoveRotation(Quaternion.Slerp(playerRB.rotation, uprightTarget, Time.fixedDeltaTime * (rotationLerpSpeed/2f)));
         }
     }
     private Vector3 VelocityAdjustedToSlope(Vector3 velocity)
@@ -183,6 +188,7 @@ public class BasicComputerPlayer : MonoBehaviour
 
             // Start boost
             flameTrail.StartBoostTrail();
+            playerVFX.ActivateTrailGenerate(true);
 
             // Boost lasts a random duration
             float trailTime = Random.Range(1f, boostDuration);
@@ -190,6 +196,7 @@ public class BasicComputerPlayer : MonoBehaviour
 
             // Stop boost
             flameTrail.StopBoostTrail();
+            playerVFX.ActivateTrailGenerate(false);
         }
     }    
 }

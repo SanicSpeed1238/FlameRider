@@ -46,17 +46,17 @@ public class PlayerHUD : MonoBehaviour
     {
         messageText.text = message;
 
-        // Prepare DOTween
+        // DOTween Prep
         RectTransform rect = messageText.rectTransform;
         rect.DOKill();
         float screenWidth = Screen.width;
-        rect.anchoredPosition = new Vector2(-screenWidth, rect.anchoredPosition.y);
+        rect.anchoredPosition = new Vector2(screenWidth * -1.5f, rect.anchoredPosition.y);
         Sequence seq = DOTween.Sequence();
 
-        // Animation: Move fast from left -> Slow in middle -> Move fast to the right
-        seq.Append(rect.DOAnchorPosX(0, 0.35f).SetEase(Ease.OutQuad));
-        seq.Append(rect.DOAnchorPosX(screenWidth * 0.2f, 1.0f).SetEase(Ease.Linear));
-        seq.Append(rect.DOAnchorPosX(screenWidth, 0.25f).SetEase(Ease.Linear));
+        // DOTWeen Animation
+        seq.Append(rect.DOAnchorPosX(screenWidth * 0f, 0.5f).SetEase(Ease.InOutCubic));
+        seq.Append(rect.DOAnchorPosX(screenWidth * 0.02f, 1.2f).SetEase(Ease.Linear));
+        seq.Append(rect.DOAnchorPosX(screenWidth * 1.5f, 0.5f).SetEase(Ease.InOutCubic));
     }
     public void DisplayCountdown(int num)
     {
@@ -64,7 +64,7 @@ public class PlayerHUD : MonoBehaviour
         if (num == 0) numText = string.Empty;
 
         countdownNumbers.text = numText;
-        countdownNumbers.transform.DOPunchScale(Vector3.one * 0.25f, 0.15f, 12, 0.8f);
+        countdownNumbers.transform.DOPunchScale(Vector3.one * 0.2f, 0.1f, 20, 0.1f);
     }
 
     public void UpdateFireEnergy(float value)

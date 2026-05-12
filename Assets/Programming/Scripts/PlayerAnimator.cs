@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Playables;
 
 public class PlayerAnimator : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class PlayerAnimator : MonoBehaviour
     private float oscillationTime;
     private Quaternion[] originalRotations;
 
+    // Other Variables
+    PlayableDirector[] levelSequences;
+
     void Start()
     {
         if (motorcycleAnim == null) Debug.LogWarning("Motorcycle Animator not set!");
@@ -22,32 +26,13 @@ public class PlayerAnimator : MonoBehaviour
 
         originalRotations = new Quaternion[elasticBones.Length];
         for (int i = 0; i < elasticBones.Length; i++) { originalRotations[i] = elasticBones[i].localRotation; }
+
+        levelSequences = FindObjectsByType<PlayableDirector>(FindObjectsSortMode.None);
     }
 
     private void Update()
     {
-        float normalizedSpeed = Mathf.Clamp01(oscillationSpeed);
-        if (normalizedSpeed > 0.01f) oscillationTime += Time.deltaTime * elasticSpeed * (0.5f + normalizedSpeed);
-
-        for (int i = 0; i < elasticBones.Length; i++)
-        {
-            float angle;
-
-            if (normalizedSpeed <= 0.01f)
-            {
-                angle = minAngle;
-            }
-            else
-            {
-                float offset = i * 0.5f;
-                float wave = Mathf.Sin(oscillationTime + offset) * 0.5f + 0.5f;
-                float targetAngle = Mathf.Lerp(minAngle, maxAngle, wave);
-                angle = Mathf.Lerp(minAngle, targetAngle, normalizedSpeed);
-            }
-
-            elasticBones[i].localRotation = Quaternion.Slerp
-                (elasticBones[i].localRotation, originalRotations[i] * Quaternion.Euler(angle, 0f, 0f), Time.deltaTime * 10f);
-        }
+        if (!IsAnimatedThruSequence()) AnimateHair();
     }    
 
     public void SetSpeed(float speed)
@@ -91,5 +76,51 @@ public class PlayerAnimator : MonoBehaviour
         DriftAnimation(false, 0);
         BrakeAnimation(false);
         SetGrounded(true);
+    }
+
+    private void AnimateHair()
+    {
+        float normalizedSpeed = Mathf.Clamp01(oscillationSpeed);
+        if (normalizedSpeed > 0.01f) oscillationTime += Time.deltaTime * elasticSpeed * (0.5f + normalizedSpeed);
+
+        for (int i = 0; i < elasticBones.Length; i++)
+        {
+            float angle;
+
+            if (normalizedSpeed <= 0.01f)
+            {
+                angle = minAngle;
+            }
+            else
+            {
+                float offset = i * 0.5f;
+                float wave = Mathf.Sin(oscillationTime + offset) * 0.5f + 0.5f;
+                float targetAngle = Mathf.Lerp(minAngle, maxAngle, wave);
+                angle = Mathf.Lerp(minAngle, targetAngle, normalizedSpeed);
+            }
+
+            elasticBones[i].localRotation = Quaternion.Slerp
+                (elasticBones[i].localRotation, originalRotations[i] * Quaternion.Euler(angle, 0f, 0f), Time.deltaTime * 10f);
+        }
+    }
+
+    private bool IsAnimatedThruSequence()
+    {
+        foreach (var director in levelSequences)
+        {
+            if (director.state != PlayState.Playing)
+                continue;
+
+            foreach (var output in director.playableAsset.outputs)
+            {
+                if (output.streamName.Contains("Animation"))
+                {
+                    var binding = director.GetGenericBinding(output.sourceObject);
+                    if (binding == playerAnim)
+                        return true;
+                }
+            }
+        }
+        return false;
     }
 }

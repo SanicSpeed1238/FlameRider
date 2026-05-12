@@ -263,7 +263,7 @@ public class PlayerController : MonoBehaviour
                 isBoosting = true;
                 flameTrail.StartBoostTrail();
                 playerVFX.ActivateTrailGenerate(true);
-                playerVFX.ActivateBoostEffect(true);
+                playerVFX.ActivateBoostCameraFX(true);
                 playerSFX.StartSound(playerSFX.boostingSound);
             }  
         } 
@@ -275,7 +275,7 @@ public class PlayerController : MonoBehaviour
             isBoosting = false;
             flameTrail.StopBoostTrail();
             playerVFX.ActivateTrailGenerate(false);
-            playerVFX.ActivateBoostEffect(false);
+            playerVFX.ActivateBoostCameraFX(false);
             playerSFX.StopSound(playerSFX.boostingSound);
         }
     }
@@ -608,7 +608,7 @@ public class PlayerController : MonoBehaviour
 
         private void UpdateCheckpoint(GameObject checkpointTrigger)
         {
-            if (!trackManager) return;
+            if (!trackManager || isFinished) return;
 
             currentCheckpoint = checkpointTrigger.transform;
             int checkpointIndex = Array.IndexOf(trackManager.checkPoints, checkpointTrigger);

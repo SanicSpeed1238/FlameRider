@@ -157,7 +157,12 @@ public class GameState : MonoBehaviour
     }
     private void SkipIntro()
     {
+        StopCoroutine(introCoroutine);
+        introCoroutine = null;
+
+        introSequence.GetComponent<PlayableDirector>().Stop();
         introSequence.SetActive(false);
+
         StartGame();
     }
     #endregion
@@ -178,7 +183,10 @@ public class GameState : MonoBehaviour
         gameMusic.Stop();
         startSound.PlayOneShot(finishSound.clip);
 
-        yield return new WaitForSeconds(3f);
+        Time.timeScale = 0.2f;
+        yield return new WaitForSecondsRealtime(1.5f);
+
+        Time.timeScale = 1;
         PlayerHUD.Instance.SetSelectedButton(playerHUD.GetComponent<PlayerHUD>().replayButton);        
     }
     #endregion  

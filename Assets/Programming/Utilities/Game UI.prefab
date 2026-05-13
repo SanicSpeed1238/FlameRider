@@ -1230,7 +1230,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: a1ec5e186f44c9e49a9d12964e55efd9, type: 2}
-  m_Color: {r: 1, g: 0.05882353, b: 0, a: 1}
+  m_Color: {r: 1, g: 0.1764706, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1728,7 +1728,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 1d5773b9d849b96439fd6d4ada048522, type: 3}
+  m_Resource: {fileID: 8300000, guid: 4aa45812b131c344d875b05c56a0c80f, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -2325,7 +2325,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: fd33fa8cdcfd9014d82c8483d9d2077c, type: 3}
+  m_Resource: {fileID: 8300000, guid: 4aa45812b131c344d875b05c56a0c80f, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -6144,7 +6144,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 30fb40669d8ec2b47b41a5f55bfc72e2, type: 3}
+  m_Resource: {fileID: 8300000, guid: d527a947c6559394fb4d84da868c6ec9, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

@@ -6,8 +6,10 @@ public class PlayerAudio : MonoBehaviour
     public AudioSource idleSound;
     public AudioSource movingSound;
     public AudioSource boostingSound;
+    public AudioSource ridingSound;
     public AudioSource driftingSound;
     public AudioSource jumpSound;
+    public AudioSource explosionSound;
     public AudioSource respawnSound;
 
     public void PlaySound(AudioSource audio)
@@ -30,8 +32,10 @@ public class PlayerAudio : MonoBehaviour
         idleSound.volume = 0;
         movingSound.volume = 0;
         boostingSound.volume = 0;
+        ridingSound.volume = 0;
         driftingSound.volume = 0;
         jumpSound.volume = 0;
+        explosionSound.volume = 0;
         respawnSound.volume = 0;
     }
 }

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5921051619722202206}
   - component: {fileID: 5480052307268210057}
   - component: {fileID: 8720945139537465316}
-  m_Layer: 1
+  m_Layer: 0
   m_Name: Embers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4844,7 +4844,7 @@ GameObject:
   - component: {fileID: 5119194019259460350}
   - component: {fileID: 5338295518203200635}
   - component: {fileID: 1956064770181438283}
-  m_Layer: 1
+  m_Layer: 0
   m_Name: vfx_Drift
   m_TagString: Untagged
   m_Icon: {fileID: 0}

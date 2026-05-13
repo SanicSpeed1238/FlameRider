@@ -144,8 +144,6 @@ public class PlayerController : MonoBehaviour
         if (!CanInput()) return;
         //---------------------
 
-        // Player Actions
-
         CheckGrounded();
         JumpPhysics();
 
@@ -249,7 +247,7 @@ public class PlayerController : MonoBehaviour
             {
                 onFlameTrail = false;
                 playerVFX.ActivateTrailRide(false);
-                playerSFX.StopSound(playerSFX.boostingSound);
+                playerSFX.StopSound(playerSFX.ridingSound);
             }
         }
     }
@@ -264,6 +262,7 @@ public class PlayerController : MonoBehaviour
                 flameTrail.StartBoostTrail();
                 playerVFX.ActivateTrailGenerate(true);
                 playerVFX.ActivateBoostCameraFX(true);
+                playerSFX.PlaySound(playerSFX.explosionSound);
                 playerSFX.StartSound(playerSFX.boostingSound);
             }  
         } 
@@ -276,7 +275,6 @@ public class PlayerController : MonoBehaviour
             flameTrail.StopBoostTrail();
             playerVFX.ActivateTrailGenerate(false);
             playerVFX.ActivateBoostCameraFX(false);
-            playerSFX.StopSound(playerSFX.boostingSound);
         }
     }
 
@@ -363,7 +361,7 @@ public class PlayerController : MonoBehaviour
             if (isGrounded)
             {
                 RegenerateFireEngery(1f);
-                playerSFX.StartSound(playerSFX.driftingSound);
+                if(driftDirection != 0) playerSFX.StartSound(playerSFX.driftingSound);
             }
         }
     }
@@ -405,7 +403,7 @@ public class PlayerController : MonoBehaviour
             if (isGrounded && (Vector3.Dot(playerRB.transform.up, Vector3.up) > 0.5f))
             {
                 playerRB.AddForce(jumpHeight * transform.up, ForceMode.Impulse);
-                playerSFX.PlaySound(playerSFX.jumpSound);
+                playerSFX.StartSound(playerSFX.jumpSound);
 
                 jumpTimer = 0f;
                 hasJumped = true;
@@ -443,7 +441,7 @@ public class PlayerController : MonoBehaviour
             onFlameTrail = true;
             offFlameTrailTimer = 0f;
             playerVFX.ActivateTrailRide(true);
-            playerSFX.StartSound(playerSFX.boostingSound);
+            playerSFX.StartSound(playerSFX.ridingSound);
             maxSpeed += trailSpeedBoost * Time.fixedDeltaTime;
         }
     }
@@ -579,6 +577,7 @@ public class PlayerController : MonoBehaviour
             steerUnstable = true;
             unstableTimer = unstableDuration;
 
+            playerSFX.PlaySound(playerSFX.respawnSound);
             //Debug.DrawRay(contactPoint, wallCollideDirection * 2f, Color.blue, 1f);
         }
         #endregion
@@ -587,9 +586,13 @@ public class PlayerController : MonoBehaviour
         IEnumerator RespawnPlayer()
         {
             isRespawning = true;
-            ResetPlayerState();
 
-            playerSFX.PlaySound(playerSFX.respawnSound);
+            StopBoost();
+            StopDrift();
+            playerAnimator.ResetAnimations();
+            playerVFX.StopAllEffects();
+
+            playerSFX.StartSound(playerSFX.respawnSound);
             PlayerHUD.Instance.FadeScreen(0.5f, 1f);            
             yield return new WaitForSeconds(1f);
 
@@ -597,7 +600,8 @@ public class PlayerController : MonoBehaviour
             playerRB.rotation = currentCheckpoint.rotation;
             SnapToGround();
 
-            ResetPlayerState();
+            inputAccel = 0f;
+            inputSteer = 0f;
             currentSpeed = 0f;
             playerVelocity = Vector3.zero;
             playerRB.linearVelocity = playerVelocity;

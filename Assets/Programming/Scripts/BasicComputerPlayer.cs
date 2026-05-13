@@ -189,6 +189,7 @@ public class BasicComputerPlayer : MonoBehaviour
             yield return new WaitForSeconds(waitTime);
 
             // Start boost
+            yield return new WaitUntil(() => GameState.Instance.isPlaying);
             flameTrail.StartBoostTrail();
             playerVFX.ActivateTrailGenerate(true);
 

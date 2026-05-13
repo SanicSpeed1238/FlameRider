@@ -183,10 +183,13 @@ public class GameState : MonoBehaviour
         gameMusic.Stop();
         startSound.PlayOneShot(finishSound.clip);
 
+        float fixedTimeScale = Time.fixedDeltaTime;
         Time.timeScale = 0.2f;
+        Time.fixedDeltaTime *= Time.timeScale;
         yield return new WaitForSecondsRealtime(1.5f);
 
         Time.timeScale = 1;
+        Time.fixedDeltaTime = fixedTimeScale;
         PlayerHUD.Instance.SetSelectedButton(playerHUD.GetComponent<PlayerHUD>().replayButton);        
     }
     #endregion  

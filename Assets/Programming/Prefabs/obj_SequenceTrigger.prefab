@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3059472436058991124}
   - component: {fileID: 5297867122767577310}
-  - component: {fileID: 6725139311462672056}
   - component: {fileID: 3338278320264992806}
   - component: {fileID: 7447479635114832320}
   - component: {fileID: 4253670255475520672}
@@ -48,24 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 903f9f7c02bcb2144bd423260610288f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerReference: {fileID: 0}
---- !u!320 &6725139311462672056
-PlayableDirector:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3854916586998144086}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_PlayableAsset: {fileID: 0}
-  m_InitialState: 0
-  m_WrapMode: 2
-  m_DirectorUpdateMode: 1
-  m_InitialTime: 0
-  m_SceneBindings: []
-  m_ExposedReferences:
-    m_References: []
+  sequenceCamera: {fileID: 0}
 --- !u!65 &3338278320264992806
 BoxCollider:
   m_ObjectHideFlags: 0

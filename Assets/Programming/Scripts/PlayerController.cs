@@ -507,6 +507,7 @@ public class PlayerController : MonoBehaviour
                     playerRB.MoveRotation(Quaternion.LookRotation(playerRB.transform.forward, hit.normal));
             }         
         }
+
         void AlignToGround(RaycastHit ground)
         {
             if (isGrounded)
@@ -534,6 +535,18 @@ public class PlayerController : MonoBehaviour
                 playerRB.MoveRotation(Quaternion.Slerp(playerRB.rotation, uprightTarget, uprightSpeed * Time.fixedDeltaTime));
             }
         }
+
+        void SnapToGround()
+        {
+            Ray ray = new(playerRB.position, -playerRB.transform.up);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, groundLayer))
+            {
+                Vector3 newPosition = hit.point;
+                playerRB.MovePosition(newPosition);
+            }
+        }
+
         Vector3 VelocityAdjustedToSlope(Vector3 playerVelocityVector)
         {
             var ray = new Ray(groundDetectOrigin.position, -playerRB.transform.up);
@@ -576,14 +589,20 @@ public class PlayerController : MonoBehaviour
             isRespawning = true;
             ResetPlayerState();
 
-            playerRB.position = currentCheckpoint.position;
-            playerRB.rotation = currentCheckpoint.rotation;
-            playerRB.linearVelocity = Vector3.down;
-            currentSpeed = 0f;
-
             playerSFX.PlaySound(playerSFX.respawnSound);
+            PlayerHUD.Instance.FadeScreen(0.5f, 1f);            
             yield return new WaitForSeconds(1f);
 
+            playerRB.position = currentCheckpoint.position;
+            playerRB.rotation = currentCheckpoint.rotation;
+            SnapToGround();
+
+            ResetPlayerState();
+            currentSpeed = 0f;
+            playerVelocity = Vector3.zero;
+            playerRB.linearVelocity = playerVelocity;
+
+            yield return new WaitForSeconds(1.5f);           
             isRespawning = false;
         }
 
@@ -626,11 +645,8 @@ public class PlayerController : MonoBehaviour
                 else
                 {
                     isFinished = true;
-
                     GetComponent<BasicComputerPlayer>().AutoMovePlayer(currentSpeed);
-                    playerAnimator.SetGrounded(true);
-                    playerVFX.StopAllEffects();
-                    playerSFX.StopAllAudio();
+                    ResetPlayerState();
 
                     GameState.Instance.PlayResultsSequence();
                 }
@@ -693,7 +709,7 @@ public class PlayerController : MonoBehaviour
         if (playerInput_Jump.WasPressedThisFrame()) inputJump_Pressed = true;
         else inputJump_Pressed = false;
     }
-    private bool CanInput()
+    public bool CanInput()
     {
         if (GameState.Instance.isPlaying && !isRespawning && !isAutomated && !isFinished) return true;
         else return false;

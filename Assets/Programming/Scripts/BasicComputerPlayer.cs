@@ -126,12 +126,14 @@ public class BasicComputerPlayer : MonoBehaviour
             // Calculate "L Stick Input" for Steer Animation
             float angleDifference = Quaternion.Angle(playerRB.rotation, targetRotation);
             float normalizedTurn = Mathf.Clamp(angleDifference / 15f, 0f, 1f);
-            float sign = Mathf.Sign(Vector3.Cross(playerRB.transform.forward, direction).y);
+            Vector3 cross = Vector3.Cross(playerRB.transform.forward, direction);
+            float sign = Mathf.Sign(Vector3.Dot(cross, playerRB.transform.up));
             normalizedTurn *= sign;
             playerAnimator.SteerAnimation(normalizedTurn);
         }
 
         Vector3 playerVelocity = baseSpeed * playerRB.transform.forward;
+        playerVelocity.y = playerRB.linearVelocity.y;
         playerVelocity = VelocityAdjustedToSlope(playerVelocity);
         playerRB.linearVelocity = playerVelocity;
     }

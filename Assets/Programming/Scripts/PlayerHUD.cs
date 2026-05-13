@@ -30,6 +30,9 @@ public class PlayerHUD : MonoBehaviour
     public GameObject resumeButton;
     public GameObject replayButton;
 
+    [Header("Other References")]
+    public GameObject fadeScreen;
+
     // Other Variables Needed
     private EventSystem eventSystem;
 
@@ -119,5 +122,29 @@ public class PlayerHUD : MonoBehaviour
     public void SetSelectedButton(GameObject menuButton)
     {
         eventSystem.SetSelectedGameObject(menuButton);
+    }
+
+    public void FadeScreen(float transitionDuration, float holdDuration)
+    {      
+        if (!fadeScreen.TryGetComponent<Image>(out var img))
+        {
+            Debug.LogWarning("FadeScreen: No Image component found!");
+            return;
+        }
+        img.DOKill();
+        Sequence seq = DOTween.Sequence();
+
+        // Fade to Black
+        seq.Append(img.DOFade(1f, transitionDuration)
+            .SetEase(Ease.OutQuad)
+            .SetUpdate(true));
+
+        // Hold
+        seq.AppendInterval(holdDuration);
+
+        // Fade to Normal
+        seq.Append(img.DOFade(0f, transitionDuration)
+            .SetEase(Ease.InQuad)
+            .SetUpdate(true));
     }
 }

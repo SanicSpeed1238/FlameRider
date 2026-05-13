@@ -12,12 +12,14 @@ public class PlayerAnimator : MonoBehaviour
     public float minAngle = -50f;
     public float maxAngle = -100;
     public float elasticSpeed = 20f;
+    public bool startAnimatingHair;
     private float oscillationSpeed;
     private float oscillationTime;
     private Quaternion[] originalRotations;
 
     // Other Variables
     PlayableDirector[] levelSequences;
+    bool animatingHair;
 
     void Start()
     {
@@ -26,13 +28,14 @@ public class PlayerAnimator : MonoBehaviour
 
         originalRotations = new Quaternion[elasticBones.Length];
         for (int i = 0; i < elasticBones.Length; i++) { originalRotations[i] = elasticBones[i].localRotation; }
+        animatingHair = startAnimatingHair;
 
         levelSequences = FindObjectsByType<PlayableDirector>(FindObjectsSortMode.None);
     }
 
     private void Update()
     {
-        if (!IsAnimatedThruSequence()) AnimateHair();
+        if (animatingHair) AnimateHairAlgorithm();
     }    
 
     public void SetSpeed(float speed)
@@ -78,7 +81,12 @@ public class PlayerAnimator : MonoBehaviour
         SetGrounded(true);
     }
 
-    private void AnimateHair()
+    public void AnimateHair(bool activate)
+    {
+        animatingHair = activate;
+        if(!activate) for (int i = 0; i < elasticBones.Length; i++) { elasticBones[i].localRotation = originalRotations[i]; }
+    }
+    private void AnimateHairAlgorithm()
     {
         float normalizedSpeed = Mathf.Clamp01(oscillationSpeed);
         if (normalizedSpeed > 0.01f) oscillationTime += Time.deltaTime * elasticSpeed * (0.5f + normalizedSpeed);

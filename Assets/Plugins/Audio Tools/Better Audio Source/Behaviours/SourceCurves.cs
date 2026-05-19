@@ -22,7 +22,7 @@ namespace BetterAudio
 
         [SerializeField]
         bool _multiply;
-        [SerializeField]
+        //[SerializeField]
         public bool Multiply
         {
             get

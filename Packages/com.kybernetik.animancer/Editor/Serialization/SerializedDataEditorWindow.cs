@@ -58,7 +58,8 @@ namespace Animancer.Editor
             {
                 try
                 {
-                    if (_Data == null)
+                    if (SourceObject == null ||
+                        _Data == null)
                         return false;
 
                     var sourceData = SourceData;

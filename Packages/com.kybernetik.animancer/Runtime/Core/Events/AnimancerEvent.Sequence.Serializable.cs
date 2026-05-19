@@ -191,9 +191,14 @@ namespace Animancer
                 /// <remarks>If the value is not set, the value is determined by <see cref="GetDefaultNormalizedEndTime"/>.</remarks>
                 public float GetNormalizedEndTime(float speed = 1)
                 {
-                    return _NormalizedTimes.IsNullOrEmpty()
-                        ? GetDefaultNormalizedEndTime(speed)
-                        : _NormalizedTimes[^1];
+                    if (_NormalizedTimes.IsNullOrEmpty())
+                        return GetDefaultNormalizedEndTime(speed);
+
+                    var normalizedEndTime = _NormalizedTimes[^1];
+                    if (float.IsNaN(normalizedEndTime))
+                        return GetDefaultNormalizedEndTime(speed);
+
+                    return normalizedEndTime;
                 }
 
                 /************************************************************************************************************************/

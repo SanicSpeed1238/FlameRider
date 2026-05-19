@@ -194,7 +194,7 @@ namespace BetterAudio
         [SerializeField]
         Transform _target;
 
-        [SerializeField]
+        //[SerializeField]
         public Transform target
         {
             set
@@ -440,7 +440,7 @@ namespace BetterAudio
         }
     }
 
-    [SerializeField]
+    //[SerializeField]
     [System.Serializable]
     public class BetterArrayAudioClip
     {

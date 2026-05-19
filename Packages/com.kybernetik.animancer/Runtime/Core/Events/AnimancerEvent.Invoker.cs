@@ -94,6 +94,23 @@ namespace Animancer
                 => InvocationQueue.GetEnumerator();
 
             /************************************************************************************************************************/
+#if UNITY_EDITOR
+            /************************************************************************************************************************/
+
+            /// <summary>Ensures that the invocation queue is cleared when entering Play Mode.</summary>
+            [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+            private static void Clear()
+            {
+                InvocationQueue.Clear();
+                _CurrentInvocation = 0;
+#if UNITY_ASSERTIONS
+                Instances.Clear();
+#endif
+            }
+
+            /************************************************************************************************************************/
+#endif
+            /************************************************************************************************************************/
 #if UNITY_ASSERTIONS
             /************************************************************************************************************************/
 

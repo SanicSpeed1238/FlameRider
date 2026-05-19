@@ -12,6 +12,8 @@
         _SkySaturation("Sky Saturation", Range(0,2)) = 1
         _HorizonHeight ("Horizon Height", Range(-0.5,0.5)) = 0
          _HorizonSharpness("Horizon Sharpness", Range(0,1)) = 0.5
+        _HorizonFogDensity("Horizon Fog Density", Range(0, 2)) = 0.25
+        _HorizonFogColor("Horizon Fog Color", Color) = (1,1,1,1)
         [Toggle] _EnableMoon("Enable Moon", Float) = 0
         _MoonTex("Moon Texture", 2D) = "white" {}
         _MoonSize("Moon Size", Range(0,1)) = 0.25
@@ -56,6 +58,8 @@
             float  _SkySaturation;
             float  _HorizonHeight;
             float  _HorizonSharpness;
+            float  _HorizonFogDensity;
+            fixed4 _HorizonFogColor;
             fixed  _EnableMoon;
             sampler2D _MoonTex;
             float  _MoonSize;
@@ -107,6 +111,11 @@
 
                 float blend = smoothstep(-BLEND, BLEND, yShift);
                 fixed3 col = lerp(bottom, top, blend);
+
+                float fogBand = saturate(1.0 - abs(yShift) * 4.0);
+                float fogW = saturate(_HorizonFogDensity) * fogBand;
+                fogW = fogW * fogW * (3.0 - 2.0 * fogW);
+                col = lerp(col, _HorizonFogColor.rgb, fogW);
 
                 float luma = dot(col, fixed3(0.2126, 0.7152, 0.0722));
                 col = lerp(luma.xxx, col, _SkySaturation);

@@ -44,8 +44,8 @@ namespace Animancer
         public ObjectPool()
         {
             AnimancerUtilities.AssertDerivedPoolType<T>(GetType());
-#if ANIMANCER_LOG_OBJECT_POOLING
-            AllPools.Add(this);
+#if UNITY_EDITOR
+            AllPools.Add(new(this));
 #endif
         }
 #endif
@@ -210,16 +210,29 @@ namespace Animancer
 
         /************************************************************************************************************************/
 
-#if ANIMANCER_LOG_OBJECT_POOLING
-        private static readonly List<ObjectPool<T>>
+#if UNITY_EDITOR
+        private static readonly List<WeakReference<ObjectPool<T>>>
             AllPools = new();
 
         static ObjectPool()
         {
             UnityEditor.EditorApplication.playModeStateChanged += change =>
             {
-                for (int i = 0; i < AllPools.Count; i++)
-                    Debug.Log($"{change}: {AllPools[i]}");
+                for (int i = AllPools.Count - 1; i >= 0; i--)
+                {
+                    if (AllPools[i].TryGetTarget(out var pool))
+                    {
+#if ANIMANCER_LOG_OBJECT_POOLING
+                        Debug.Log($"{change}: {pool}");
+#endif
+
+                        pool.Items.Clear();
+                    }
+                    else
+                    {
+                        AllPools.RemoveAt(i);
+                    }
+                }
             };
         }
 #endif

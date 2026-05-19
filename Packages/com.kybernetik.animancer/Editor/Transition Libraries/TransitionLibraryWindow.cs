@@ -94,7 +94,8 @@ namespace Animancer.Editor.TransitionLibraries
                 if (base.HasDataChanged)
                     return true;
 
-                if (_EditorData == null)
+                if (SourceObject == null ||
+                    _EditorData == null)
                     return false;
 
                 var sourceEditorData = SourceEditorData;
